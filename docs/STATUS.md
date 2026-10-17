@@ -5,7 +5,7 @@
 
 ## Now
 - **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T2` (Godot project bootstrap) or `M0-T6` (Blender pipeline) — parallel-safe.
+- **Next task to start:** `M0-T2` (Godot project bootstrap). `M0-T6` (Blender pipeline) is in review.
 - **Owner actions waiting:**
   1. Allow Godot downloads in the cloud environment (network allowlist, see
      `docs/06-ai-workflow.md` §2).
@@ -36,7 +36,7 @@
 | M0-T3 | Test, lint & validation harness | ⬜ | |
 | M0-T4 | CI: tests + downloadable builds | ⬜ | |
 | M0-T5 | Screenshot harness | ⬜ | |
-| M0-T6 | Blender generator pipeline v0 | ⬜ | |
+| M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
 | M0-T7 | Godot model import & tier display | ⬜ | |
 | M0-T8 | Owner guides | ⬜ | |
 
@@ -55,6 +55,19 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
   from GitHub releases **succeeded** this time, so Godot is available locally (symlinked at
   `~/.local/bin/godot`; make sure `~/.local/bin` is on PATH). `gdtoolkit==4.5.0` is pinned.
   The script is idempotent and never fails on a blocked download.
+
+- M0-T6 (2026-10-17): Blender pipeline v0 is in. `bash tools/cloud/setup.sh` builds the venv;
+  then `tools/blender/.venv/bin/python tools/blender/build.py --recipe ships/test_kestrel`
+  (or `--all`, `--no-previews`). Outputs: `game/assets/models/ships/test_kestrel.glb` +
+  `.manifest.json`, and the contact sheet `docs/previews/test_kestrel.png` (~20 s on 4 cores).
+  Tests: `tools/blender/.venv/bin/python -m unittest discover -s tools/blender/tests -t tools/blender`.
+  **M0-T3 must call that test command from `tools/check.sh`** (it doesn't exist yet), and
+  M0-T7 should read these conventions (art bible §3.1): nose = Blender +Y (Godot -Z), a socket's
+  +Y is its fire/exhaust direction, sockets carry glTF extras `kind`/`index`/`min_tier`
+  (`min_tier` 3 on `SOCKET_primary_2`, which only exists on T3 ships), and `<id>-colonly` is the
+  convex hull of the base hull, wings and fins only (tier parts don't change collision).
+  `T0ONLY_*` is hidden at tier >= 1. The exported `.glb` is byte-identical between runs.
+  `assets.yml` compares manifests (not `.glb` bytes) to the committed ones.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

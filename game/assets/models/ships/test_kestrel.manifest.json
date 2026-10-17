@@ -1,0 +1,345 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        5.06,
+        7.0,
+        3.35
+      ],
+      "min": [
+        -5.06,
+        -7.01,
+        -0.8493
+      ],
+      "size": [
+        10.12,
+        14.01,
+        4.1993
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        6.4,
+        7.5,
+        3.35
+      ],
+      "min": [
+        -6.4,
+        -7.01,
+        -0.8493
+      ],
+      "size": [
+        12.8,
+        14.51,
+        4.1993
+      ]
+    }
+  },
+  "category": "ships",
+  "collision": [
+    "hull-colonly"
+  ],
+  "id": "test_kestrel",
+  "parts": {
+    "T0ONLY_stock_cowl": {
+      "hidden_when_upgraded": true,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "T1_armor_plate_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 1,
+      "triangles": 132
+    },
+    "T1_armor_plate_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 1,
+      "triangles": 132
+    },
+    "T1_dorsal_armor": {
+      "hidden_when_upgraded": false,
+      "min_tier": 1,
+      "triangles": 88
+    },
+    "T2_engine_pod_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 2,
+      "triangles": 508
+    },
+    "T2_engine_pod_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 2,
+      "triangles": 508
+    },
+    "T2_engine_pod_glow_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 2,
+      "triangles": 72
+    },
+    "T2_engine_pod_glow_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 2,
+      "triangles": 72
+    },
+    "T3_nose_cannon": {
+      "hidden_when_upgraded": false,
+      "min_tier": 3,
+      "triangles": 68
+    },
+    "T3_wing_extension_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 3,
+      "triangles": 44
+    },
+    "T3_wing_extension_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 3,
+      "triangles": 44
+    },
+    "antenna": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 28
+    },
+    "canopy_frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 224
+    },
+    "canopy_glass": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "engine_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 232
+    },
+    "engine_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 232
+    },
+    "engine_glow_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 36
+    },
+    "engine_glow_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 36
+    },
+    "gun_pod_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 160
+    },
+    "gun_pod_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 160
+    },
+    "hull": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 164
+    },
+    "missile_rail": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 88
+    },
+    "spine": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 60
+    },
+    "tail_fin_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "tail_fin_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "vents": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 264
+    },
+    "wing_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wing_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wing_stripe_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 88
+    },
+    "wing_stripe_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 88
+    },
+    "wingtip_lights": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 24
+    }
+  },
+  "sockets": [
+    {
+      "index": 0,
+      "kind": "cockpit_cam",
+      "location": [
+        0.0,
+        1.3,
+        0.97
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_cockpit_cam_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "engine",
+      "location": [
+        0.75,
+        -7.05,
+        -0.05
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "engine",
+      "location": [
+        -0.75,
+        -7.05,
+        -0.05
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "primary",
+      "location": [
+        2.9,
+        0.9,
+        -0.1287
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "primary",
+      "location": [
+        -2.9,
+        0.9,
+        -0.1287
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 2,
+      "kind": "primary",
+      "location": [
+        0.0,
+        7.5,
+        -0.2
+      ],
+      "min_tier": 3,
+      "name": "SOCKET_primary_2",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "secondary",
+      "location": [
+        0.0,
+        3.0,
+        -0.5
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_secondary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "tier_parts": {
+    "T0ONLY": [
+      "T0ONLY_stock_cowl"
+    ],
+    "T1": [
+      "T1_armor_plate_L",
+      "T1_armor_plate_R",
+      "T1_dorsal_armor"
+    ],
+    "T2": [
+      "T2_engine_pod_L",
+      "T2_engine_pod_R",
+      "T2_engine_pod_glow_L",
+      "T2_engine_pod_glow_R"
+    ],
+    "T3": [
+      "T3_nose_cannon",
+      "T3_wing_extension_L",
+      "T3_wing_extension_R"
+    ]
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 2148,
+      "T1": 2456,
+      "T2": 3616,
+      "T3": 3772
+    },
+    "total": 3816
+  }
+}

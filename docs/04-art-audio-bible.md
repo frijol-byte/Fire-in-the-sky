@@ -68,6 +68,17 @@ tools/blender/
 | `*-colonly` | Collision-only convex hull (Godot import hint) |
 | `LOD` | Godot auto-generates LODs on import; no manual LOD meshes |
 
+Conventions fixed by M0-T6 (`tools/blender/kit/common.py` enforces the names):
+- **Axes:** nose = Blender +Y, up = +Z, starboard = +X (glTF export is Y-up, so the nose points
+  to Godot -Z). Parts are authored with transforms baked in; mirrored pairs end in `_L`/`_R`.
+- **Sockets:** a socket's +Y axis (Godot -Z) is the fire/exhaust direction, so engine sockets are
+  turned 180° about Z. Each carries glTF extras `kind`, `index`, `min_tier` (the tier at which
+  the socket exists, normally 0).
+- **Tiers:** `T#_` parts show at ship tier >= #; `T0ONLY_` parts show only at tier 0.
+- **Collision:** one `<name>-colonly` convex hull of the base hull, wings and fins.
+- Each recipe writes `<id>.manifest.json` beside the `.glb` (triangles per tier, sockets, tier
+  parts, bounds); CI fails if it differs from the committed one.
+
 ### 3.2 Materials (by role, not by texture)
 Material **names** in Blender map to Godot shader materials through a post-import script:
 

@@ -5,9 +5,8 @@
 
 ## Now
 - **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T3` (test/lint harness) or `M0-T5` (screenshot harness) — both
-  unblocked by T2; `M0-T6` (Blender pipeline) is also still parallel-safe.
-- **Next task to start:** `M0-T2` (Godot project bootstrap). `M0-T6` (Blender pipeline) is in review.
+- **Next task to start:** `M0-T3` (test/lint harness); `M0-T4` (CI) and `M0-T7` (model import)
+  follow. T2, T5 and T6 are in review.
 - **Owner actions waiting:**
   1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
@@ -35,7 +34,7 @@
 | M0-T2 | Godot project bootstrap | 👀 | PR open |
 | M0-T3 | Test, lint & validation harness | ⬜ | |
 | M0-T4 | CI: tests + downloadable builds | ⬜ | |
-| M0-T5 | Screenshot harness | ⬜ | |
+| M0-T5 | Screenshot harness | 👀 | PR open |
 | M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
 | M0-T7 | Godot model import & tier display | ⬜ | |
 | M0-T8 | Owner guides | ⬜ | |
@@ -83,6 +82,22 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
   convex hull of the base hull, wings and fins only (tier parts don't change collision).
   `T0ONLY_*` is hidden at tier >= 1. The exported `.glb` is byte-identical between runs.
   `assets.yml` compares manifests (not `.glb` bytes) to the committed ones.
+
+- M0-T5 (2026-10-17): screenshot harness is in (see architecture §7 for usage). Things the next
+  session must know:
+  - `bash tools/screenshot.sh --all` (or a scene name) → `build/screens/*.png`; read the PNGs.
+    Add repeatable shots by copying a scene in `game/tests/shots/` (`ShotDirector` + `ShotDef`).
+  - Godot silently falls back to OpenGL when Vulkan can't start; the script spots that in the
+    log and watermarks PNGs "COMPAT". Movie Maker ignores `--resolution`: always 1920x1080.
+  - **M0-T3 must call `bash tools/tests/screenshot_test.sh` from `tools/check.sh`** (it takes
+    about a minute; it needs Godot + Xvfb, so skip with a message when they're missing).
+    There are no gdUnit tests for `ShotDirector`'s static helpers yet because gdUnit4 isn't
+    vendored; T3 should add them (`manifest_path_from_args`, `shots_on_frame`, `last_frame`).
+  - `screenshots.yml` runs on `game/**` changes and uploads the `screens` artifact. T4's
+    `ci.yml` may fold it in later.
+  - `kestrel_shot.tscn` shows every tier part at once (the glb has no tier switching yet);
+    M0-T7 owns tier display and should update that scene.
+  - `tools/requirements.txt` now also pins Pillow (used for the COMPAT stamp).
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

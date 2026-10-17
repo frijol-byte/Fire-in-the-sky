@@ -1,0 +1,55 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/ships/test_kestrel.glb" id="1_ship"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="2_dir"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="3_def"]
+
+[sub_resource type="Resource" id="Resource_three_quarter"]
+script = ExtResource("3_def")
+label = "three_quarter"
+frame = 3
+camera_position = Vector3(14, 7, 18)
+look_at_point = Vector3(0, 0, 0)
+fov = 45.0
+
+[sub_resource type="Resource" id="Resource_top"]
+script = ExtResource("3_def")
+label = "top"
+frame = 5
+camera_position = Vector3(0, 28, 0.01)
+look_at_point = Vector3(0, 0, 0)
+fov = 45.0
+
+[sub_resource type="Resource" id="Resource_front"]
+script = ExtResource("3_def")
+label = "front"
+frame = 7
+camera_position = Vector3(0, 1, -24)
+look_at_point = Vector3(0, 0, 0)
+fov = 45.0
+
+[sub_resource type="Environment" id="Environment_space"]
+background_mode = 1
+background_color = Color(0.015, 0.02, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.45, 0.6, 1)
+ambient_light_energy = 0.6
+
+[node name="KestrelShot" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+
+[node name="test_kestrel" parent="." instance=ExtResource("1_ship")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)
+current = true
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("2_dir")
+shots = Array[ExtResource("3_def")]([SubResource("Resource_three_quarter"), SubResource("Resource_top"), SubResource("Resource_front")])
+camera = NodePath("../Camera3D")

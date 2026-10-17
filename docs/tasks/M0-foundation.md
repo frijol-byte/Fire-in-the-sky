@@ -137,7 +137,7 @@ Card format: **Size** S ≈ small session, M ≈ full session, L ≈ consider sp
   just say whether the direction (shape language) feels right.
 
 ### M0-T7 · Godot model import & tier display
-- **Size:** M · **Depends on:** T2, T6 · **Read:** art bible §3.1–3.2, architecture §5.1
+- **Size:** M · **Depends on:** T3 (gdUnit4 for its tests), T5 (shot scenes), T6 · **Read:** art bible §3.1–3.2, architecture §5.1, art bible §3.1 "Conventions fixed by M0-T6"
 - **Do:**
   - A post-import script for `game/assets/models/**`: role materials → Godot materials
     (placeholder faction paint shader with `primary_color`/`secondary_color` params),
@@ -148,6 +148,10 @@ Card format: **Size** S ≈ small session, M ≈ full session, L ≈ consider sp
     key light, changing tier every 3 s, with the tier name shown in a label.
   - Unit tests: socket discovery and tier visibility.
   - Add a shot scene for the boot view, and include the screenshot in the PR.
+  - Update `game/tests/shots/kestrel_shot.tscn` so it shows one tier per shot (T0 and T3 at
+    least). Today it shows every tier part at once.
+  - Left over from M0-T5: gdUnit tests for `ShotDirector`'s static helpers
+    (`manifest_path_from_args`, `shots_on_frame`, `last_frame`).
 - **Acceptance:** tests pass. The screenshot shows the ship lit and textured with role
   materials.
 

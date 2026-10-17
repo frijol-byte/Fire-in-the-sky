@@ -4,9 +4,9 @@
 > session's briefing.
 
 ## Now
-- **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T4` (CI) or `M0-T5` (screenshot harness). T2, T3 and T6 are in
-  review.
+- **Phase:** M0 — Foundation, in progress.
+- **What to start next:** any ⬜ task in the table below whose "Depends on" tasks are all ✅.
+  Tasks that are ready at the same time can run in parallel sessions.
 - **Owner actions waiting:**
   1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
@@ -28,20 +28,23 @@
 
 ## Current milestone tasks (M0)
 
-| Card | Title | State | PR |
-|---|---|---|---|
-| M0-T1 | Repo skeleton & cloud bootstrap | ✅ | PR #1 |
-| M0-T2 | Godot project bootstrap | 👀 | PR open |
-| M0-T3 | Test, lint & validation harness | 👀 | PR open |
-| M0-T4 | CI: tests + downloadable builds | ⬜ | |
-| M0-T5 | Screenshot harness | ⬜ | |
-| M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
-| M0-T7 | Godot model import & tier display | ⬜ | |
-| M0-T8 | Owner guides | ⬜ | |
-
-T1 is merged. Parallel-safe: **T4 ∥ T5** (T4 needs T3 merged).
+| Card | Title | Depends on | State | PR |
+|---|---|---|---|---|
+| M0-T1 | Repo skeleton & cloud bootstrap | — | ✅ | #1 |
+| M0-T2 | Godot project bootstrap | T1 | ✅ | #2 |
+| M0-T3 | Test, lint & validation harness | T2 | ✅ | #5 |
+| M0-T4 | CI: tests + downloadable builds | T3 | ⬜ | |
+| M0-T5 | Screenshot harness | T2 | ✅ | #4 |
+| M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
+| M0-T7 | Godot model import & tier display | T3, T5, T6 | ⬜ | |
+| M0-T8 | Owner guides | T4 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
+
+**Editing this file (to avoid merge conflicts between parallel sessions):** change only your
+own task's row, and add notes under your own `- <card id> (date):` bullet in "Notes for the
+next session". When merging `main` into your branch, keep every row's most advanced state
+and keep all notes bullets from both sides.
 
 ## Notes for the next session
 - Planning research (2026-10-04): Godot **4.7.2** is the latest stable; gdUnit4 **v6.2.1**;
@@ -105,6 +108,41 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
     task should bind them and drop the exemptions in `test_input_router.gd`.
   - Godot writes `*.import` files next to imported assets (e.g. `test_kestrel.glb.import`);
     they are committed (Godot convention) so `check.sh` leaves the tree clean. Commit new ones.
+- M0-T5 (2026-10-17): screenshot harness is in (see architecture §7 for usage). Things the next
+  session must know:
+  - `bash tools/screenshot.sh --all` (or a scene name) → `build/screens/*.png`; read the PNGs.
+    Add repeatable shots by copying a scene in `game/tests/shots/` (`ShotDirector` + `ShotDef`).
+  - Godot silently falls back to OpenGL when Vulkan can't start; the script spots that in the
+    log and watermarks PNGs "COMPAT". Movie Maker ignores `--resolution`: always 1920x1080.
+  - `tools/check.sh` runs `tools/tests/screenshot_test.sh` (added at merge time, see below).
+    gdUnit tests for `ShotDirector`'s static helpers (`manifest_path_from_args`,
+    `shots_on_frame`, `last_frame`) are still missing; they're now part of M0-T7.
+  - `screenshots.yml` runs on `game/**` changes and uploads the `screens` artifact. T4's
+    `ci.yml` may fold it in later.
+  - `kestrel_shot.tscn` shows every tier part at once (the glb has no tier switching yet);
+    M0-T7 owns tier display and should update that scene.
+  - `tools/requirements.txt` now also pins Pillow (used for the COMPAT stamp).
+- Merge-time integration (2026-10-17, planning session), after PRs #4 and #5:
+  - `tools/check.sh` now also runs the screenshot self-test as a `screenshots` step (skipped
+    with `--quick`; fails if `xvfb-run` is missing, like a missing Godot does). **M0-T4's CI
+    must install Xvfb + Mesa Vulkan** (see `.github/workflows/screenshots.yml`) before
+    running `check.sh`, and can fold `screenshots.yml` into `ci.yml`.
+  - `tools/screenshot.sh` now runs `godot --import` on every run. Before, it only imported a
+    never-imported project, so a new `class_name` script (e.g. `ShotDef`) failed to parse
+    when the `.godot/` cache already existed.
+  - Verified on the merged result: full `check.sh` passes, including all 14 screenshot checks.
+  - First CI run of `screenshots.yml` failed because `imgtool.py` ran under `python -I`, which
+    hides a Pillow that pip put in the user site (GitHub runners are non-root). Fixed by
+    dropping `-I` for it. The self-test's "watermarked" checks also passed when the image tool
+    crashed; they now fail. **For M0-T4:** the runner has no `uv`, so `setup.sh` can't build the
+    bpy venv there and `check.sh`'s "blender tests" step would be skipped; install uv in
+    `ci.yml` (e.g. `astral-sh/setup-uv`) before running `setup.sh`.
+- Planning-session check (2026-10-17), on `main` after PRs #2 and #3: `setup.sh` gives all ✅;
+  `--import` and a 120-frame boot run print no errors or warnings; gdformat/gdlint are clean;
+  the 16 Blender tests pass; rebuilding test_kestrel is byte-identical to the committed `.glb`
+  and manifest. The yellow bar floating beside the ship in the 3/4 preview views is the 2 m
+  scale bar (preview only, not in the `.glb`). M0-T7's dependencies were corrected to T3 + T5
+  + T6, since its tests need gdUnit4 and its screenshot needs shot scenes.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

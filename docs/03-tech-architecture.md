@@ -212,9 +212,24 @@ Tests are how the owner (a non-coder) can trust the work.
 Godot's `--headless` mode doesn't render. `tools/screenshot.sh` instead runs Godot under
 **Xvfb with Mesa's software Vulkan (lavapipe)**, using Godot's **Movie Maker mode**
 (`--write-movie`, with a fixed fps) to capture frames deterministically, however slow the
-software renderer is. Claude can view the PNGs to check its own visual work. If lavapipe
-proves unreliable, the fallback is the Compatibility renderer for layout-only checks (to be
-confirmed in M0-T5).
+software renderer is. Claude can view the PNGs to check its own visual work.
+
+Confirmed in M0-T5: lavapipe works in the cloud container and in GitHub Actions (about 1 s
+per scene plus ~5 s start-up). Movie Maker always records at the project's 1920×1080.
+
+- `tools/screenshot.sh <scene> [--frames N] [--out prefix]` renders one scene; `--all`
+  renders every scene in `game/tests/shots/`. PNGs land in `build/screens/` (git-ignored).
+- **Shot scenes** live in `game/tests/shots/`. Each has a `ShotDirector` node and a list of
+  `ShotDef` resources (label, frame, camera position, look-at point, fov). The director
+  moves the camera on each frame, writes the frame list to a manifest, and quits when it's
+  done; the script keeps only those frames as `<scene>_<label>.png`. To get a repeatable
+  screenshot of anything new, copy `kestrel_shot.tscn` (3D) or `boot_shot.tscn` (UI), swap
+  the content and edit the shots. Use frame numbers of 2 or more so the scene can settle.
+- **Compatibility fallback:** if Vulkan can't start, Godot falls back to OpenGL by itself
+  (or `--compat` forces it). The script detects this from Godot's log and stamps every PNG
+  with a red **COMPAT** label. Compat renders are good for layout and not for lighting or
+  materials.
+- Self-test: `bash tools/tests/screenshot_test.sh` (also runs in `screenshots.yml`).
 
 ## 8. CI/CD (GitHub Actions)
 

@@ -3,16 +3,17 @@
 # Linux build boots by running it headless for 120 frames. Used by ci.yml and release.yml; also
 # runnable locally (needs Godot + export templates for the pinned version).
 #
-#   bash tools/ci/export.sh
+#   bash tools/ci/export.sh        version = git describe --tags --always
+#   BUILD_VERSION=x bash ...       override the version string
 #
-# Output: build/export/windows/FireInTheSky.exe (+ console wrapper), build/export/linux/FireInTheSky.x86_64 (PCK embedded)
+# Output (PCK embedded): build/export/windows/FireInTheSky.exe, build/export/linux/FireInTheSky.x86_64
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 export PATH="$HOME/.local/bin:$PATH"
 
-VERSION="$(git describe --tags --always 2>/dev/null || echo dev)"
+VERSION="${BUILD_VERSION:-$(git describe --tags --always 2>/dev/null || echo dev)}"
 printf '%s\n' "$VERSION" >game/version.txt
 echo "== version: $VERSION"
 

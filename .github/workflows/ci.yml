@@ -17,33 +17,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # full history + tags, so `git describe` gives a real version
-      - name: Read pinned Godot version
-        id: godot
-        run: echo "version=$(tr -d '[:space:]' < .godot-version)" >> "$GITHUB_OUTPUT"
-      - name: Install Godot (+ export templates, cached)
-        uses: chickensoft-games/setup-godot@v2
-        with:
-          version: ${{ steps.godot.outputs.version }}
-          use-dotnet: false
-          include-templates: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: tools/requirements.txt
-      - name: Install gdtoolkit
-        run: pip install -r tools/requirements.txt
-      - name: Install Blender pipeline (bpy) for its unit tests
-        run: |
-          python -m venv tools/blender/.venv
-          tools/blender/.venv/bin/pip install -q -r tools/blender/requirements.txt
+      - uses: ./.github/actions/setup-build
       - name: tools/check.sh
         run: bash tools/check.sh
-      - name: Write version, export Windows + Linux, boot the Linux build
-        run: bash tools/ci/export.sh
-      - name: Short SHA
+      # On PRs Actions checks out a merge commit; name builds after the PR's own head commit so
+      # the artifact name, the version on the boot screen and the PR page all agree.
+      - name: Build version
         id: sha
-        run: echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short="${HEAD_SHA:0:7}"
+          echo "short=$short" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            echo "version=$short" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Write version, export Windows + Linux, boot the Linux build
+        env:
+          BUILD_VERSION: ${{ steps.sha.outputs.version }}
+        run: bash tools/ci/export.sh
       - uses: actions/upload-artifact@v4
         with:
           name: FireInTheSky-windows-${{ steps.sha.outputs.short }}

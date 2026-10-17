@@ -3,7 +3,8 @@
 # gdUnit4 (unit + sim) and the smoke test. Prints a PASS/FAIL table; exits non-zero on failure.
 #
 #   bash tools/check.sh           everything
-#   bash tools/check.sh --quick   skips the long sims (game/tests/sim/long)
+#   bash tools/check.sh --quick   skips the long sims (game/tests/sim/long) and the
+#                                 screenshot harness self-test
 #
 # Per-step logs go to build/check-logs/. Needs Godot on PATH (bash tools/cloud/setup.sh, then
 # export PATH=$HOME/.local/bin:$PATH).
@@ -131,11 +132,24 @@ else
     if grep -E '^(SCRIPT ERROR|ERROR|WARNING):' "$log"; then status=1; fi
     return "$status"
   }
+  # Renders real frames under Xvfb + lavapipe (tools/screenshot.sh), so it needs Xvfb.
+  step_screenshots() { bash tools/tests/screenshot_test.sh; }
 
   run_step "godot import" step_import
   run_step "gdunit unit" step_unit
   run_step "gdunit sim" step_sim
   run_step "smoke" step_smoke
+  if [ "$QUICK" -eq 1 ]; then
+    skip_step "screenshots" "--quick skips the screenshot harness self-test"
+  elif command -v xvfb-run >/dev/null; then
+    run_step "screenshots" step_screenshots
+  else
+    echo "xvfb-run not found: run bash tools/cloud/setup.sh"
+    NAMES+=("screenshots")
+    RESULTS+=("FAIL")
+    SECONDS_TAKEN+=("0")
+    FAILED=1
+  fi
 fi
 
 # --- Summary -------------------------------------------------------------------------------

@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags, so `git describe` gives a real version
+      - uses: ./.github/actions/setup-build
+      - name: tools/check.sh
+        run: bash tools/check.sh
+      # On PRs Actions checks out a merge commit; name builds after the PR's own head commit so
+      # the artifact name, the version on the boot screen and the PR page all agree.
+      - name: Build version
+        id: sha
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short="${HEAD_SHA:0:7}"
+          echo "short=$short" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            echo "version=$short" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Write version, export Windows + Linux, boot the Linux build
+        env:
+          BUILD_VERSION: ${{ steps.sha.outputs.version }}
+        run: bash tools/ci/export.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FireInTheSky-windows-${{ steps.sha.outputs.short }}
+          path: build/export/windows/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FireInTheSky-linux-${{ steps.sha.outputs.short }}
+          path: build/export/linux/
+          if-no-files-found: error
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs-${{ steps.sha.outputs.short }}
+          path: |
+            build/check-logs/
+            build/reports/
+            build/export/*.log
+          if-no-files-found: ignore

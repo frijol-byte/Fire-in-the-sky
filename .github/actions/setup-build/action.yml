@@ -1,0 +1,38 @@
+name: Set up build environment
+description: >-
+  Installs the pinned Godot (+ export templates, cached), Xvfb + Mesa lavapipe (for the
+  screenshot self-test in tools/check.sh), gdtoolkit/Pillow, and the bpy venv. Needs a prior
+  actions/checkout.
+
+runs:
+  using: composite
+  steps:
+    - name: Read pinned Godot version
+      id: godot
+      shell: bash
+      run: echo "version=$(tr -d '[:space:]' < .godot-version)" >> "$GITHUB_OUTPUT"
+    - name: Install Godot (+ export templates, cached)
+      uses: chickensoft-games/setup-godot@v2
+      with:
+        version: ${{ steps.godot.outputs.version }}
+        use-dotnet: false
+        include-templates: true
+    - name: Install Xvfb and Mesa software Vulkan
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq xvfb mesa-vulkan-drivers libvulkan1 libgl1 libxi6 libxrandr2 \
+          libxcursor1 libxinerama1 unzip
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: pip
+        cache-dependency-path: tools/requirements.txt
+    - name: Install gdtoolkit and Pillow
+      shell: bash
+      run: pip install -r tools/requirements.txt
+    - name: Install Blender pipeline (bpy) for its unit tests
+      shell: bash
+      run: |
+        python -m venv tools/blender/.venv
+        tools/blender/.venv/bin/pip install -q -r tools/blender/requirements.txt

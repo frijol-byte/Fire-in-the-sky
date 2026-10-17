@@ -5,9 +5,8 @@
 
 ## Now
 - **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T3` (test/lint harness) or `M0-T5` (screenshot harness) — both
-  unblocked by T2; `M0-T6` (Blender pipeline) is also still parallel-safe.
-- **Next task to start:** `M0-T2` (Godot project bootstrap). `M0-T6` (Blender pipeline) is in review.
+- **Next task to start:** `M0-T4` (CI) or `M0-T5` (screenshot harness). T2, T3 and T6 are in
+  review.
 - **Owner actions waiting:**
   1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
@@ -33,14 +32,14 @@
 |---|---|---|---|
 | M0-T1 | Repo skeleton & cloud bootstrap | ✅ | PR #1 |
 | M0-T2 | Godot project bootstrap | 👀 | PR open |
-| M0-T3 | Test, lint & validation harness | ⬜ | |
+| M0-T3 | Test, lint & validation harness | 👀 | PR open |
 | M0-T4 | CI: tests + downloadable builds | ⬜ | |
 | M0-T5 | Screenshot harness | ⬜ | |
 | M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
 | M0-T7 | Godot model import & tier display | ⬜ | |
 | M0-T8 | Owner guides | ⬜ | |
 
-T1 is merged. Parallel-safe: **T2 ∥ T6**. After T2: **T3 ∥ T5**.
+T1 is merged. Parallel-safe: **T4 ∥ T5** (T4 needs T3 merged).
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
 
@@ -83,6 +82,29 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
   convex hull of the base hull, wings and fins only (tier parts don't change collision).
   `T0ONLY_*` is hidden at tier >= 1. The exported `.glb` is byte-identical between runs.
   `assets.yml` compares manifests (not `.glb` bytes) to the committed ones.
+
+- M0-T3 (2026-10-17): `bash tools/check.sh [--quick]` is the one gate (gdformat, gdlint,
+  validate_data, python tool tests, Blender pipeline tests, Godot import, gdUnit4 unit + sim,
+  smoke); per-step logs in `build/check-logs/`. Things the next session must know:
+  - gdUnit4 **v6.2.1** is vendored in `game/addons/gdUnit4` (its own `test/` dir removed) and
+    enabled in `project.godot`. Run suites headless with `--ignoreHeadlessMode`; check.sh
+    wraps this. gdUnit exit code must be 0 (it returns 101 for warnings such as orphan nodes).
+  - New tests: `game/tests/unit/test_*.gd`; sims in `game/tests/sim/` (see `sim_helper.gd`:
+    `SimHelper.step_physics` awaits N physics ticks, 60 Hz, so ~1 s per 60 ticks of real time).
+    Long sims go in `game/tests/sim/long/`, which `--quick` skips.
+  - Smoke: add every new scene to `game/tests/smoke/scenes.txt`. The runner uses an
+    `OS.add_logger` catcher, so any `push_error`/`push_warning`/engine warning fails it. Run
+    `godot --headless --path game --import` first on a fresh checkout (check.sh does) so the
+    global class cache exists.
+  - `tools/validate_data.py` (tests: `python3 -m unittest discover -s tools/tests`): licenses.csv
+    paths are relative to `game/` (e.g. `assets/audio/x.ogg`); non-commercial/share-alike
+    licenses are rejected; `tr("LITERAL")` keys must exist in `strings.csv`.
+  - `gdlintrc` sets line length 110 and excludes `addons`; `gdformat` stays at its default 100.
+  - Input tests exempt pitch/yaw from needing a keyboard event (mouse-steered) and
+    `thrust_up/down` from needing a gamepad event (GDD gives them no button yet); the flight
+    task should bind them and drop the exemptions in `test_input_router.gd`.
+  - Godot writes `*.glb.import` next to models on import; it is left untracked (T7 decides
+    whether to commit it).
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

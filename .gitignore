@@ -1,0 +1,5 @@
+game/.godot/
+build/
+tools/blender/.venv/
+__pycache__/
+*.blend1

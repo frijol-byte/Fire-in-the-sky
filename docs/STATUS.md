@@ -131,6 +131,12 @@ and keep all notes bullets from both sides.
     never-imported project, so a new `class_name` script (e.g. `ShotDef`) failed to parse
     when the `.godot/` cache already existed.
   - Verified on the merged result: full `check.sh` passes, including all 14 screenshot checks.
+  - First CI run of `screenshots.yml` failed because `imgtool.py` ran under `python -I`, which
+    hides a Pillow that pip put in the user site (GitHub runners are non-root). Fixed by
+    dropping `-I` for it. The self-test's "watermarked" checks also passed when the image tool
+    crashed; they now fail. **For M0-T4:** the runner has no `uv`, so `setup.sh` can't build the
+    bpy venv there and `check.sh`'s "blender tests" step would be skipped; install uv in
+    `ci.yml` (e.g. `astral-sh/setup-uv`) before running `setup.sh`.
 - Planning-session check (2026-10-17), on `main` after PRs #2 and #3: `setup.sh` gives all ✅;
   `--import` and a 120-frame boot run print no errors or warnings; gdformat/gdlint are clean;
   the 16 Blender tests pass; rebuilding test_kestrel is byte-identical to the committed `.glb`

@@ -9,14 +9,19 @@ cd "$ROOT" || exit 1
 export PATH="$HOME/.local/bin:$PATH"
 PY=python3
 python3 -c 'import PIL' >/dev/null 2>&1 || PY="$ROOT/tools/blender/.venv/bin/python"
-IMG="$PY -I tools/screenshot/imgtool.py"
+# No -I: it would hide a Pillow installed in the user site (as on CI runners).
+IMG="$PY tools/screenshot/imgtool.py"
 OUT="build/screens-test"
 rm -rf "$OUT"; mkdir -p "$OUT"
 fails=0
 check() { if "${@:2}" >/dev/null 2>&1; then echo "ok   $1"; else echo "FAIL $1"; fails=$((fails + 1)); fi; }
 nonblank() { [ "$($IMG stats "$1" | sed 's/.*distinct=//')" -gt 8 ]; }
 differs() { $IMG differs "$1" "$2"; }
-is_stamped() { [ "$($IMG diff "$1" "$2")" != "0.0000" ]; }
+is_stamped() {
+  local d
+  d="$($IMG diff "$1" "$2")" || return 1  # a crashing image tool must not pass as "stamped"
+  [ -n "$d" ] && [ "$d" != "0.0000" ]
+}
 
 check "plain scene renders" bash tools/screenshot.sh core/boot/boot.tscn --frames 4 --out "$OUT/plain"
 check "plain scene PNG is not blank" nonblank "$OUT/plain.png"

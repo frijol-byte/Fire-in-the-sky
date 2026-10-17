@@ -163,7 +163,11 @@ for scene in "${SCENES[@]}"; do
     cp "$last" "$prefix.png"; outputs+=("$prefix.png")
   fi
   for png in "${outputs[@]}"; do
-    [ "$mode" = compat ] && "$PY" -I tools/screenshot/imgtool.py watermark "$png" COMPAT
+    # No -I here: it would hide a Pillow installed in the user site (as on CI runners).
+    if [ "$mode" = compat ] && ! "$PY" tools/screenshot/imgtool.py watermark "$png" COMPAT; then
+      echo "!! could not watermark $png (is Pillow installed? pip install -r tools/requirements.txt)" >&2
+      failed=1
+    fi
     echo "   -> $png"
   done
   rm -rf "$tmp"

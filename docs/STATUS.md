@@ -39,7 +39,7 @@
 | M0-T5 | Screenshot harness | T2 | ✅ | #4 |
 | M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
 | M0-T7 | Godot model import & tier display | T3, T5, T6 | ✅ | #7 |
-| M0-T8 | Owner guides | T4 | ⬜ | |
+| M0-T8 | Owner guides | T4 | 👀 | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
 
@@ -195,6 +195,17 @@ and keep all notes bullets from both sides.
     no tags the version is the short SHA.
   - Not verified here (no Actions runner in the session): the workflow YAML parses, but the
     setup-godot action, cache and uploads are exercised for the first time by the PR's own CI run.
+
+- M0-T8 (2026-10-17): docs only. `docs/guides/owner-quickstart.md` (sessions, PR review,
+  artifacts, merge, releases, playtest report) and `docs/guides/blender-mcp-windows.md`
+  (Blender 5.2 LTS + `mcp-for-blender` add-on, Claude Desktop/Code, write-back rule).
+  Things the next session must know:
+  - The MCP choice is `mcp-for-blender` (`ahujasid/blender-mcp`), taken from its README.
+    Blender's own site was unreachable from the session, so Blender Lab's official MCP server
+    (reported experimental, needs Blender 5.1+) is only mentioned, not documented. The owner
+    hasn't tried the Windows steps yet; fix the guide from their first real attempt.
+  - The quickstart mentions F12 bug capture and the pause-menu bug-report button, which arrive in
+    M1; the guide says so. Update it if that card changes.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

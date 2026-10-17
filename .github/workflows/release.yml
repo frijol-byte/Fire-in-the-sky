@@ -1,0 +1,60 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "playtest-*"
+
+permissions:
+  contents: write # create the GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Read pinned Godot version
+        id: godot
+        run: echo "version=$(tr -d '[:space:]' < .godot-version)" >> "$GITHUB_OUTPUT"
+      - name: Install Godot (+ export templates, cached)
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ steps.godot.outputs.version }}
+          use-dotnet: false
+          include-templates: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+      - name: Install gdtoolkit
+        run: pip install -r tools/requirements.txt
+      - name: Install Blender pipeline (bpy) for its unit tests
+        run: |
+          python -m venv tools/blender/.venv
+          tools/blender/.venv/bin/pip install -q -r tools/blender/requirements.txt
+      - name: tools/check.sh
+        run: bash tools/check.sh
+      - name: Write version, export Windows + Linux, boot the Linux build
+        run: bash tools/ci/export.sh
+      - name: Zip builds and write release notes
+        run: |
+          mkdir -p dist
+          (cd build/export/windows && zip -r "../../../dist/FireInTheSky-windows-${GITHUB_REF_NAME}.zip" .)
+          (cd build/export/linux && zip -r "../../../dist/FireInTheSky-linux-${GITHUB_REF_NAME}.zip" .)
+          python3 tools/ci/release_notes.py "${GITHUB_REF_NAME}" > dist/RELEASE_NOTES.md
+          cat dist/RELEASE_NOTES.md
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          case "${GITHUB_REF_NAME}" in playtest-*) flags+=(--prerelease) ;; esac
+          gh release create "${GITHUB_REF_NAME}" dist/*.zip \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file dist/RELEASE_NOTES.md \
+            "${flags[@]}"

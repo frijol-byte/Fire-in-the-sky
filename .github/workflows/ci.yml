@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags, so `git describe` gives a real version
+      - name: Read pinned Godot version
+        id: godot
+        run: echo "version=$(tr -d '[:space:]' < .godot-version)" >> "$GITHUB_OUTPUT"
+      - name: Install Godot (+ export templates, cached)
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ steps.godot.outputs.version }}
+          use-dotnet: false
+          include-templates: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+      - name: Install gdtoolkit
+        run: pip install -r tools/requirements.txt
+      - name: Install Blender pipeline (bpy) for its unit tests
+        run: |
+          python -m venv tools/blender/.venv
+          tools/blender/.venv/bin/pip install -q -r tools/blender/requirements.txt
+      - name: tools/check.sh
+        run: bash tools/check.sh
+      - name: Write version, export Windows + Linux, boot the Linux build
+        run: bash tools/ci/export.sh
+      - name: Short SHA
+        id: sha
+        run: echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FireInTheSky-windows-${{ steps.sha.outputs.short }}
+          path: build/export/windows/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FireInTheSky-linux-${{ steps.sha.outputs.short }}
+          path: build/export/linux/
+          if-no-files-found: error
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs-${{ steps.sha.outputs.short }}
+          path: |
+            build/check-logs/
+            build/reports/
+            build/export/*.log
+          if-no-files-found: ignore

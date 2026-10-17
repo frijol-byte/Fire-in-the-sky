@@ -5,10 +5,11 @@
 
 ## Now
 - **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T4` (CI) or `M0-T5` (screenshot harness). T2, T3 and T6 are in
-  review.
+- **Next task to start:** `M0-T5` (screenshot harness). T2, T3, T4 and T6 are in review.
 - **Owner actions waiting:**
-  1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
+  1. After the M0-T4 PR is merged: turn on branch protection for `main` requiring the
+     `check-and-build` check (clicks are in the M0-T4 PR description).
+  2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
 
 ## Milestones
@@ -33,13 +34,13 @@
 | M0-T1 | Repo skeleton & cloud bootstrap | ✅ | PR #1 |
 | M0-T2 | Godot project bootstrap | 👀 | PR open |
 | M0-T3 | Test, lint & validation harness | 👀 | PR open |
-| M0-T4 | CI: tests + downloadable builds | ⬜ | |
+| M0-T4 | CI: tests + downloadable builds | 👀 | PR open |
 | M0-T5 | Screenshot harness | ⬜ | |
 | M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
 | M0-T7 | Godot model import & tier display | ⬜ | |
 | M0-T8 | Owner guides | ⬜ | |
 
-T1 is merged. Parallel-safe: **T4 ∥ T5** (T4 needs T3 merged).
+T1 is merged. Parallel-safe: **T5** next (T4 is in review).
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
 
@@ -105,6 +106,31 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
     task should bind them and drop the exemptions in `test_input_router.gd`.
   - Godot writes `*.import` files next to imported assets (e.g. `test_kestrel.glb.import`);
     they are committed (Godot convention) so `check.sh` leaves the tree clean. Commit new ones.
+
+- M0-T4 (2026-10-17): CI and builds. `game/export_presets.cfg` has "Windows Desktop" and
+  "Linux" (x86_64, PCK embedded, no signing). `.github/workflows/ci.yml` (PR + push to `main`,
+  single job `check-and-build`) runs `tools/check.sh`, then `bash tools/ci/export.sh`, then
+  uploads `FireInTheSky-windows-<sha7>` / `FireInTheSky-linux-<sha7>`. `release.yml` (tags
+  `v*`, `playtest-*`) does the same, zips, and creates a GitHub Release (`playtest-*` is marked
+  pre-release). Things the next session must know:
+  - `tools/ci/export.sh` is also runnable locally: it writes `game/version.txt` (git-ignored;
+    `git describe --tags --always`), exports both presets to `build/export/`, then boots the
+    Linux build headless for 120 frames and requires exit 0, no engine errors/warnings and the
+    version in the boot log. Locally it needs the 4.7.2 export templates in
+    `~/.local/share/godot/export_templates/4.7.2.stable/` (a 1.2 GB `.tpz` from the Godot
+    GitHub release; extract just `version.txt`, `linux_release.x86_64`,
+    `windows_release_x86_64*.exe`). `setup.sh` does not install them (too big for every session).
+  - Release notes: add a `### <heading mentioning the tag>` subsection under "## Release
+    notes" below, e.g. `### M0 Foundation (v0.1.0, playtest-m0)`.
+    `tools/ci/release_notes.py <tag>` prints the matching body (whole-word match on the tag);
+    with no match the release still publishes with a one-line fallback.
+  - The export preset excludes `tests/*` and `addons/*` and includes `version.txt` via
+    `include_filter`. A new non-resource runtime file type (json, txt, ...) needs adding to
+    `include_filter` in **both** presets or it will be missing from builds.
+  - CI needs the full history (`fetch-depth: 0`) so `git describe` sees tags. If the repo has
+    no tags the version is the short SHA.
+  - Not verified here (no Actions runner in the session): the workflow YAML parses, but the
+    setup-godot action, cache and uploads are exercised for the first time by the PR's own CI run.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

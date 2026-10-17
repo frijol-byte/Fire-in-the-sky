@@ -103,8 +103,8 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
   - Input tests exempt pitch/yaw from needing a keyboard event (mouse-steered) and
     `thrust_up/down` from needing a gamepad event (GDD gives them no button yet); the flight
     task should bind them and drop the exemptions in `test_input_router.gd`.
-  - Godot writes `*.glb.import` next to models on import; it is left untracked (T7 decides
-    whether to commit it).
+  - Godot writes `*.import` files next to imported assets (e.g. `test_kestrel.glb.import`);
+    they are committed (Godot convention) so `check.sh` leaves the tree clean. Commit new ones.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

@@ -4,10 +4,9 @@
 > session's briefing.
 
 ## Now
-- **Phase:** Planning complete (2026-10-04). Next: **M0 — Foundation**.
-- **Next task to start:** `M0-T3` (test/lint harness) or `M0-T5` (screenshot harness) — both
-  unblocked by T2; `M0-T6` (Blender pipeline) is also still parallel-safe.
-- **Next task to start:** `M0-T2` (Godot project bootstrap). `M0-T6` (Blender pipeline) is in review.
+- **Phase:** M0 — Foundation, in progress.
+- **What to start next:** any ⬜ task in the table below whose "Depends on" tasks are all ✅.
+  Tasks that are ready at the same time can run in parallel sessions.
 - **Owner actions waiting:**
   1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
@@ -29,20 +28,23 @@
 
 ## Current milestone tasks (M0)
 
-| Card | Title | State | PR |
-|---|---|---|---|
-| M0-T1 | Repo skeleton & cloud bootstrap | ✅ | PR #1 |
-| M0-T2 | Godot project bootstrap | 👀 | PR open |
-| M0-T3 | Test, lint & validation harness | ⬜ | |
-| M0-T4 | CI: tests + downloadable builds | ⬜ | |
-| M0-T5 | Screenshot harness | ⬜ | |
-| M0-T6 | Blender generator pipeline v0 | 👀 | PR open |
-| M0-T7 | Godot model import & tier display | ⬜ | |
-| M0-T8 | Owner guides | ⬜ | |
-
-T1 is merged. Parallel-safe: **T2 ∥ T6**. After T2: **T3 ∥ T5**.
+| Card | Title | Depends on | State | PR |
+|---|---|---|---|---|
+| M0-T1 | Repo skeleton & cloud bootstrap | — | ✅ | #1 |
+| M0-T2 | Godot project bootstrap | T1 | ✅ | #2 |
+| M0-T3 | Test, lint & validation harness | T2 | ⬜ | |
+| M0-T4 | CI: tests + downloadable builds | T3 | ⬜ | |
+| M0-T5 | Screenshot harness | T2 | ⬜ | |
+| M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
+| M0-T7 | Godot model import & tier display | T3, T5, T6 | ⬜ | |
+| M0-T8 | Owner guides | T4 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
+
+**Editing this file (to avoid merge conflicts between parallel sessions):** change only your
+own task's row, and add notes under your own `- <card id> (date):` bullet in "Notes for the
+next session". When merging `main` into your branch, keep every row's most advanced state
+and keep all notes bullets from both sides.
 
 ## Notes for the next session
 - Planning research (2026-10-04): Godot **4.7.2** is the latest stable; gdUnit4 **v6.2.1**;
@@ -83,6 +85,12 @@ States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔
   convex hull of the base hull, wings and fins only (tier parts don't change collision).
   `T0ONLY_*` is hidden at tier >= 1. The exported `.glb` is byte-identical between runs.
   `assets.yml` compares manifests (not `.glb` bytes) to the committed ones.
+- Planning-session check (2026-10-17), on `main` after PRs #2 and #3: `setup.sh` gives all ✅;
+  `--import` and a 120-frame boot run print no errors or warnings; gdformat/gdlint are clean;
+  the 16 Blender tests pass; rebuilding test_kestrel is byte-identical to the committed `.glb`
+  and manifest. The yellow bar floating beside the ship in the 3/4 preview views is the 2 m
+  scale bar (preview only, not in the `.glb`). M0-T7's dependencies were corrected to T3 + T5
+  + T6, since its tests need gdUnit4 and its screenshot needs shot scenes.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

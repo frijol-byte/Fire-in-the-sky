@@ -137,7 +137,7 @@ Card format: **Size** S ≈ small session, M ≈ full session, L ≈ consider sp
   just say whether the direction (shape language) feels right.
 
 ### M0-T7 · Godot model import & tier display
-- **Size:** M · **Depends on:** T2, T6 · **Read:** art bible §3.1–3.2, architecture §5.1
+- **Size:** M · **Depends on:** T3 (gdUnit4 for its tests), T5 (shot scenes), T6 · **Read:** art bible §3.1–3.2, architecture §5.1
 - **Do:**
   - A post-import script for `game/assets/models/**`: role materials → Godot materials
     (placeholder faction paint shader with `primary_color`/`secondary_color` params),

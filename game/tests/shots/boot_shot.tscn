@@ -1,13 +1,31 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://core/boot/boot.tscn" id="1_boot"]
 [ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="2_dir"]
 [ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="3_def"]
 
-[sub_resource type="Resource" id="Resource_boot"]
+[sub_resource type="Resource" id="Resource_tier_0"]
 script = ExtResource("3_def")
-label = "boot"
+label = "tier_0"
 frame = 3
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_tier_1"]
+script = ExtResource("3_def")
+label = "tier_1"
+frame = 95
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_tier_2"]
+script = ExtResource("3_def")
+label = "tier_2"
+frame = 185
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_tier_3"]
+script = ExtResource("3_def")
+label = "tier_3"
+frame = 275
 move_camera = false
 
 [node name="BootShot" type="Node"]
@@ -16,4 +34,4 @@ move_camera = false
 
 [node name="ShotDirector" type="Node" parent="."]
 script = ExtResource("2_dir")
-shots = Array[ExtResource("3_def")]([SubResource("Resource_boot")])
+shots = Array[ExtResource("3_def")]([SubResource("Resource_tier_0"), SubResource("Resource_tier_1"), SubResource("Resource_tier_2"), SubResource("Resource_tier_3")])

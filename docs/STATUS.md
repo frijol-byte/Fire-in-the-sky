@@ -36,7 +36,7 @@
 | M0-T4 | CI: tests + downloadable builds | T3 | ⬜ | |
 | M0-T5 | Screenshot harness | T2 | ✅ | #4 |
 | M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
-| M0-T7 | Godot model import & tier display | T3, T5, T6 | ⬜ | |
+| M0-T7 | Godot model import & tier display | T3, T5, T6 | 👀 | PR open |
 | M0-T8 | Owner guides | T4 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
@@ -108,6 +108,27 @@ and keep all notes bullets from both sides.
     task should bind them and drop the exemptions in `test_input_router.gd`.
   - Godot writes `*.import` files next to imported assets (e.g. `test_kestrel.glb.import`);
     they are committed (Godot convention) so `check.sh` leaves the tree clean. Commit new ones.
+- M0-T7 (2026-10-17): model import and tier display are in. Things the next session must know:
+  - Every `.glb` under `game/assets/models/` needs `import_script/path="res://core/import/model_post_import.gd"`
+    in its `.glb.import` (Godot has no per-folder default; `validate_data.py` fails otherwise). Set it for
+    each new model, run `godot --headless --path game --import`, commit the `.import`.
+  - The rules live in `core/import/model_import_rules.gd` (unit tested; the hook is a thin shell).
+    Metadata names are in art bible 3.1. Role materials map to `game/shaders/materials/*.tres`
+    (placeholders; edit those, no reimport needed). Faction paint is `shaders/faction_paint.gdshader`
+    with per-ship *instance* uniforms `primary_color`/`secondary_color`, set by `ShipModel.set_paint()`.
+  - Godot builds a trimesh from `-colonly`; the rules swap it for a convex hull (a trimesh can't sit on a
+    `RigidBody3D`). The `Collision` StaticBody3D sits inside the model; the Ship scene (M1) should
+    move/replace it with its own collision setup.
+  - `ShipModel` is the script on the root of a ship `.glb`: `set_tier`, `get_sockets(kind)` (tier-aware),
+    `set_paint`. Tier names are `TIER_NAME_0..3` in strings.csv (placeholders: Stock, Armored, Boosted,
+    Elite).
+  - Boot scene is now a 3D showcase (turntable Kestrel, tier changes every 3 s). Shot scenes:
+    `boot_shot` (one PNG per tier), `kestrel_shot` (tier 3), `tiers_shot` (T0-T3 line-up).
+  - Added gdUnit tests for `ShotDirector`'s static helpers (the T5 leftover).
+  - Gotcha: Godot does not reimport a model when only the *post-import script* changes. After editing
+    `core/import/*.gd` locally, delete `game/.godot/imported/<model>.glb-*` (CI starts clean, so it's fine).
+  - `tools/tests/screenshot_test.sh` now checks the COMPAT stamp on a static UI scene
+    (`tests/shots/harness_shot.tscn`); the boot scene rotates, so it can't be compared across renderers.
 - M0-T5 (2026-10-17): screenshot harness is in (see architecture §7 for usage). Things the next
   session must know:
   - `bash tools/screenshot.sh --all` (or a scene name) → `build/screens/*.png`; read the PNGs.

@@ -44,6 +44,7 @@ environment = SubResource("Environment_space")
 transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
 
 [node name="test_kestrel" parent="." instance=ExtResource("1_ship")]
+tier = 3
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30)

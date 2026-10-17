@@ -98,6 +98,24 @@ class ValidateDataTest(unittest.TestCase):
         errors = validate_data.validate(self.root)
         self.assertEqual(errors, ["smoke/scenes.txt: scene does not exist: res://missing.tscn"])
 
+    def test_model_import_needs_the_post_import_script(self) -> None:
+        self.write("assets/models/ships/x.glb", "glTF")
+        errors = validate_data.validate(self.root)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("no .import file", errors[0])
+        self.write("assets/models/ships/x.glb.import", '[params]\nimport_script/path=""\n')
+        errors = validate_data.validate(self.root)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("needs import_script/path", errors[0])
+
+    def test_model_import_with_the_script_passes(self) -> None:
+        self.write("assets/models/ships/x.glb", "glTF")
+        self.write(
+            "assets/models/ships/x.glb.import",
+            f'[params]\nimport_script/path="{validate_data.MODEL_IMPORT_SCRIPT}"\n',
+        )
+        self.assertEqual(validate_data.validate(self.root), [])
+
 
 if __name__ == "__main__":
     unittest.main()

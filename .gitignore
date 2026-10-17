@@ -3,3 +3,4 @@ build/
 tools/blender/.venv/
 __pycache__/
 *.blend1
+game/version.txt

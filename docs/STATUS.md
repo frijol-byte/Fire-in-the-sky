@@ -8,7 +8,9 @@
 - **What to start next:** any ⬜ task in the table below whose "Depends on" tasks are all ✅.
   Tasks that are ready at the same time can run in parallel sessions.
 - **Owner actions waiting:**
-  1. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
+  1. After the M0-T4 PR is merged: turn on branch protection for `main` requiring the
+     `check-and-build` check (clicks are in the M0-T4 PR description).
+  2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
 
 ## Milestones
@@ -33,7 +35,7 @@
 | M0-T1 | Repo skeleton & cloud bootstrap | — | ✅ | #1 |
 | M0-T2 | Godot project bootstrap | T1 | ✅ | #2 |
 | M0-T3 | Test, lint & validation harness | T2 | ✅ | #5 |
-| M0-T4 | CI: tests + downloadable builds | T3 | ⬜ | |
+| M0-T4 | CI: tests + downloadable builds | T3 | 👀 | #6 |
 | M0-T5 | Screenshot harness | T2 | ✅ | #4 |
 | M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
 | M0-T7 | Godot model import & tier display | T3, T5, T6 | ⬜ | |
@@ -143,6 +145,35 @@ and keep all notes bullets from both sides.
   and manifest. The yellow bar floating beside the ship in the 3/4 preview views is the 2 m
   scale bar (preview only, not in the `.glb`). M0-T7's dependencies were corrected to T3 + T5
   + T6, since its tests need gdUnit4 and its screenshot needs shot scenes.
+
+- M0-T4 (2026-10-17): CI and builds. `game/export_presets.cfg` has "Windows Desktop" and
+  "Linux" (x86_64, PCK embedded, no signing). `.github/workflows/ci.yml` (PR + push to `main`,
+  single job `check-and-build`) runs `tools/check.sh`, then `bash tools/ci/export.sh`, then
+  uploads `FireInTheSky-windows-<sha7>` / `FireInTheSky-linux-<sha7>`. `release.yml` (tags
+  `v*`, `playtest-*`) does the same, zips, and creates a GitHub Release (`playtest-*` is marked
+  pre-release). Things the next session must know:
+  - `tools/ci/export.sh` is also runnable locally: it writes `game/version.txt` (git-ignored;
+    `git describe --tags --always`), exports both presets to `build/export/`, then boots the
+    Linux build headless for 120 frames and requires exit 0, no engine errors/warnings and the
+    version in the boot log. Locally it needs the 4.7.2 export templates in
+    `~/.local/share/godot/export_templates/4.7.2.stable/` (a 1.2 GB `.tpz` from the Godot
+    GitHub release; extract just `version.txt`, `linux_release.x86_64`,
+    `windows_release_x86_64*.exe`). `setup.sh` does not install them (too big for every session).
+  - Release notes: add a `### <heading mentioning the tag>` subsection under "## Release
+    notes" below, e.g. `### M0 Foundation (v0.1.0, playtest-m0)`.
+    `tools/ci/release_notes.py <tag>` prints the matching body (whole-word match on the tag);
+    with no match the release still publishes with a one-line fallback.
+  - The export preset excludes `tests/*` and `addons/*` and includes `version.txt` via
+    `include_filter`. A new non-resource runtime file type (json, txt, ...) needs adding to
+    `include_filter` in **both** presets or it will be missing from builds.
+  - Both workflows share `.github/actions/setup-build` (setup-godot with templates, Xvfb + Mesa
+    lavapipe for check.sh's screenshot self-test, gdtoolkit/Pillow, bpy venv). On PRs the
+    version/artifact suffix is the PR head's short SHA (Actions checks out a merge commit);
+    `BUILD_VERSION=x bash tools/ci/export.sh` overrides the version.
+  - CI needs the full history (`fetch-depth: 0`) so `git describe` sees tags. If the repo has
+    no tags the version is the short SHA.
+  - Not verified here (no Actions runner in the session): the workflow YAML parses, but the
+    setup-godot action, cache and uploads are exercised for the first time by the PR's own CI run.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

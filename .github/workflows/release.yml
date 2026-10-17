@@ -1,0 +1,41 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "playtest-*"
+
+permissions:
+  contents: write # create the GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+      - name: tools/check.sh
+        run: bash tools/check.sh
+      - name: Write version, export Windows + Linux, boot the Linux build
+        run: bash tools/ci/export.sh
+      - name: Zip builds and write release notes
+        run: |
+          mkdir -p dist
+          (cd build/export/windows && zip -r "../../../dist/FireInTheSky-windows-${GITHUB_REF_NAME}.zip" .)
+          (cd build/export/linux && zip -r "../../../dist/FireInTheSky-linux-${GITHUB_REF_NAME}.zip" .)
+          python3 tools/ci/release_notes.py "${GITHUB_REF_NAME}" > dist/RELEASE_NOTES.md
+          cat dist/RELEASE_NOTES.md
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          case "${GITHUB_REF_NAME}" in playtest-*) flags+=(--prerelease) ;; esac
+          gh release create "${GITHUB_REF_NAME}" dist/*.zip \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file dist/RELEASE_NOTES.md \
+            "${flags[@]}"

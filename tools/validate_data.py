@@ -9,6 +9,8 @@ Checks:
   3. Every literal key used with tr("KEY") in .gd/.tscn/.tres files exists in
      game/localization/strings.csv (which needs a `keys` and an `en` column).
   4. Every scene in game/tests/smoke/scenes.txt exists.
+  5. Every model under game/assets/models/ (a .glb with an .import file) names the model
+     post-import script, so role materials, sockets and tier parts are set up on import.
 
 Usage: python3 tools/validate_data.py [--root <repo root>]
 """
@@ -151,11 +153,30 @@ def check_smoke_scenes(game: Path) -> list[str]:
     return errors
 
 
+MODEL_IMPORT_SCRIPT = "res://core/import/model_post_import.gd"
+
+
+def check_model_imports(game: Path) -> list[str]:
+    errors: list[str] = []
+    models = game / "assets" / "models"
+    if not models.is_dir():
+        return errors
+    for glb in sorted(models.rglob("*.glb")):
+        rel = glb.relative_to(game).as_posix()
+        import_file = glb.with_name(glb.name + ".import")
+        if not import_file.is_file():
+            errors.append(f"{rel}: no .import file (run godot --headless --path game --import and commit it)")
+        elif f'import_script/path="{MODEL_IMPORT_SCRIPT}"' not in import_file.read_text(encoding="utf-8"):
+            errors.append(f'{rel}.import: needs import_script/path="{MODEL_IMPORT_SCRIPT}"')
+    return errors
+
+
 CHECKS = [
     ("licenses", check_licenses),
     ("ext_resources", check_ext_resources),
     ("localization", check_localization),
     ("smoke scenes", check_smoke_scenes),
+    ("model imports", check_model_imports),
 ]
 
 

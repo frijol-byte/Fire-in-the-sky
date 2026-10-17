@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3k7fits0boot"]
+[gd_scene load_steps=4 format=3 uid="uid://b3k7fits0boot"]
 
 [ext_resource type="Script" path="res://core/boot/boot.gd" id="1_boot"]
+[ext_resource type="PackedScene" path="res://assets/models/ships/test_kestrel.glb" id="2_ship"]
+
+[sub_resource type="Environment" id="Environment_sky"]
+background_mode = 1
+background_color = Color(0.02, 0.035, 0.11, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.42, 0.62, 1)
+ambient_light_energy = 0.7
+tonemap_mode = 2
 
 [node name="Boot" type="Control"]
 layout_mode = 3
@@ -11,37 +20,76 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_boot")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.015, 0.02, 0.05, 1)
+[node name="World" type="Node3D" parent="."]
 
-[node name="Center" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+environment = SubResource("Environment_sky")
 
-[node name="Title" type="Label" parent="Center"]
+[node name="KeyLight" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+light_energy = 1.6
+shadow_enabled = true
+
+[node name="RimLight" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(-0.866, 0.2, -0.46, 0, 0.917, 0.4, 0.5, 0.346, -0.79, 0, 0, 0)
+light_color = Color(0.45, 0.6, 1, 1)
+light_energy = 0.7
+
+[node name="Camera3D" type="Camera3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 0.9455, 0.3256, 0, -0.3256, 0.9455, 0, 5.5, 16.5)
+current = true
+fov = 40.0
+
+[node name="Pivot" type="Node3D" parent="World"]
 unique_name_in_owner = true
-layout_mode = 2
+
+[node name="Ship" parent="World/Pivot" instance=ExtResource("2_ship")]
+unique_name_in_owner = true
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -600.0
+offset_top = 48.0
+offset_right = 600.0
+offset_bottom = 170.0
+grow_horizontal = 2
 theme_override_font_sizes/font_size = 96
 text = "FIRE IN THE SKY"
 horizontal_alignment = 1
 
-[node name="Version" type="Label" parent="Center"]
+[node name="TierName" type="Label" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -130.0
+offset_right = 400.0
+offset_bottom = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 44
+text = "Tier"
+horizontal_alignment = 1
+
+[node name="Version" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -64.0
+offset_right = 432.0
+offset_bottom = -24.0
+grow_vertical = 0
 theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
 theme_override_font_sizes/font_size = 28
 text = "dev"
-horizontal_alignment = 1

@@ -34,10 +34,12 @@ check "three_quarter differs from top" differs "$OUT/k_three_quarter.png" "$OUT/
 check "top differs from front" differs "$OUT/k_top.png" "$OUT/k_front.png"
 check "temp frames are cleaned up" test -z "$(ls -A build/screens | grep '^\.tmp-')"
 
-check "forced compat renders" bash tools/screenshot.sh boot_shot --compat --out "$OUT/compat"
-check "compat PNG is watermarked" is_stamped "$OUT/compat_boot.png" "$OUT/plain.png"
-check "automatic fallback renders" env SCREENSHOT_VK_ICD=/nonexistent.json bash tools/screenshot.sh boot_shot --out "$OUT/auto"
-check "automatic fallback PNG is watermarked" is_stamped "$OUT/auto_boot.png" "$OUT/plain.png"
+# A static UI scene renders the same under both renderers, so any difference is the stamp.
+check "fixture renders" bash tools/screenshot.sh harness_shot --out "$OUT/h"
+check "forced compat renders" bash tools/screenshot.sh harness_shot --compat --out "$OUT/compat"
+check "compat PNG is watermarked" is_stamped "$OUT/compat_ui.png" "$OUT/h_ui.png"
+check "automatic fallback renders" env SCREENSHOT_VK_ICD=/nonexistent.json bash tools/screenshot.sh harness_shot --out "$OUT/auto"
+check "automatic fallback PNG is watermarked" is_stamped "$OUT/auto_ui.png" "$OUT/h_ui.png"
 
 check "bad scene fails" bash -c '! bash tools/screenshot.sh no_such_scene.tscn'
 echo

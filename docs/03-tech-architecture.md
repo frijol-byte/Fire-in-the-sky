@@ -98,7 +98,8 @@ something goes wrong. Favor boring, explicit and data-driven designs.
 ### 5.1 Ship
 ```
 Ship (RigidBody3D, custom_integrator = true)
-├─ ShipModel (instanced .glb; sockets → Marker3D; tier parts toggled by name)
+├─ ShipModel (instanced .glb whose root has the `ShipModel` script; sockets → Marker3D;
+│              tier parts toggled by name; see art bible 3.1)
 ├─ FlightController   # ShipControls + ShipDef → forces/torques (FA, drift, boost)
 ├─ PowerSystem        # energy capacitor, regen, consumers
 ├─ Durability         # shield/armor/hull, damage intake, regen
@@ -109,6 +110,10 @@ Ship (RigidBody3D, custom_integrator = true)
 ├─ Subsystems (optional, for capitals/bosses)
 └─ Pilot              # PlayerPilot | AIPilot → produces ShipControls each tick
 ```
+- `ShipModel` API (`game/ships/ship_model.gd`): `set_tier(tier)` / `tier`, `get_sockets(kind)` (only
+  the sockets that exist at the current tier, ordered by index), `set_paint(primary, secondary)`.
+  Instantiating a ship `.glb` gives you one directly. Add a new ship by building it with the Blender
+  recipe pipeline and setting its `.glb.import` `import_script/path` (check.sh enforces this).
 - `ShipDef` holds the flight params, slots, base stats, upgrade tiers, model path and
   per-tier visual part names.
 - `FlightController` runs in `_integrate_forces`: it computes the desired velocity and angular

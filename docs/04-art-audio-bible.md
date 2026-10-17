@@ -76,6 +76,15 @@ Conventions fixed by M0-T6 (`tools/blender/kit/common.py` enforces the names):
   the socket exists, normally 0).
 - **Tiers:** `T#_` parts show at ship tier >= #; `T0ONLY_` parts show only at tier 0.
 - **Collision:** one `<name>-colonly` convex hull of the base hull, wings and fins.
+What Godot makes of those names (M0-T7; `game/core/import/model_import_rules.gd`, applied by the
+post-import hook `model_post_import.gd` that every model's `.glb.import` must name):
+- `SOCKET_<kind>_<n>` → `Marker3D` with metadata `kind` (StringName), `index`, `min_tier`.
+- `T<n>_*` → metadata `min_tier = n`; `T0ONLY_*` → metadata `max_tier = 0`;
+  `SUB_<name>` → metadata `subsystem = <name>`. `ShipModel.set_tier()` toggles visibility.
+- `PAINT_*` meshes get `paint = true` and the faction paint shader, whose `primary_color` /
+  `secondary_color` are per-ship instance parameters (`ShipModel.set_paint()`).
+- `<id>-colonly` → a `Collision` child (`StaticBody3D`) with a convex hull shape.
+- Models under `models/ships/` get the `ShipModel` script on their root node.
 - Each recipe writes `<id>.manifest.json` beside the `.glb` (triangles per tier, sockets, tier
   parts, bounds); CI fails if it differs from the committed one.
 

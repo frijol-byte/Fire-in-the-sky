@@ -1,3 +1,8 @@
 keys,en
 GAME_TITLE,FIRE IN THE SKY
 BOOT_VERSION,Version %s
+BOOT_TIER,Tier %d - %s
+TIER_NAME_0,Stock
+TIER_NAME_1,Armored
+TIER_NAME_2,Boosted
+TIER_NAME_3,Elite

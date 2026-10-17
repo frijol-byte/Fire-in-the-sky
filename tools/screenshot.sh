@@ -64,10 +64,10 @@ LVP_ICD="${SCREENSHOT_VK_ICD:-}"  # override (also used by the self-test)
 for f in $([ -z "$LVP_ICD" ] && echo /usr/share/vulkan/icd.d/lvp_icd*.json /etc/vulkan/icd.d/lvp_icd*.json); do
   [ -f "$f" ] && { LVP_ICD="$f"; break; }
 done
-if [ ! -d game/.godot/imported ]; then
-  echo "== importing project"
-  godot --headless --path game --import >/dev/null 2>&1 || true
-fi
+# Always import: it refreshes the global script class cache (new `class_name` scripts are
+# unknown to an editor-less run until then) and is quick when nothing changed.
+echo "== importing project"
+godot --headless --path game --import >/dev/null 2>&1 || true
 
 # Resolves the scene argument to a res:// path, or prints nothing.
 resolve_scene() {

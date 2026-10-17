@@ -1,0 +1,3 @@
+# Every scene the smoke test must boot (one res:// path per line, # for comments).
+# Add each new scene here; tools/validate_data.py fails if a listed scene does not exist.
+res://core/boot/boot.tscn

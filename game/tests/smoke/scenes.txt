@@ -2,3 +2,5 @@
 # Add each new scene here; tools/validate_data.py fails if a listed scene does not exist.
 res://core/boot/boot.tscn
 res://core/debug/input_debug.tscn
+res://ships/ship.tscn
+res://core/debug/flight_debug.tscn

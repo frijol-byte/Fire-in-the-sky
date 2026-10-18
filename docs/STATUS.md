@@ -51,7 +51,7 @@
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
 | M1-T1 | Input layer & ShipControls | M0 | ✅ | #10 |
-| M1-T2 | Ship physics core (FA on) | T1 | 👀 | |
+| M1-T2 | Ship physics core (FA on) | T1 | 👀 | #11 |
 | M1-T3 | Drift (FA off), boost & energy | T2 | ⬜ | |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ⬜ | |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |

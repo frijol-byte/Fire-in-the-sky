@@ -26,6 +26,8 @@ living stations, ships you upgrade and *see* change, and boss fights you remembe
 | [`docs/06-ai-workflow.md`](docs/06-ai-workflow.md) | How sessions, reviews, playtests and Blender fit together |
 | [`docs/07-roadmap.md`](docs/07-roadmap.md) | Milestones M0–M9, timeline, risks, post-slice backlog |
 | [`docs/tasks/`](docs/tasks/) | Task cards, one AI session each |
+| [`docs/guides/owner-quickstart.md`](docs/guides/owner-quickstart.md) | Owner's step-by-step: start sessions, review and merge PRs, playtest, report |
+| [`docs/guides/blender-mcp-windows.md`](docs/guides/blender-mcp-windows.md) | Optional: live Blender + Claude on your Windows PC |
 | [`docs/templates/playtest-report.md`](docs/templates/playtest-report.md) | Fill this in after each playtest |
 
 ## Starting a task

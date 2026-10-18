@@ -9,9 +9,10 @@
 - **What to start next:** M1-T1 (`docs/tasks/M1-flight.md`). M1 can start while the M0
   playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
-  0. Merge the M0 review-gate PR, then playtest M0: download `playtest-M0` from GitHub →
-     Releases (if it isn't there yet, the gate PR says how it gets published), run it, and
-     tick the checklist at the bottom of `docs/tasks/M0-foundation.md`.
+  0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
+     GitHub's Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest
+     release yourself"; sessions can't push tags). When the release run is green, download
+     it, play, and tick the checklist at the bottom of `docs/tasks/M0-foundation.md`.
   1. M0-T4 is merged (#6): turn on branch protection for `main` requiring the
      `check-and-build` check (clicks are in the M0-T4 PR description).
   2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
@@ -222,6 +223,9 @@ and keep all notes bullets from both sides.
   - `screenshots.yml` is gone: `ci.yml` renders every shot scene after the build and uploads
     `screens-<sha7>`.
   - M1 cards have "Notes from the M0 gate" bullets; read them with the card.
+  - Pushing a tag from a cloud session is rejected (only the session branch can be pushed).
+    `release.yml` now also runs on `release: published` and uploads to an existing release,
+    so the owner publishes playtest releases from the Releases page.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

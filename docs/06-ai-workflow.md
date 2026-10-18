@@ -87,7 +87,10 @@ The gate session:
 5. Writes `docs/reviews/M<n>.md`: a summary in plain language for the owner, findings, and a
    risk list.
 6. Refines the **next** milestone's task cards using what was learned (rolling planning).
-7. Tags `playtest-M<n>` to trigger the release build, and updates `docs/STATUS.md`.
+7. Tags `playtest-M<n>` to trigger the release build, and updates `docs/STATUS.md`. Cloud
+   sessions can't push tags, so the gate PR usually asks the owner to publish the release
+   from GitHub's Releases page after merging (owner quickstart §5); `release.yml` then
+   attaches the builds and notes.
 
 Then the owner playtests (§4). The milestone is **done** when the review gate is clean and
 the playtest checklist passes, or its failures have become tasks the owner accepts as

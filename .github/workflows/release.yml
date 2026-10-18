@@ -5,12 +5,22 @@ on:
     tags:
       - "v*"
       - "playtest-*"
+  # The owner can also publish a release (and its new tag) from GitHub's Releases page; this
+  # run then attaches the builds and the notes to that release.
+  release:
+    types: [published]
+
+# A release made on the website can fire both events; run them one after the other.
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
 
 permissions:
   contents: write # create the GitHub Release
 
 jobs:
   release:
+    if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'playtest-')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -35,7 +45,12 @@ jobs:
         run: |
           flags=()
           case "${GITHUB_REF_NAME}" in playtest-*) flags+=(--prerelease) ;; esac
-          gh release create "${GITHUB_REF_NAME}" dist/*.zip \
-            --title "${GITHUB_REF_NAME}" \
-            --notes-file dist/RELEASE_NOTES.md \
-            "${flags[@]}"
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" dist/*.zip --clobber
+            gh release edit "${GITHUB_REF_NAME}" --notes-file dist/RELEASE_NOTES.md "${flags[@]}"
+          else
+            gh release create "${GITHUB_REF_NAME}" dist/*.zip \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file dist/RELEASE_NOTES.md \
+              "${flags[@]}"
+          fi

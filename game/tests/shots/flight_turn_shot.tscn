@@ -1,0 +1,59 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://ships/ship.tscn" id="1_ship"]
+[ext_resource type="Script" path="res://tests/shots/flight_turn_driver.gd" id="2_drv"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="3_dir"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="4_def"]
+
+[sub_resource type="Resource" id="Resource_straight"]
+script = ExtResource("4_def")
+label = "1_cruise"
+frame = 40
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_entering"]
+script = ExtResource("4_def")
+label = "2_turn_start"
+frame = 65
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_mid"]
+script = ExtResource("4_def")
+label = "3_mid_turn"
+frame = 90
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_late"]
+script = ExtResource("4_def")
+label = "4_turn_end"
+frame = 130
+move_camera = false
+
+[sub_resource type="Environment" id="Environment_space"]
+background_mode = 1
+background_color = Color(0.015, 0.02, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.45, 0.6, 1)
+ambient_light_energy = 0.6
+
+[node name="FlightTurnShot" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+
+[node name="Ship" parent="." instance=ExtResource("1_ship")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 160, 0)
+current = true
+far = 5000.0
+
+[node name="Driver" type="Node" parent="."]
+script = ExtResource("2_drv")
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("3_dir")
+shots = Array[ExtResource("4_def")]([SubResource("Resource_straight"), SubResource("Resource_entering"), SubResource("Resource_mid"), SubResource("Resource_late")])

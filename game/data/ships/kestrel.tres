@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ShipDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ship_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"kestrel"
+display_name_key = "SHIP_KESTREL_NAME"
+model_path = "res://assets/models/ships/test_kestrel.glb"
+mass = 6000.0
+thrust_forward = 360000.0
+thrust_reverse = 240000.0
+thrust_lateral = 210000.0
+thrust_vertical = 210000.0
+max_speed = 180.0
+max_reverse_speed = 90.0
+max_strafe_speed = 90.0
+max_vertical_speed = 70.0
+max_angular_rate_deg = Vector3(90, 90, 150)
+angular_accel_deg = Vector3(450, 450, 600)
+fa_linear_gain = 6.0
+fa_angular_gain = 12.0
+energy_capacity = 100.0
+energy_regen = 12.0
+energy_regen_delay = 1.2
+boost_max_speed = 320.0
+boost_thrust_multiplier = 2.0
+boost_energy_per_second = 30.0
+primary_slots = 2
+secondary_slots = 1
+device_slots = 1

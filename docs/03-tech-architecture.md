@@ -119,6 +119,10 @@ Ship (RigidBody3D, custom_integrator = true)
 - `FlightController` runs in `_integrate_forces`: it computes the desired velocity and angular
   velocity from the controls, then a PD controller produces thrust clamped by per-axis
   limits. With FA off it skips linear damping.
+- Implemented so far (M1-T2): `Ship` (`ships/ship.tscn`), `FlightController` (FA on), `ShipDef`/`Content`,
+  `PlayerPilot`. The controller is velocity-error based: it closes `1 - exp(-gain*dt)` of the error
+  each tick, clamped by per-axis thrust/mass, so it cannot overshoot. `PowerSystem` and drift/boost
+  are M1-T3.
 - **Sim tests** check: time to stop from max speed, top speed reached, turn rates, drift
   keeps momentum, boost drains energy. All within tolerances defined in the `ShipDef`.
 

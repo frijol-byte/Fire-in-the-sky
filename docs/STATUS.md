@@ -6,7 +6,7 @@
 ## Now
 - **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
   waiting**.
-- **What to start next:** M1-T2 (`docs/tasks/M1-flight.md`); M1-T1 is in review. M1 can run while
+- **What to start next:** M1-T3 (`docs/tasks/M1-flight.md`); M1-T1 and M1-T2 are in review. M1 can run while
   the M0 playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
   0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
@@ -51,7 +51,7 @@
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
 | M1-T1 | Input layer & ShipControls | M0 | 👀 | |
-| M1-T2 | Ship physics core (FA on) | T1 | ⬜ | |
+| M1-T2 | Ship physics core (FA on) | T1 | 👀 | |
 | M1-T3 | Drift (FA off), boost & energy | T2 | ⬜ | |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ⬜ | |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
@@ -265,6 +265,43 @@ and keep all notes bullets from both sides.
   - Vertical thrust on the gamepad is bound to paddle buttons (see the PR's Design questions);
     the NO_GAMEPAD_YET exemption in `test_input_router.gd` is gone.
   - Static functions can't call `tr()`; use `TranslationServer.translate()` there.
+
+- M1-T2 (2026-10-18): ship physics core with flight assist on. Things the next session must know:
+  - **`ShipDef`** (`data/defs/ship_def.gd`, extends `ContentDef`) holds mass, per-axis thrust in
+    newtons (acceleration = thrust / mass, see `accel_*()`), per-axis speed limits, turn rates and
+    angular accelerations (degrees in the file, `*_rad()` helpers), FA gains, and the energy/boost
+    params T3 will use (`boost_*`, `energy_*`, unused so far). `problems()` validates a def.
+    `data/ships/kestrel.tres` uses the GDD 4.4 light-fighter numbers; it still points at
+    `test_kestrel.glb` until T7 renames it.
+  - **`Content`** now scans `res://data/` for every `.tres` that is a `ContentDef` and indexes it by
+    `kind()` + `id` (`Content.ship(id)`, `Content.ids(kind)`). Invalid defs are logged with
+    `Log.error` and skipped, which fails the smoke test. Adding content needs no list to edit.
+  - **`FlightController.compute()`** (`ships/flight_controller.gd`) is the single place that turns
+    `ShipControls` + `ShipDef` + current local velocities into the next velocities. T3 should extend
+    it (FA off, boost); don't add a second path. The sticks command a velocity (throttle x top
+    speed per local axis, reverse and strafe have their own speed limits, the whole vector is
+    limited to `max_speed`) and a turn rate. Each tick closes `1 - exp(-gain * dt)` of the error,
+    clamped by thrust/mass (forward and reverse thrust differ) or angular accel per axis, so it can
+    never overshoot.
+  - **`Ship`** (`ships/ship.tscn`) is a `RigidBody3D` with `custom_integrator` (Jolt supports it:
+    the body integrates position from the velocities we set in `_integrate_forces`), no gravity or
+    damping, `can_sleep = false` and `continuous_cd`. It instances the def's model, moves the
+    model's `Collision` shapes onto itself and frees the model's StaticBody3D. Set `ship.def` before
+    adding it to the tree. A pilot (`PlayerPilot`, an AI, a test) writes `ship.controls` in its
+    `_physics_process`, which runs before the physics step, so the value is used the same tick.
+  - Sims: `tests/sim/flight_sim.gd` (`FlightSim.spawn/fly/snapshot`) is the helper; add ships to
+    `SHIP_IDS` in `test_flight_linear.gd` (T7 parameterises over all three). Gotchas: the first
+    physics frame of a gdUnit suite is not a full tick for a freshly added body (the determinism
+    test warms up with one frame), and Jolt prints one harmless "job system exceeded the maximum
+    number of jobs" warning while many bodies are created and freed in a fast sim; it does not
+    fail the run.
+  - Shot scenes render at 30 fps against 60 physics ticks (`--fixed-fps 30`), so shot frame N is
+    physics tick 2N. `flight_turn_shot` (scripted turn, top-down) is the example. Exported node
+    references (`@export var x: Node`) in hand-written `.tscn` shot scenes did not resolve for me;
+    the driver uses `@onready` + `$"../Node"` instead.
+  - Debug scene `core/debug/flight_debug.tscn`: fly the Kestrel with the mouse/gamepad through a
+    field of pylons (rigid chase camera until T4; Esc quits). It is not reachable from the
+    boot screen; run it with `godot --path game res://core/debug/flight_debug.tscn`.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

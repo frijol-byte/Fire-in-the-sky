@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://core/debug/flight_debug.gd" id="1_dbg"]
+[ext_resource type="PackedScene" path="res://ships/ship.tscn" id="2_ship"]
+
+[sub_resource type="Environment" id="Environment_space"]
+background_mode = 1
+background_color = Color(0.015, 0.02, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.45, 0.6, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="LabelSettings" id="LabelSettings_readout"]
+font_size = 40
+
+[node name="FlightDebug" type="Node3D"]
+script = ExtResource("1_dbg")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+
+[node name="Ship" parent="." instance=ExtResource("2_ship")]
+
+[node name="Camera3D" type="Camera3D" parent="Ship"]
+transform = Transform3D(1, 0, 0, 0, 0.9762, 0.2164, 0, -0.2164, 0.9762, 0, 6, 22)
+current = true
+far = 20000.0
+
+[node name="Readout" type="Label" parent="."]
+offset_left = 48.0
+offset_top = 40.0
+offset_right = 900.0
+offset_bottom = 100.0
+label_settings = SubResource("LabelSettings_readout")

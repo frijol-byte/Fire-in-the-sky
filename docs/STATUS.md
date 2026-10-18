@@ -4,10 +4,14 @@
 > session's briefing.
 
 ## Now
-- **Phase:** M0 — Foundation, in progress.
-- **What to start next:** any ⬜ task in the table below whose "Depends on" tasks are all ✅.
-  Tasks that are ready at the same time can run in parallel sessions.
+- **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
+  waiting**.
+- **What to start next:** M1-T1 (`docs/tasks/M1-flight.md`). M1 can start while the M0
+  playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
+  0. Merge the M0 review-gate PR, then playtest M0: download `playtest-M0` from GitHub →
+     Releases (if it isn't there yet, the gate PR says how it gets published), run it, and
+     tick the checklist at the bottom of `docs/tasks/M0-foundation.md`.
   1. M0-T4 is merged (#6): turn on branch protection for `main` requiring the
      `check-and-build` check (clicks are in the M0-T4 PR description).
   2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
@@ -17,7 +21,7 @@
 
 | # | Milestone | State | Review | Playtest release |
 |---|---|---|---|---|
-| M0 | Foundation | 🔨 in progress | — | — |
+| M0 | Foundation | 🧪 playtest | ✅ [M0](reviews/M0.md) | `playtest-M0` |
 | M1 | Flight | ⬜ | — | — |
 | M2 | Combat core | ⬜ | — | — |
 | M3 | AI depth & challenge | ⬜ | — | — |
@@ -39,9 +43,9 @@
 | M0-T5 | Screenshot harness | T2 | ✅ | #4 |
 | M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
 | M0-T7 | Godot model import & tier display | T3, T5, T6 | ✅ | #7 |
-| M0-T8 | Owner guides | T4 | 👀 | |
+| M0-T8 | Owner guides | T4 | ✅ | #8 |
 
-States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked
+States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
 **Editing this file (to avoid merge conflicts between parallel sessions):** change only your
 own task's row, and add notes under your own `- <card id> (date):` bullet in "Notes for the
@@ -207,5 +211,29 @@ and keep all notes bullets from both sides.
   - The quickstart mentions F12 bug capture and the pause-menu bug-report button, which arrive in
     M1; the guide says so. Update it if that card changes.
 
+- M0 review gate (2026-10-18): clean; report in `docs/reviews/M0.md`. Things the next session
+  must know:
+  - `check.sh` runs gdUnit with `--fixed-fps 60`: one frame = one physics tick, no waiting on
+    the wall clock (sims ~50x faster than real time). The "~1 s per 60 ticks" note under
+    M0-T3 no longer applies.
+  - `validate_data.py` now rejects hardcoded player-facing text: outside `game/tests/`, scene
+    `text`/`tooltip_text`/`placeholder_text` must be empty or a `strings.csv` key, and scripts
+    may not assign a string literal to them. Use `tr("KEY")`.
+  - `screenshots.yml` is gone: `ci.yml` renders every shot scene after the build and uploads
+    `screens-<sha7>`.
+  - M1 cards have "Notes from the M0 gate" bullets; read them with the card.
+
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_
+
+### M0 Foundation (playtest-M0)
+The first playable build. There's no gameplay yet: this checks that the whole pipeline
+works, from script-generated ship to a Windows build.
+
+- The boot screen shows the placeholder fighter turning slowly in space. Every 3 seconds it
+  switches upgrade tier (Stock → Armored → Boosted → Elite), and the parts change: armour
+  plates, then extra engine pods, then longer wings.
+- The version number is in the bottom-left corner.
+- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
+  **More info → Run anyway**. Close the window to quit.
+- Playtest checklist: bottom of `docs/tasks/M0-foundation.md`.

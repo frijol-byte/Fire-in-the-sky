@@ -48,6 +48,14 @@ jobs:
           name: FireInTheSky-linux-${{ steps.sha.outputs.short }}
           path: build/export/linux/
           if-no-files-found: error
+      # Every shot scene as PNGs, for reviewing visual changes on the PR (Checks -> Artifacts).
+      - name: Render every shot scene
+        run: bash tools/screenshot.sh --all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screens-${{ steps.sha.outputs.short }}
+          path: build/screens/*.png
+          if-no-files-found: error
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4

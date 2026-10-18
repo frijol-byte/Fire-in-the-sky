@@ -89,9 +89,9 @@ will usually link the PR.
 - **In the description.** Under **Screenshots / previews**, images appear inline.
 - **Model previews.** Click the **Files changed** tab, find files under `docs/previews/`, and
   click **View** (or the file name) to see the image.
-- **Fresh screenshots from CI.** Click the **Checks** tab → in the left list click the
-  **screenshots** workflow (if the PR touched the game) → scroll to **Artifacts** at the
-  bottom of its summary → click **screens** to download a zip of PNGs.
+- **Fresh screenshots from CI.** Click the **Checks** tab → in the left list click **ci** →
+  scroll to **Artifacts** at the bottom of its summary → click **screens-XXXXXXX** to
+  download a zip of PNGs.
 
 ### Find the build artifact (try the game before merging)
 1. PR page → **Checks** tab → in the left list click **ci**.

@@ -75,3 +75,16 @@ func test_problems_reports_bad_values() -> void:
 	var slow_boost: ShipDef = _kestrel_copy()
 	slow_boost.boost_max_speed = slow_boost.max_speed - 1.0
 	assert_str(", ".join(slow_boost.problems())).contains("boost_max_speed")
+
+
+func test_problems_reports_bad_energy_and_boost_values() -> void:
+	var def: ShipDef = _kestrel_copy()
+	def.boost_min_energy = def.energy_capacity + 1.0
+	def.energy_regen = -1.0
+	def.fa_excess_bleed_time = 0.0
+	def.boost_energy_per_second = 0.0
+	var found: String = ", ".join(def.problems())
+	assert_str(found).contains("boost_min_energy")
+	assert_str(found).contains("energy_regen")
+	assert_str(found).contains("fa_excess_bleed_time")
+	assert_str(found).contains("boost_energy_per_second")

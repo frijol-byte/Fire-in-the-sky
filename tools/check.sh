@@ -107,10 +107,12 @@ else
   }
 
   # gdUnit4 exits 0 only if every test passed with no warnings (e.g. orphan nodes).
+  # --fixed-fps 60: every frame advances exactly one physics tick and frames don't wait for the
+  # wall clock, so sims run as fast as the CPU allows (~50x real time) and stay deterministic.
   gdunit() {
     local target_args=()
     for target in "$@"; do target_args+=(-a "$target"); done
-    "$GODOT" --headless --path game -s -d --remote-debug tcp://127.0.0.1:0 \
+    "$GODOT" --headless --path game --fixed-fps 60 -s -d --remote-debug tcp://127.0.0.1:0 \
       res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -c \
       -rd ../build/reports -rc 1 "${target_args[@]}"
   }

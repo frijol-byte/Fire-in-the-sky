@@ -58,7 +58,7 @@ offset_right = 600.0
 offset_bottom = 170.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 96
-text = "FIRE IN THE SKY"
+text = "GAME_TITLE"
 horizontal_alignment = 1
 
 [node name="TierName" type="Label" parent="."]
@@ -76,7 +76,7 @@ offset_bottom = -70.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 44
-text = "Tier"
+text = ""
 horizontal_alignment = 1
 
 [node name="Version" type="Label" parent="."]
@@ -92,4 +92,4 @@ offset_bottom = -24.0
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
 theme_override_font_sizes/font_size = 28
-text = "dev"
+text = ""

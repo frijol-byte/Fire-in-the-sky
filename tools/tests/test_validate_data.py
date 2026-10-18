@@ -83,6 +83,31 @@ class ValidateDataTest(unittest.TestCase):
         self.write("s.gd", 'extends Node\nvar t = tr("HELLO")\n# tr("COMMENTED_OUT")\n')
         self.assertEqual(validate_data.validate(self.root), [])
 
+    def test_hardcoded_scene_text_is_flagged(self) -> None:
+        self.write("ui/a.tscn", '[node name="L" type="Label"]\ntext = "Hello there"\n')
+        errors = validate_data.validate(self.root)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("ui/a.tscn:2: hardcoded player-facing text", errors[0])
+
+    def test_scene_text_that_is_a_key_or_empty_passes(self) -> None:
+        self.write("ui/a.tscn", 'text = "HELLO"\ntooltip_text = ""\n')
+        self.write("tests/shots/b.tscn", 'text = "Fixture text is fine in tests"\n')
+        self.assertEqual(validate_data.validate(self.root), [])
+
+    def test_multiline_scene_text_is_flagged(self) -> None:
+        self.write("ui/a.tscn", 'text = "HELLO\nmore"\n')
+        self.assertEqual(len(validate_data.validate(self.root)), 1)
+
+    def test_hardcoded_script_text_is_flagged(self) -> None:
+        self.write("ui/s.gd", 'extends Node\nfunc f(l: Label) -> void:\n\tl.text = "Hi"\n')
+        errors = validate_data.validate(self.root)
+        self.assertEqual(errors, ["ui/s.gd:3: hardcoded player-facing text; use a strings.csv key / tr()"])
+
+    def test_script_text_via_tr_or_empty_passes(self) -> None:
+        body = 'extends Node\nfunc f(l: Label) -> void:\n\tl.text = tr("HELLO")\n\tl.text = ""\n'
+        self.write("ui/s.gd", body + '\t# l.text = "commented"\n')
+        self.assertEqual(validate_data.validate(self.root), [])
+
     def test_strings_csv_needs_en_column(self) -> None:
         self.write("localization/strings.csv", "keys,de\nHELLO,Hallo\n")
         self.assertIn("`en` column", validate_data.validate(self.root)[0])

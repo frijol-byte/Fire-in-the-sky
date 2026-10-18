@@ -5,6 +5,9 @@ extends RefCounted
 ## Pattern: build the scene under test, add it to the suite's tree, then call
 ## `step_physics` to advance exactly N physics ticks (60 Hz, see project.godot) and assert on
 ## the resulting state. Never use wall-clock timers in sim tests.
+##
+## `tools/check.sh` runs gdUnit with `--fixed-fps 60`, so each frame is exactly one physics
+## tick and ticks run as fast as the CPU allows (a 10 s flight sim takes well under a second).
 
 ## Physics tick length in seconds (matches `physics/common/physics_ticks_per_second`).
 const TICK: float = 1.0 / 60.0

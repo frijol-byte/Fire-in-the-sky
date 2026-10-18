@@ -89,9 +89,9 @@ will usually link the PR.
 - **In the description.** Under **Screenshots / previews**, images appear inline.
 - **Model previews.** Click the **Files changed** tab, find files under `docs/previews/`, and
   click **View** (or the file name) to see the image.
-- **Fresh screenshots from CI.** Click the **Checks** tab → in the left list click the
-  **screenshots** workflow (if the PR touched the game) → scroll to **Artifacts** at the
-  bottom of its summary → click **screens** to download a zip of PNGs.
+- **Fresh screenshots from CI.** Click the **Checks** tab → in the left list click **ci** →
+  scroll to **Artifacts** at the bottom of its summary → click **screens-XXXXXXX** to
+  download a zip of PNGs.
 
 ### Find the build artifact (try the game before merging)
 1. PR page → **Checks** tab → in the left list click **ci**.
@@ -141,6 +141,19 @@ At the end of each milestone the review session publishes a **playtest release**
 3. Under **Assets**, click **FireInTheSky-windows-playtest-M0.zip** to download. The text
    above the Assets lists what changed and what to look for.
 4. Extract and run it exactly as in "Find the build artifact" steps 4–6.
+
+### Publish a playtest release yourself (when the review PR asks you to)
+Cloud sessions can push branches but not tags, so the review session may ask you to
+publish the release. Do it **after** merging the review PR:
+
+1. Open **Releases** (as in step 1 above) and click **Draft a new release**.
+2. Click **Choose a tag**, type the name the PR gives you (e.g. `playtest-M0`), and click
+   **Create new tag: playtest-M0 on publish**. Leave **Target** on `main`.
+3. **Release title:** the same name. Leave the description empty (it gets filled in).
+4. Tick **Set as a pre-release**, then click **Publish release**.
+5. Wait about 5 minutes. The **Actions** tab shows a **release** run; when it has a green
+   tick, the release has its notes and the two zip files under **Assets**. If it shows a red
+   cross, start a session and paste the run's link.
 
 ---
 

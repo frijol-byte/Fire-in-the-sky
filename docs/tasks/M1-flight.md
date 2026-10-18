@@ -22,6 +22,15 @@ in-game overlay, and the chosen values are saved into the ship data.
     ("RT", "LMB").
   - Unit tests: deadzone/curve math, and mouse virtual-stick mapping.
 - **Acceptance:** tests pass, and a debug scene prints controls live (shot in the PR).
+- **Notes from the M0 gate:**
+  - `InputRouter` already tracks `last_device` in `_input`; extend that rather than adding a
+    second detector. Add the typed `input_device_changed` signal to `autoload/events.gd`.
+  - Bind `thrust_up/down` on the gamepad (GDD §5 gives them no button yet; pick one and list
+    it under "Design questions"), then delete their exemption in
+    `game/tests/unit/test_input_router.gd`. Pitch/yaw stay exempt from keyboard events
+    (the mouse virtual stick steers them).
+  - Glyph texts ("RT", "LMB") are player-facing: put them in `strings.csv` (`GLYPH_*` keys).
+    `validate_data.py` now rejects string literals assigned to `.text`.
 
 ### M1-T2 · Ship physics core (FA on)
 - **Size:** L · **Depends on:** T1 · **Read:** GDD §4, architecture §5.1
@@ -38,6 +47,16 @@ in-game overlay, and the chosen values are saved into the ship data.
     within the expected time (from thrust/mass ±10%), the turn rate matches the max, no
     oscillation (overshoot < 5%), and the same inputs give the same results (determinism).
 - **Acceptance:** sims pass, and a shot sequence (a ship doing a turn) is in the PR.
+- **Notes from the M0 gate:**
+  - An instanced ship `.glb` contains a `Collision` StaticBody3D with a convex hull (see
+    `core/import/model_import_rules.gd`). The `Ship` must move that `CollisionShape3D` under
+    its own `RigidBody3D` and free the StaticBody3D, or Jolt sees a static body inside the ship.
+  - Put `ShipDef` in `data/defs/ship_def.gd`. `Content` is a stub with `register`/`get_def`;
+    add a loader that scans `res://data/` and a `Content.ship(id)` helper, with a unit test.
+  - Sims are fast now (`check.sh` runs gdUnit with `--fixed-fps 60`, ~50x real time), so run
+    full stop-from-max-speed scenarios, not shortened ones. Copy
+    `tests/sim/test_physics_stepping.gd` for the determinism test.
+  - Add the `Ship` scene and any debug scene to `tests/smoke/scenes.txt`.
 
 ### M1-T3 · Drift (FA off), boost & energy
 - **Size:** M · **Depends on:** T2 · **Read:** GDD §4.2–4.3
@@ -63,6 +82,10 @@ in-game overlay, and the chosen values are saved into the ship data.
   - A free look (hold) on the right stick while the ship keeps flying (settings flag; off by
     default, because the right stick aims).
 - **Acceptance:** shots of both views in the PR, and smoke tests pass.
+- **Notes from the M0 gate:** `build.py` already handles any category
+  (`--recipe props/canopy_human_light` → `game/assets/models/props/`). Every new `.glb` needs
+  `import_script/path="res://core/import/model_post_import.gd"` in its `.glb.import`
+  (`validate_data.py` enforces it); only `models/ships/` get the `ShipModel` script.
 
 ### M1-T5 · Flight arena & sense of speed
 - **Size:** L · **Depends on:** T2, T4 · **Read:** art bible §5–6, GDD §4.5
@@ -79,6 +102,13 @@ in-game overlay, and the chosen values are saved into the ship data.
   - A collision response: bumping asteroids hurts nothing yet but bounces believably (Jolt).
 - **Acceptance:** shots from the arena in the PR, and performance logged (avg frame time
   headless with lavapipe is informative only).
+- **Notes from the M0 gate:**
+  - Asteroid `.glb`s need the post-import script in their `.glb.import` too (see T4's note).
+  - `licenses.csv` paths are relative to `game/` (`assets/audio/engine_hum.ogg`), and each
+    audio file needs a row and a `CREDITS.md` line. CC0 only, if possible (art bible §9).
+  - Lavapipe renders glow and particles differently from a real GPU; say so in the PR and
+    ask the owner to judge effects in the build artifact.
+  - Add `flight_test.tscn` to `tests/smoke/scenes.txt` and make a shot scene for it.
 
 ### M1-T6 · Flight HUD v0, tuning overlay & bug capture
 - **Size:** M · **Depends on:** T3 · **Read:** art bible §7
@@ -95,6 +125,13 @@ in-game overlay, and the chosen values are saved into the ship data.
     The pause menu has an "Open bug report folder" button.
 - **Acceptance:** shot of the HUD and overlay in the PR, and a unit test for the
   tuning-snippet writer.
+- **Notes from the M0 gate:**
+  - `Log` truncates `user://logs/session.log` on every launch and keeps no history in memory.
+    Add a ring buffer of the last 200 lines to `Log` (unit-tested) for the bug capture.
+  - Every HUD/overlay label goes through `strings.csv` (`validate_data.py` enforces it).
+    Numbers formatted into a translated pattern are fine (`tr("HUD_SPEED") % speed`).
+  - `docs/guides/owner-quickstart.md` already describes F12 and the pause-menu button. Update
+    it if the controls or folder change.
 
 ### M1-T7 · Three ship profiles + ship switcher
 - **Size:** M · **Depends on:** T5 · **Read:** GDD §4.4, §19, art bible §2–3
@@ -107,6 +144,12 @@ in-game overlay, and the chosen values are saved into the ship data.
     the selected ship.
   - Sims from T2/T3 parameterised over all 3 ships.
 - **Acceptance:** sims pass for all ships. A contact sheet of all three ships is in the PR.
+- **Notes from the M0 gate:** the rename touches the recipe, the `.glb` + `.glb.import` +
+  manifest, `docs/previews/test_kestrel.png`, `core/boot/boot.tscn`, the shot scenes
+  (`kestrel_shot`, `tiers_shot`), `tests/unit/test_ship_model.gd`,
+  `tools/blender/build.py`'s usage text and `tools/blender/tests/test_pipeline.py`
+  (`grep -rn test_kestrel`). If a ship gets a 4th tier, `ShipModel.MAX_TIER` and its
+  `@export_range(0, 3)` change together.
 
 ---
 

@@ -234,13 +234,14 @@ per scene plus ~5 s start-up). Movie Maker always records at the project's 1920�
   (or `--compat` forces it). The script detects this from Godot's log and stamps every PNG
   with a red **COMPAT** label. Compat renders are good for layout and not for lighting or
   materials.
-- Self-test: `bash tools/tests/screenshot_test.sh` (also runs in `screenshots.yml`).
+- Self-test: `bash tools/tests/screenshot_test.sh` (`check.sh` runs it). `ci.yml` renders every
+  shot scene after the build and uploads them as the `screens-<sha7>` artifact.
 
 ## 8. CI/CD (GitHub Actions)
 
 | Workflow | Trigger | Jobs |
 |---|---|---|
-| `ci.yml` | PR, push to `main` | Install the pinned Godot → `tools/check.sh` → export Windows + Linux → upload build artifacts (and screenshots) |
+| `ci.yml` | PR, push to `main` | Install the pinned Godot → `tools/check.sh` → export Windows + Linux → upload build artifacts → render shot scenes → upload `screens-<sha7>` |
 | `assets.yml` | Changes in `tools/blender/**` | Install `bpy` → run all generators → fail if the exported `.glb` files differ from the committed ones, or if any generator errors |
 | `release.yml` | Tag `v*` or `playtest-*` | Export → zip → GitHub Release with notes from `docs/STATUS.md` |
 

@@ -11,6 +11,9 @@ Checks:
   4. Every scene in game/tests/smoke/scenes.txt exists.
   5. Every model under game/assets/models/ (a .glb with an .import file) names the model
      post-import script, so role materials, sockets and tier parts are set up on import.
+  6. No hardcoded player-facing text (architecture 5.8): outside game/tests/, a `text`,
+     `tooltip_text` or `placeholder_text` in a .tscn is empty or a strings.csv key (Godot
+     auto-translates it), and a .gd file never assigns a string literal to one of them.
 
 Usage: python3 tools/validate_data.py [--root <repo root>]
 """
@@ -33,6 +36,9 @@ SKIP_DIRS = {".godot", "addons", ".git"}
 FORBIDDEN_LICENSE = re.compile(r"(^|[-_ ])(NC|SA)([-_ ]|$)", re.IGNORECASE)
 EXT_RESOURCE = re.compile(r'^\[ext_resource\b.*?\bpath="(res://[^"]+)"', re.MULTILINE)
 TR_CALL = re.compile(r'\btr\(\s*&?"([^"]+)"')
+TEXT_PROPS = r"(?:text|tooltip_text|placeholder_text)"
+SCENE_TEXT = re.compile(r'^' + TEXT_PROPS + r' = "(.*)')
+SCRIPT_TEXT = re.compile(r'\.' + TEXT_PROPS + r'\s*=\s*"[^"]')
 
 
 def game_files(game: Path, suffixes: set[str]) -> list[Path]:
@@ -139,6 +145,28 @@ def check_localization(game: Path) -> list[str]:
     return errors
 
 
+def check_hardcoded_text(game: Path) -> list[str]:
+    keys, errors = load_loc_keys(game)
+    if not keys and errors:
+        return []  # check_localization already reports a broken strings.csv
+    problems: list[str] = []
+    for path in game_files(game, {".gd", ".tscn"}):
+        rel = path.relative_to(game).as_posix()
+        if rel.startswith("tests/"):
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            if path.suffix == ".tscn":
+                match = SCENE_TEXT.match(line)
+                value = match.group(1) if match else None
+                # A value without its closing quote on this line is multi-line text, never a key.
+                if value is None or value == '"' or (value.endswith('"') and value[:-1] in keys):
+                    continue
+            elif line.lstrip().startswith("#") or not SCRIPT_TEXT.search(line):
+                continue
+            problems.append(f"{rel}:{number}: hardcoded player-facing text; use a strings.csv key / tr()")
+    return problems
+
+
 def check_smoke_scenes(game: Path) -> list[str]:
     errors: list[str] = []
     listing = game / "tests" / "smoke" / "scenes.txt"
@@ -175,6 +203,7 @@ CHECKS = [
     ("licenses", check_licenses),
     ("ext_resources", check_ext_resources),
     ("localization", check_localization),
+    ("hardcoded text", check_hardcoded_text),
     ("smoke scenes", check_smoke_scenes),
     ("model imports", check_model_imports),
 ]

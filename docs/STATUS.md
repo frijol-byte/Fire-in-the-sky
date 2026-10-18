@@ -6,7 +6,7 @@
 ## Now
 - **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
   waiting**.
-- **What to start next:** M1-T3 (`docs/tasks/M1-flight.md`); M1-T1 and M1-T2 are in review. M1 can run while
+- **What to start next:** M1-T3 (`docs/tasks/M1-flight.md`); M1-T1 is merged (#10), M1-T2 is in review. M1 can run while
   the M0 playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
   0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
@@ -50,7 +50,7 @@
 
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
-| M1-T1 | Input layer & ShipControls | M0 | 👀 | |
+| M1-T1 | Input layer & ShipControls | M0 | ✅ | #10 |
 | M1-T2 | Ship physics core (FA on) | T1 | 👀 | |
 | M1-T3 | Drift (FA off), boost & energy | T2 | ⬜ | |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ⬜ | |

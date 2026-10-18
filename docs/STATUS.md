@@ -6,8 +6,8 @@
 ## Now
 - **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
   waiting**.
-- **What to start next:** M1-T1 (`docs/tasks/M1-flight.md`). M1 can start while the M0
-  playtest is pending; fixes from the playtest become cards first.
+- **What to start next:** M1-T2 (`docs/tasks/M1-flight.md`); M1-T1 is in review. M1 can run while
+  the M0 playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
   0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
      GitHub's Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest
@@ -23,7 +23,7 @@
 | # | Milestone | State | Review | Playtest release |
 |---|---|---|---|---|
 | M0 | Foundation | 🧪 playtest | ✅ [M0](reviews/M0.md) | `playtest-M0` |
-| M1 | Flight | ⬜ | — | — |
+| M1 | Flight | 🔨 | — | — |
 | M2 | Combat core | ⬜ | — | — |
 | M3 | AI depth & challenge | ⬜ | — | — |
 | M4 | World & stations | ⬜ | — | — |
@@ -45,6 +45,18 @@
 | M0-T6 | Blender generator pipeline v0 | T1 | ✅ | #3 |
 | M0-T7 | Godot model import & tier display | T3, T5, T6 | ✅ | #7 |
 | M0-T8 | Owner guides | T4 | ✅ | #8 |
+
+## M1 tasks (Flight)
+
+| Card | Title | Depends on | State | PR |
+|---|---|---|---|---|
+| M1-T1 | Input layer & ShipControls | M0 | 👀 | |
+| M1-T2 | Ship physics core (FA on) | T1 | ⬜ | |
+| M1-T3 | Drift (FA off), boost & energy | T2 | ⬜ | |
+| M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ⬜ | |
+| M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
+| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ⬜ | |
+| M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -226,6 +238,33 @@ and keep all notes bullets from both sides.
   - Pushing a tag from a cloud session is rejected (only the session branch can be pushed).
     `release.yml` now also runs on `release: published` and uploads to an existing release,
     so the owner publishes playtest releases from the Releases page.
+
+- M1-T1 (2026-10-18): `ShipControls` (`ships/ship_controls.gd`) and the new `InputRouter`.
+  Things the next session must know:
+  - Gameplay reads `InputRouter.controls` (rebuilt every physics tick, a fresh snapshot; autoloads
+    tick before scene nodes, so a ship sees this tick's value). Tests and AI can call
+    `InputRouter.build_controls()`. Conventions are in the `ShipControls` header: pitch +1 = nose
+    up, yaw +1 = nose right, roll +1 = right wing down; thrust x strafe right, y up, z forward.
+    `device` is the device slot 0..3 (D-pad); `interact`, `device` and `target_cmd` are true for
+    one tick only. `target_cmd` is `ShipControls.Target`: a double-tap on `target_nearest` within
+    18 ticks gives NEAREST_ANY.
+  - Shaping: radial deadzone, then `pow(magnitude, exponent)`, then each axis clamped to -1..1 (so
+    W+D on a keyboard is full thrust on both axes). It is one function chain
+    (`shape_stick` / `shape_axis` / `mouse_stick`); reuse it, don't re-derive it.
+  - Settings keys (`controls/stick_deadzone`, `curve_exponent`, `invert_y`, `mouse_flight`,
+    `mouse_deadzone`, `mouse_radius`) are read with defaults from `Settings` each tick, so the
+    options menu only has to set them. Mouse radii are fractions of viewport height.
+  - The mouse stick is ignored until the mouse has moved at least once and while the last device
+    was a gamepad. Nothing captures or hides the cursor yet; the flight scene decides that.
+  - `Events.input_device_changed(device: int)` carries an `InputRouter.Device` value. Stick drift
+    under 0.5 and key/button releases don't count as device changes.
+  - Glyphs: `InputRouter.glyph_for(action, device = -1)`; text comes from `GLYPH_*` keys
+    (keyboard key names come from Godot). Rebinding UI later should reuse it.
+  - Debug scene `core/debug/input_debug.tscn` (in the smoke list); shot `input_debug_shot` renders a
+    fixed sample.
+  - Vertical thrust on the gamepad is bound to paddle buttons (see the PR's Design questions);
+    the NO_GAMEPAD_YET exemption in `test_input_router.gd` is gone.
+  - Static functions can't call `tr()`; use `TranslationServer.translate()` there.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

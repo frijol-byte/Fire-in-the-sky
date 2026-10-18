@@ -3,11 +3,8 @@ extends GdUnitTestSuite
 ## keyboard/mouse event and at least one gamepad event (the game is gamepad-first).
 
 ## Pitch/yaw are steered by the mouse position (virtual joystick), which `InputRouter` reads
-## directly in the flight task, so they have no keyboard/mouse action event.
+## directly (see `InputRouter.mouse_stick`), so they have no keyboard/mouse action event.
 const MOUSE_STEERED: PackedStringArray = ["pitch_up", "pitch_down", "yaw_left", "yaw_right"]
-
-## The GDD (section 5) gives vertical strafe no gamepad button yet; the flight task decides.
-const NO_GAMEPAD_YET: PackedStringArray = ["thrust_up", "thrust_down"]
 
 
 func test_actions_list_is_not_empty() -> void:
@@ -25,8 +22,6 @@ func test_every_action_exists_in_input_map() -> void:
 
 func test_every_action_has_a_gamepad_event() -> void:
 	for action: String in InputRouter.ACTIONS:
-		if action in NO_GAMEPAD_YET:
-			continue
 		var has_pad: bool = false
 		for event: InputEvent in InputMap.action_get_events(action):
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:

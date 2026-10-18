@@ -6,3 +6,7 @@ extends Node
 
 ## Emitted by `Game` whenever the top-level flow state changes.
 signal game_state_changed(new_state: StringName)
+
+## Emitted by `InputRouter` when the player switches between gamepad and keyboard/mouse.
+## `device` is an `InputRouter.Device` value (0 keyboard/mouse, 1 gamepad).
+signal input_device_changed(device: int)

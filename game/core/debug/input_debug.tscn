@@ -1,0 +1,75 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/debug/input_debug.gd" id="1_dbg"]
+
+[node name="InputDebug" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dbg")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.07, 0.12, 1)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 48.0
+offset_right = 1000.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 56
+text = "INPUT_DEBUG_TITLE"
+
+[node name="Readout" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 160.0
+offset_right = 1000.0
+offset_bottom = 760.0
+theme_override_font_sizes/font_size = 36
+
+[node name="MoveStick" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1050.0
+offset_top = 260.0
+offset_right = 1390.0
+offset_bottom = 600.0
+
+[node name="MoveCaption" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1050.0
+offset_top = 620.0
+offset_right = 1390.0
+offset_bottom = 700.0
+theme_override_font_sizes/font_size = 32
+text = "INPUT_DEBUG_MOVE"
+horizontal_alignment = 1
+
+[node name="LookStick" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1470.0
+offset_top = 260.0
+offset_right = 1810.0
+offset_bottom = 600.0
+
+[node name="LookCaption" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1470.0
+offset_top = 620.0
+offset_right = 1810.0
+offset_bottom = 700.0
+theme_override_font_sizes/font_size = 32
+text = "INPUT_DEBUG_LOOK"
+horizontal_alignment = 1

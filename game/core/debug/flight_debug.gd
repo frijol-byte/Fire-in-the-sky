@@ -1,6 +1,7 @@
 extends Node3D
-## Debug scene: fly the Kestrel with flight assist through a field of marker pylons. A
-## stand-in until the flight arena (M1-T5) and the real cameras (M1-T4) exist. Esc quits.
+## Debug scene: fly the Kestrel with flight assist through a field of marker pylons, with the
+## real chase/cockpit camera (V or R3 switches views, hold Z for free look when the
+## `camera/free_look` setting is on). A stand-in until the flight arena (M1-T5). Esc quits.
 
 const PYLON_COUNT: int = 400
 const FIELD_RADIUS: float = 3000.0
@@ -8,11 +9,15 @@ const PYLON_SEED: int = 7
 
 @onready var _ship: Ship = $Ship
 @onready var _readout: Label = $Readout
+@onready var _rig: CameraRig = $CameraRig
 
 
 func _ready() -> void:
 	_build_pylons()
 	_ship.add_child(PlayerPilot.new())
+	_rig.attach(_ship)
+	# Free look is off by default (the right stick aims); this scene turns it on for trying it out.
+	Settings.set_value(InputRouter.SETTING_FREE_LOOK, true)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 

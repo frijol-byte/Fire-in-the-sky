@@ -51,6 +51,24 @@ extends ContentDef
 @export var boost_thrust_multiplier: float = 2.0
 @export var boost_energy_per_second: float = 30.0
 
+@export_group("Camera")
+## Where the chase camera sits, in the ship's axes: +Y up, +Z behind the ship (camera -Z is forward).
+@export var chase_offset: Vector3 = Vector3(0.0, 4.0, 15.0)
+## The chase camera looks at the point this many metres ahead of the ship.
+@export var chase_look_ahead: float = 60.0
+## Time constant (seconds) of the camera's position lag when the ship turns. 0 = rigid.
+@export var chase_position_lag: float = 0.12
+## Same for the camera's rotation lag. 0 = rigid.
+@export var chase_rotation_lag: float = 0.18
+## The chase camera drops back this many extra metres at top speed.
+@export var chase_speed_pullback: float = 3.0
+## Field of view in degrees (vertical), cruising.
+@export_range(20.0, 120.0) var base_fov: float = 75.0
+## Degrees added to the field of view while boosting.
+@export var boost_fov_kick: float = 8.0
+## Canopy frame shown in the cockpit view (a prop `.glb`).
+@export_file("*.glb") var canopy_path: String = ""
+
 @export_group("Slots (placeholder)")
 @export var primary_slots: int = 2
 @export var secondary_slots: int = 1
@@ -125,6 +143,14 @@ func problems() -> PackedStringArray:
 			result.append("max_angular_rate_deg[%d] must be above 0" % axis)
 		if angular_accel_deg[axis] <= 0.0:
 			result.append("angular_accel_deg[%d] must be above 0" % axis)
+	if chase_offset.z <= 0.0:
+		result.append("chase_offset.z must be above 0 (the camera sits behind the ship)")
+	if chase_position_lag < 0.0 or chase_rotation_lag < 0.0:
+		result.append("camera lag must not be negative")
+	if base_fov < 20.0 or base_fov > 120.0 or boost_fov_kick < 0.0:
+		result.append("base_fov must be 20..120 and boost_fov_kick at least 0")
+	if not canopy_path.is_empty() and not ResourceLoader.exists(canopy_path):
+		result.append("canopy_path does not exist: %s" % canopy_path)
 	if boost_max_speed < max_speed:
 		result.append("boost_max_speed must not be below max_speed")
 	if model_path.is_empty() or not ResourceLoader.exists(model_path):

@@ -16,6 +16,7 @@ var controls: ShipControls = ShipControls.new()
 var model: ShipModel = null
 
 @onready var _flight: FlightController = $FlightController
+@onready var _power: PowerSystem = $PowerSystem
 
 
 func _ready() -> void:
@@ -33,17 +34,35 @@ func _ready() -> void:
 		Log.error(&"ship", "Ship has no ShipDef")
 		return
 	mass = def.mass
+	_power.configure(def)
 	_flight.def = def
+	_flight.power = _power
+	_flight.boost_depleted.connect(_on_boost_depleted)
 	_build_model()
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	_flight.integrate(state, controls)
+	_power.tick(state.step)
+
+
+## The ship's energy capacitor (boost, and later weapons and devices, spend from it).
+func power() -> PowerSystem:
+	return _power
+
+
+## True while boost is firing.
+func is_boosting() -> bool:
+	return _flight.boosting
 
 
 ## Returns the velocity in the ship's own axes (-Z is forward), handy for HUDs and tests.
 func local_velocity() -> Vector3:
 	return global_basis.orthonormalized().inverse() * linear_velocity
+
+
+func _on_boost_depleted() -> void:
+	Events.boost_depleted.emit(self)
 
 
 func _build_model() -> void:

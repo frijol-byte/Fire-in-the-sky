@@ -106,6 +106,18 @@ func test_boost_kicks_the_fov_up_and_it_settles_back() -> void:
 	assert_float(_rig.camera.fov).is_equal_approx(base, 0.2)
 
 
+func test_the_fov_kick_ends_when_boost_runs_out_of_energy() -> void:
+	var boosting: ShipControls = FlightSim.controls(Vector3(0.0, 0.0, 1.0))
+	boosting.boost = true
+	await _step(60, boosting)
+	assert_bool(_ship.is_boosting()).is_true()
+	# Boost stays held, but the capacitor is empty: boost cuts out and so does the kick.
+	_ship.power().energy = 0.0
+	await _step(240, boosting)
+	assert_bool(_ship.is_boosting()).is_false()
+	assert_float(_rig.camera.fov).is_equal_approx(_ship.def.base_fov, 0.3)
+
+
 func test_a_wall_behind_the_ship_pulls_the_camera_in_and_it_recovers() -> void:
 	var wall: StaticBody3D = StaticBody3D.new()
 	var shape: CollisionShape3D = CollisionShape3D.new()

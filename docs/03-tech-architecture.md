@@ -119,14 +119,16 @@ Ship (RigidBody3D, custom_integrator = true)
 - `FlightController` runs in `_integrate_forces`: it computes the desired velocity and angular
   velocity from the controls, then a PD controller produces thrust clamped by per-axis
   limits. With FA off it skips linear damping.
-- Implemented so far (M1-T2): `Ship` (`ships/ship.tscn`), `FlightController` (FA on), `ShipDef`/`Content`,
-  `PlayerPilot`. The controller is velocity-error based: it closes `1 - exp(-gain*dt)` of the error
-  each tick, clamped by per-axis thrust/mass, so it cannot overshoot. `PowerSystem` and drift/boost
-  are M1-T3.
+- Implemented so far (M1-T2, T3): `Ship` (`ships/ship.tscn`), `FlightController` (FA on and off,
+  boost), `PowerSystem`, `ShipDef`/`Content`, `PlayerPilot`. The controller is velocity-error based: it
+  closes `1 - exp(-gain*dt)` of the error each tick, clamped by per-axis thrust/mass, so it cannot
+  overshoot. With FA off the sticks are plain thrust (momentum is kept, capped by `speed_cap`); with
+  FA on, speed above the cap blends away in `fa_excess_bleed_time`. Boost drains `PowerSystem` and
+  latches off when it runs dry (`Events.boost_depleted`).
 - **Camera (M1-T4):** `CameraRig` (`ships/camera_rig.tscn`) is a *sibling* of the player's `Ship`, never
   a child, and follows it with `attach(ship)`. It updates every rendered frame. Chase view: the
   camera sits at `ShipDef.chase_offset`, its position and rotation lag the ship by the `chase_*_lag`
-  time constants, it drops back with speed, kicks the FOV by `boost_fov_kick` while boosting, and
+  time constants, it drops back with speed, kicks the FOV by `boost_fov_kick` while `Ship.is_boosting()`, and
   ray-casts from the ship so geometry between them pulls it in (layer mask `clearance_mask`, layer 1).
   Cockpit view: the camera sits on the model's `SOCKET_cockpit_cam_0`, the exterior model hides and
   the `canopy_path` prop (Blender recipe `props/canopy_human_light`, origin = the pilot's eye) shows.

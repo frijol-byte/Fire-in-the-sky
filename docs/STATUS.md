@@ -52,7 +52,7 @@
 |---|---|---|---|---|
 | M1-T1 | Input layer & ShipControls | M0 | ✅ | #10 |
 | M1-T2 | Ship physics core (FA on) | T1 | ✅ | #11 |
-| M1-T3 | Drift (FA off), boost & energy | T2 | 👀 | #12 |
+| M1-T3 | Drift (FA off), boost & energy | T2 | ✅ | #12 |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | 👀 | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ⬜ | |
@@ -303,37 +303,6 @@ and keep all notes bullets from both sides.
     field of pylons (rigid chase camera until T4; Esc quits). It is not reachable from the
     boot screen; run it with `godot --path game res://core/debug/flight_debug.tscn`.
 
-- M1-T4 (2026-10-18): chase and cockpit cameras. Things the next session must know:
-  - **`CameraRig`** (`ships/camera_rig.tscn`, `class_name CameraRig`) is a sibling of the ship:
-    `rig.attach(ship)` once the ship is in the tree. It reads `ship.def` (new `ShipDef` "Camera"
-    group: `chase_offset`, `chase_look_ahead`, `chase_position_lag`, `chase_rotation_lag`,
-    `chase_speed_pullback`, `base_fov`, `boost_fov_kick`, `canopy_path`; validated by `problems()`)
-    and updates in `_process`. Tests step it by hand: `rig.set_process(false)` then
-    `rig.update(dt)` (see `tests/sim/test_camera_rig_sim.gd`). Each feel rule is a static function
-    (`chase_pose_for`, `smooth_weight`, `clearance_step`, `boost_fov`, `shake_amplitude`,
-    `free_look_basis`), unit tested. The T6 tuning overlay should edit the `ShipDef` camera fields.
-  - **Boost FOV:** the kick follows `Ship.is_boosting()` (boosting and powered), so it fades out when
-    the capacitor runs dry (`CameraRig._update_boost`).
-  - **Shake:** `rig.shake(strength 0..1, seconds)`; nothing calls it yet (collisions/damage will).
-    The `camera/shake` setting (0..1, default 1) scales it for accessibility.
-  - **Free look:** new `free_look` action (`Z`, gamepad Paddle 3 = button 18, see the PR's Design
-    questions) and setting `camera/free_look` (default off). While held with the setting on,
-    `InputRouter.build_controls()` gives the ship no pitch/yaw and the camera uses
-    `InputRouter.free_look_vector()`. `InputRouter.look_input()` is the one place that shapes the aim
-    input. `flight_debug.tscn` turns the setting on so it can be tried; the options menu (later)
-    should expose it.
-  - **Cockpit:** the exterior `ShipModel` is hidden while in cockpit view (the canopy prop is shown
-    instead and stays fixed to the ship while free look/shake move the camera). Props need
-    `import_script/path="res://core/import/model_post_import.gd"` like ships (done for
-    `canopy_human_light.glb`). `build.py` recipes may set `PREVIEW = "eye"` and `INFO = [...]` to get
-    the eye-view sheet instead of the ship contact sheet.
-  - **Clearance mask:** the chase ray hits physics layer 1 (everything for now) and ignores only the
-    player's ship. When M2+ adds other ships/projectiles, give world geometry its own layer and set
-    `clearance_mask`, so an AI ship behind you doesn't pull the camera in.
-  - **Not done / for later:** Godot's physics interpolation is off, so at render rates above 60 Hz
-    the ship and camera step with the physics tick (M1-T5, "sense of speed", should decide whether
-    to turn on `physics/common/physics_interpolation`). The "look at target" camera hold (GDD 6)
-    waits for targeting (M2).
 - M1-T3 (2026-10-18): drift (FA off), boost and the energy capacitor. Things the next session must know:
   - **`PowerSystem`** (`ships/power_system.gd`, a child node of `Ship`): `energy`, `capacity`,
     `request(amount) -> bool` (all or nothing; a spend restarts the regen delay), `can_afford`,
@@ -357,6 +326,37 @@ and keep all notes bullets from both sides.
     T7 adds the others). Unit: `test_power_system.gd`, `test_flight_controller_drift.gd`.
   - `flight_debug.tscn` now has a second readout line: energy, FA ON/OFF and BOOST. Controls: B /
     Shift = FA off, A / Space = boost.
+- M1-T4 (2026-10-18): chase and cockpit cameras. Things the next session must know:
+  - **`CameraRig`** (`ships/camera_rig.tscn`, `class_name CameraRig`) is a sibling of the ship:
+    `rig.attach(ship)` once the ship is in the tree. It reads `ship.def` (new `ShipDef` "Camera"
+    group: `chase_offset`, `chase_look_ahead`, `chase_position_lag`, `chase_rotation_lag`,
+    `chase_speed_pullback`, `base_fov`, `boost_fov_kick`, `canopy_path`; validated by `problems()`)
+    and updates in `_process`. Tests step it by hand: `rig.set_process(false)` then
+    `rig.update(dt)` (see `tests/sim/test_camera_rig_sim.gd`). Each feel rule is a static function
+    (`chase_pose_for`, `smooth_weight`, `clearance_step`, `boost_fov`, `shake_amplitude`,
+    `free_look_basis`), unit tested. The T6 tuning overlay should edit the `ShipDef` camera fields.
+  - **T3 hook (done at merge time):** the FOV kick follows `ship.is_boosting()` (boost held *and*
+    powered), in `CameraRig._update_boost`, so it drops when the capacitor runs dry.
+  - **Shake:** `rig.shake(strength 0..1, seconds)`; nothing calls it yet (collisions/damage will).
+    The `camera/shake` setting (0..1, default 1) scales it for accessibility.
+  - **Free look:** new `free_look` action (`Z`, gamepad Paddle 3 = button 18, see the PR's Design
+    questions) and setting `camera/free_look` (default off). While held with the setting on,
+    `InputRouter.build_controls()` gives the ship no pitch/yaw and the camera uses
+    `InputRouter.free_look_vector()`. `InputRouter.look_input()` is the one place that shapes the aim
+    input. `flight_debug.tscn` turns the setting on so it can be tried; the options menu (later)
+    should expose it.
+  - **Cockpit:** the exterior `ShipModel` is hidden while in cockpit view (the canopy prop is shown
+    instead and stays fixed to the ship while free look/shake move the camera). Props need
+    `import_script/path="res://core/import/model_post_import.gd"` like ships (done for
+    `canopy_human_light.glb`). `build.py` recipes may set `PREVIEW = "eye"` and `INFO = [...]` to get
+    the eye-view sheet instead of the ship contact sheet.
+  - **Clearance mask:** the chase ray hits physics layer 1 (everything for now) and ignores only the
+    player's ship. When M2+ adds other ships/projectiles, give world geometry its own layer and set
+    `clearance_mask`, so an AI ship behind you doesn't pull the camera in.
+  - **Not done / for later:** Godot's physics interpolation is off, so at render rates above 60 Hz
+    the ship and camera step with the physics tick (M1-T5, "sense of speed", should decide whether
+    to turn on `physics/common/physics_interpolation`). The "look at target" camera hold (GDD 6)
+    waits for targeting (M2).
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

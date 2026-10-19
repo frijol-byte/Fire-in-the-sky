@@ -4,3 +4,4 @@ res://core/boot/boot.tscn
 res://core/debug/input_debug.tscn
 res://ships/ship.tscn
 res://core/debug/flight_debug.tscn
+res://ships/camera_rig.tscn

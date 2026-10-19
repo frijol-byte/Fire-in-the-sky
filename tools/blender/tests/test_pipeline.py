@@ -22,6 +22,7 @@ import materials  # noqa: E402
 from kit import common  # noqa: E402
 
 KESTREL = BLENDER_DIR / "recipes" / "ships" / "test_kestrel.py"
+CANOPY = BLENDER_DIR / "recipes" / "props" / "canopy_human_light.py"
 
 
 def build_kestrel():
@@ -185,6 +186,45 @@ class ExportTests(unittest.TestCase):
         sock = next(n for n in gltf["nodes"] if n["name"] == "SOCKET_primary_2")
         self.assertEqual(sock["extras"]["min_tier"], 3)
         self.assertEqual(sock["extras"]["kind"], "primary")
+
+
+class CanopyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.recipe = build.load_recipe(CANOPY)
+        common.clear_scene()
+        cls.recipe.build()
+        cls.data = manifest.collect(cls.recipe)
+
+    def test_names_valid_and_in_the_props_category(self):
+        common.validate_names(bpy.data.objects)
+        self.assertEqual(self.recipe.CATEGORY, "props")
+
+    def test_triangle_budget(self):
+        lo, hi = self.recipe.TRIANGLE_BUDGET
+        self.assertTrue(lo <= self.data["triangles"]["total"] <= hi)
+
+    def test_is_modelled_around_the_eye(self):
+        # The eye (origin) is inside the frame's width, below its roof and above the dash, and the
+        # whole canopy lies ahead of or just behind it (nose = +Y).
+        bounds = self.data["bounds"]["all_tiers"]
+        self.assertLess(bounds["min"][0], -0.5)
+        self.assertGreater(bounds["max"][0], 0.5)
+        self.assertGreater(bounds["max"][2], 0.3)
+        self.assertLess(bounds["min"][2], -0.3)
+        self.assertGreater(bounds["max"][1], 1.0)
+        self.assertLess(bounds["size"][0], 3.0)
+
+    def test_materials_are_roles_only_and_nothing_is_collidable(self):
+        self.assertEqual(self.data["collision"], [])
+        for obj in common.mesh_objects():
+            for slot in obj.data.materials:
+                self.assertIn(slot.name, materials.ROLES)
+
+    def test_committed_manifest_matches(self):
+        committed = build.MODELS / "props" / "canopy_human_light.manifest.json"
+        self.assertTrue(committed.exists(), "run tools/blender/build.py --all and commit")
+        self.assertEqual(json.loads(committed.read_text()), json.loads(json.dumps(self.data)))
 
 
 if __name__ == "__main__":

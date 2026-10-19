@@ -123,6 +123,7 @@ virtual-stick layout. Everything is rebindable.
 | D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target |
 | L3 | Cruise drive (toward selected destination) |
 | R3 | Camera: chase ↔ cockpit |
+| Paddle 3 / `Z` (hold) | Free look: the right stick turns the camera while the ship keeps flying (settings flag, off by default) |
 | Start / Select | Pause menu / system map |
 
 **Mouse + keyboard:** the mouse steers a virtual joystick from screen center (pitch/yaw),
@@ -139,6 +140,8 @@ on-screen buttons for fire, boost and drift. Aim assist is stronger on touch.
 - **Cockpit cam:** a minimal canopy frame (one per faction × size class) with a holographic
   HUD.
 - Optional "look at target" hold (keeps the camera tracking the locked target).
+- **Free look** (hold, off by default in settings): the aim stick turns the camera instead of the
+  ship. Camera shake can be scaled or turned off in settings.
 
 ## 7. Combat
 

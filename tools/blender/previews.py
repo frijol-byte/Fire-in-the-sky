@@ -199,3 +199,64 @@ def render_contact_sheet(out_path: str, title: str, info_lines: list[str]) -> No
     sheet.paste(info, (3 * PANEL_W, PANEL_H + title_h))
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     sheet.save(out_path, optimize=True)
+
+
+EYE_W, EYE_H = 960, 540
+EYE_VERTICAL_FOV_DEG = 75.0
+
+
+def render_eye_view(out_path: str, title: str, info_lines: list[str]) -> None:
+    """Contact sheet for a prop modelled around the pilot's eye (a cockpit canopy): the view
+    from the origin looking along +Y with a 75 degree vertical field of view (what the player
+    sees in the cockpit camera), a 3/4 view from outside, and info text."""
+    cam = _setup_scene()
+    scene = bpy.context.scene
+    lo, hi = _bounds()
+    center = (lo + hi) * 0.5
+    radius = (hi - lo).length * 0.5
+    tmp = tempfile.mkdtemp()
+
+    scene.render.resolution_x, scene.render.resolution_y = EYE_W, EYE_H
+    cam.location = Vector((0.0, 0.0, 0.0))
+    cam.rotation_euler = Vector((0.0, 1.0, 0.0)).to_track_quat("-Z", "Y").to_euler()
+    cam.data.type = "PERSP"
+    cam.data.clip_start = 0.01
+    cam.data.sensor_fit = "VERTICAL"
+    cam.data.sensor_height = 24.0
+    cam.data.lens = 12.0 / math.tan(math.radians(EYE_VERTICAL_FOV_DEG) / 2.0)
+    eye = _render(os.path.join(tmp, "eye.png"))
+
+    scene.render.resolution_x, scene.render.resolution_y = PANEL_W, PANEL_H
+    cam.data.sensor_fit = "AUTO"
+    cam.data.sensor_width = 36
+    cam.data.lens = 70
+    cam.data.clip_start = 0.1
+    fov = 2 * math.atan(18 / 70)
+    dist = radius / math.sin(fov / 2) * 0.9
+    azimuth, elevation = math.radians(145), math.radians(24)
+    dir_to_cam = Vector(
+        (math.sin(azimuth) * math.cos(elevation), math.cos(azimuth) * math.cos(elevation), math.sin(elevation))
+    )
+    _frame(cam, center + dir_to_cam * dist, center, None, radius)
+    outside = _render(os.path.join(tmp, "outside.png"))
+
+    title_h = 46
+    sheet = Image.new("RGB", (EYE_W + PANEL_W, EYE_H + title_h), (10, 12, 18))
+    big, small = _font(26), _font(20)
+    ImageDraw.Draw(sheet).text((16, 9), title, fill=LABEL, font=big)
+
+    def tile(img: Image.Image, size: tuple[int, int], label: str, xy: tuple[int, int]) -> None:
+        panel = _backdrop().resize(size)
+        panel.paste(img, (0, 0), img)
+        ImageDraw.Draw(panel).text((14, 10), label, fill=LABEL, font=small)
+        sheet.paste(panel, xy)
+
+    tile(eye, (EYE_W, EYE_H), f"VIEW FROM THE EYE ({EYE_VERTICAL_FOV_DEG:.0f} deg vertical FOV)", (0, title_h))
+    tile(outside, (PANEL_W, PANEL_H), "FROM BEHIND, ABOVE", (EYE_W, title_h))
+    info = _backdrop().resize((PANEL_W, EYE_H - PANEL_H))
+    idraw = ImageDraw.Draw(info)
+    for n, line in enumerate(info_lines):
+        idraw.text((18, 10 + n * 24), line, fill=LABEL, font=small)
+    sheet.paste(info, (EYE_W, title_h + PANEL_H))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    sheet.save(out_path, optimize=True)

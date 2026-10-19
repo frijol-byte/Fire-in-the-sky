@@ -35,6 +35,7 @@ const ACTIONS: PackedStringArray = [
 	"cycle_subsystem",
 	"cruise_drive",
 	"camera_toggle",
+	"free_look",
 	"pause",
 	"system_map",
 ]
@@ -46,6 +47,10 @@ const SETTING_INVERT_Y: String = "controls/invert_y"
 const SETTING_MOUSE_FLIGHT: String = "controls/mouse_flight"
 const SETTING_MOUSE_DEADZONE: String = "controls/mouse_deadzone"
 const SETTING_MOUSE_RADIUS: String = "controls/mouse_radius"
+## When on, holding `free_look` turns the right stick (and the mouse stick) into a camera look
+## and the ship keeps flying straight. Off by default because the right stick aims.
+const SETTING_FREE_LOOK: String = "camera/free_look"
+const DEFAULT_FREE_LOOK: bool = false
 const DEFAULT_STICK_DEADZONE: float = 0.15
 ## 1 is linear, above 1 gives finer control near the center of the stick.
 const DEFAULT_CURVE_EXPONENT: float = 1.5
@@ -78,6 +83,7 @@ const _PAD_BUTTON_GLYPHS: Dictionary[int, StringName] = {
 	JOY_BUTTON_DPAD_RIGHT: &"GLYPH_PAD_DPAD_RIGHT",
 	JOY_BUTTON_PADDLE1: &"GLYPH_PAD_PADDLE_1",
 	JOY_BUTTON_PADDLE2: &"GLYPH_PAD_PADDLE_2",
+	JOY_BUTTON_PADDLE3: &"GLYPH_PAD_PADDLE_3",
 }
 
 ## Keys are "<axis index><sign of the axis value>".
@@ -134,11 +140,7 @@ func build_controls() -> ShipControls:
 	var vertical: float = shape_axis(_axis("thrust_down", "thrust_up"), deadzone, exponent)
 	c.thrust = Vector3(move.x, vertical, move.y)
 
-	var look: Vector2 = shape_stick(
-		Vector2(_axis("yaw_left", "yaw_right"), _axis("pitch_down", "pitch_up")), deadzone, exponent
-	)
-	look += _mouse_look(exponent)
-	look = look.clamp(-Vector2.ONE, Vector2.ONE)
+	var look: Vector2 = Vector2.ZERO if free_look_active() else look_input()
 	var roll: float = shape_axis(_axis("roll_left", "roll_right"), deadzone, exponent)
 	c.rotate = Vector3(-look.y if invert_y else look.y, look.x, roll)
 
@@ -150,6 +152,38 @@ func build_controls() -> ShipControls:
 	c.device = _device_slot_pressed()
 	c.target_cmd = _target_command()
 	return c
+
+
+## The aim input as (yaw, pitch) in -1..1, pitch up positive: the right stick plus the mouse
+## virtual stick, shaped like every other stick. Before the invert-Y setting.
+func look_input() -> Vector2:
+	var deadzone: float = float(Settings.get_value(SETTING_STICK_DEADZONE, DEFAULT_STICK_DEADZONE))
+	var exponent: float = float(Settings.get_value(SETTING_CURVE_EXPONENT, DEFAULT_CURVE_EXPONENT))
+	var look: Vector2 = shape_stick(
+		Vector2(_axis("yaw_left", "yaw_right"), _axis("pitch_down", "pitch_up")), deadzone, exponent
+	)
+	look += _mouse_look(exponent)
+	return look.clamp(-Vector2.ONE, Vector2.ONE)
+
+
+## True while the player holds `free_look` and the free-look setting is on. The ship then
+## ignores the aim input (see `build_controls`) and the camera uses it (`free_look_vector`).
+func free_look_active() -> bool:
+	return (
+		bool(Settings.get_value(SETTING_FREE_LOOK, DEFAULT_FREE_LOOK))
+		and Input.is_action_pressed("free_look")
+	)
+
+
+## The camera look for this frame as (yaw, pitch) in -1..1 (right and up positive, invert-Y
+## applied), or zero when free look is not active.
+func free_look_vector() -> Vector2:
+	if not free_look_active():
+		return Vector2.ZERO
+	var look: Vector2 = look_input()
+	if bool(Settings.get_value(SETTING_INVERT_Y, DEFAULT_INVERT_Y)):
+		look.y = -look.y
+	return look
 
 
 ## Notes which device `event` came from. Call it for every input event; it emits

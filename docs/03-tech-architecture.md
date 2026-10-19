@@ -125,6 +125,17 @@ Ship (RigidBody3D, custom_integrator = true)
   overshoot. With FA off the sticks are plain thrust (momentum is kept, capped by `speed_cap`); with
   FA on, speed above the cap blends away in `fa_excess_bleed_time`. Boost drains `PowerSystem` and
   latches off when it runs dry (`Events.boost_depleted`).
+- **Camera (M1-T4):** `CameraRig` (`ships/camera_rig.tscn`) is a *sibling* of the player's `Ship`, never
+  a child, and follows it with `attach(ship)`. It updates every rendered frame. Chase view: the
+  camera sits at `ShipDef.chase_offset`, its position and rotation lag the ship by the `chase_*_lag`
+  time constants, it drops back with speed, kicks the FOV by `boost_fov_kick` while `Ship.is_boosting()`, and
+  ray-casts from the ship so geometry between them pulls it in (layer mask `clearance_mask`, layer 1).
+  Cockpit view: the camera sits on the model's `SOCKET_cockpit_cam_0`, the exterior model hides and
+  the `canopy_path` prop (Blender recipe `props/canopy_human_light`, origin = the pilot's eye) shows.
+  `V`/R3 (`camera_toggle`) blends between the two in 0.35 s. `shake(strength, duration)` is the one
+  shake entry point (scaled by the `camera/shake` setting). Free look is the `camera/free_look`
+  setting plus the held `free_look` action: `InputRouter` then zeroes the ship's pitch/yaw and
+  hands the stick to the camera (`free_look_vector()`).
 - **Sim tests** check: time to stop from max speed, top speed reached, turn rates, drift
   keeps momentum, boost drains energy. All within tolerances defined in the `ShipDef`.
 

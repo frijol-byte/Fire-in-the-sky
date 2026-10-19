@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://core/debug/flight_debug.gd" id="1_dbg"]
 [ext_resource type="PackedScene" path="res://ships/ship.tscn" id="2_ship"]
+[ext_resource type="PackedScene" path="res://ships/camera_rig.tscn" id="3_rig"]
 
 [sub_resource type="Environment" id="Environment_space"]
 background_mode = 1
@@ -24,10 +25,7 @@ transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 
 
 [node name="Ship" parent="." instance=ExtResource("2_ship")]
 
-[node name="Camera3D" type="Camera3D" parent="Ship"]
-transform = Transform3D(1, 0, 0, 0, 0.9762, 0.2164, 0, -0.2164, 0.9762, 0, 6, 22)
-current = true
-far = 20000.0
+[node name="CameraRig" parent="." instance=ExtResource("3_rig")]
 
 [node name="Readout" type="Label" parent="."]
 offset_left = 48.0

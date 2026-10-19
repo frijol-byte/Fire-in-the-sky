@@ -1,0 +1,100 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        1.0482,
+        1.7,
+        0.6605
+      ],
+      "min": [
+        -1.0482,
+        -0.4387,
+        -1.1
+      ],
+      "size": [
+        2.0964,
+        2.1387,
+        1.7605
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        1.0482,
+        1.7,
+        0.6605
+      ],
+      "min": [
+        -1.0482,
+        -0.4387,
+        -1.1
+      ],
+      "size": [
+        2.0964,
+        2.1387,
+        1.7605
+      ]
+    }
+  },
+  "category": "props",
+  "collision": [],
+  "id": "canopy_human_light",
+  "parts": {
+    "a_pillar_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "a_pillar_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "dash": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 60
+    },
+    "dash_light": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 12
+    },
+    "header": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "rail_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 132
+    },
+    "rail_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 132
+    },
+    "rear_bow": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    }
+  },
+  "sockets": [],
+  "tier_parts": {
+    "T0ONLY": [],
+    "T1": [],
+    "T2": [],
+    "T3": []
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 512,
+      "T1": 512,
+      "T2": 512,
+      "T3": 512
+    },
+    "total": 512
+  }
+}

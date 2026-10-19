@@ -136,6 +136,22 @@ Ship (RigidBody3D, custom_integrator = true)
   shake entry point (scaled by the `camera/shake` setting). Free look is the `camera/free_look`
   setting plus the held `free_look` action: `InputRouter` then zeroes the ship's pitch/yaw and
   hands the stick to the camera (`free_look_vector()`).
+- **Flight arena and sense of speed (M1-T5):** `world/arenas/flight_test.tscn` (`FlightTest`) builds
+  a zone from one `ArenaDef` (`data/arenas/flight_test.tres`: sky, sun, rock field, gates, start).
+  - *Sky:* `SkyBaker` paints a nebula + stars + sun into six `SubViewport`s with
+    `shaders/nebula_bake.gdshader` when the arena loads, builds a `Cubemap` and shows it with
+    `shaders/nebula_sky.gdshader`. Headless runs have no renderer, so they keep a plain background.
+  - *Rocks:* `RockField` is the pure layout (seeded, with a clear lane along the course);
+    `AsteroidField` draws it as one `MultiMeshInstance3D` per rock variant (`props/asteroid_a..d`);
+    `RockColliders` keeps a pool of 32 static bodies on the rocks nearest the ship, so every rock the
+    player can reach is solid (bounce comes from the pool's `PhysicsMaterial`, values in the `ArenaDef`).
+  - *Speed effects:* `SpeedFx` scatters dust and boost streaks once; `shaders/space_dust.gdshader`
+    keeps them in a box around the camera (wrapping) and stretches them along the ship's velocity.
+    `EngineFx` (a child of every `Ship`) adds a glow on each engine socket and a world-space ribbon
+    trail. `ShipAudio` plays the engine hum, speed hiss and boost whoosh (placeholder WAVs from
+    `tools/audio/make_placeholder_audio.py`).
+  - *Physics interpolation* is on (`physics/common/physics_interpolation`). Anything that reads a
+    ship's transform in `_process` (camera, effects) must use `get_global_transform_interpolated()`.
 - **Sim tests** check: time to stop from max speed, top speed reached, turn rates, drift
   keeps momentum, boost drains energy. All within tolerances defined in the `ShipDef`.
 
@@ -251,6 +267,9 @@ per scene plus ~5 s start-up). Movie Maker always records at the project's 1920Ã
   (or `--compat` forces it). The script detects this from Godot's log and stamps every PNG
   with a red **COMPAT** label. Compat renders are good for layout and not for lighting or
   materials.
+- **Arena perf log:** `bash tools/perf_arena.sh` flies the flight arena on a script under lavapipe and
+  prints average/p95/worst frame time, draw calls and triangles. Informative only (a software renderer
+  says nothing about a GPU); first reading, M1-T5: ~68 ms/frame at 720p, 45 draw calls, 153 k triangles.
 - Self-test: `bash tools/tests/screenshot_test.sh` (`check.sh` runs it). `ci.yml` renders every
   shot scene after the build and uploads them as the `screens-<sha7>` artifact.
 

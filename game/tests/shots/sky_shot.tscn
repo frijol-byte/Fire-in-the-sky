@@ -1,0 +1,69 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="PackedScene" path="res://world/arenas/flight_test.tscn" id="1_arena"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="3_dir"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="4_def"]
+
+[sub_resource type="Resource" id="Resource_0"]
+script = ExtResource("4_def")
+label = "1_plus_x"
+frame = 10
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(100, 900, 0)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("4_def")
+label = "2_minus_x"
+frame = 13
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(-100, 900, 0)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_2"]
+script = ExtResource("4_def")
+label = "3_plus_y"
+frame = 16
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(0, 1000, 0)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("4_def")
+label = "4_minus_y"
+frame = 19
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(0, 800, 0)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("4_def")
+label = "5_plus_z"
+frame = 22
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(0, 900, 100)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("4_def")
+label = "6_minus_z"
+frame = 25
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(0, 900, -100)
+fov = 90.0
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("4_def")
+label = "7_sun"
+frame = 28
+camera_position = Vector3(0, 900, 0)
+look_at_point = Vector3(55.00000000000001, 928.0, -78.0)
+fov = 90.0
+
+[node name="SkyShot" type="Node3D"]
+
+[node name="Arena" parent="." instance=ExtResource("1_arena")]
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("3_dir")
+shots = Array[ExtResource("4_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5"), SubResource("Resource_6")])

@@ -1,0 +1,75 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        37.0,
+        4.2,
+        37.0
+      ],
+      "min": [
+        -37.0,
+        -4.2,
+        -37.0
+      ],
+      "size": [
+        74.0,
+        8.4,
+        74.0
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        37.0,
+        4.2,
+        37.0
+      ],
+      "min": [
+        -37.0,
+        -4.2,
+        -37.0
+      ],
+      "size": [
+        74.0,
+        8.4,
+        74.0
+      ]
+    }
+  },
+  "category": "props",
+  "collision": [],
+  "id": "ring_gate",
+  "parts": {
+    "frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 528
+    },
+    "marker": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 176
+    },
+    "rim_light": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 144
+    }
+  },
+  "sockets": [],
+  "tier_parts": {
+    "T0ONLY": [],
+    "T1": [],
+    "T2": [],
+    "T3": []
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 848,
+      "T1": 848,
+      "T2": 848,
+      "T3": 848
+    },
+    "total": 848
+  }
+}

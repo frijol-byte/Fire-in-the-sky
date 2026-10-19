@@ -42,9 +42,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().quit()
 
 
-## Returns the speed readout: forward speed along the nose, and total speed.
+## Returns the speed readout: forward speed along the nose, and total speed. (Rounded first so
+## a tiny negative speed reads "0", not "-0".)
 static func readout_text(forward: float, total: float) -> String:
-	return TranslationServer.translate("FLIGHT_DEBUG_SPEED") % [forward, total]
+	return TranslationServer.translate("FLIGHT_DEBUG_SPEED") % [roundf(forward) + 0.0, total]
 
 
 ## Returns the energy readout line with the flight assist and boost state.

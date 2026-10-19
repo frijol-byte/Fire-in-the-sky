@@ -11,6 +11,10 @@ signal game_state_changed(new_state: StringName)
 ## `device` is an `InputRouter.Device` value (0 keyboard/mouse, 1 gamepad).
 signal input_device_changed(device: int)
 
+## Emitted by `Ship` when boost stops because the capacitor ran dry (not when the pilot lets go).
+## Audio and visual effects hook in here.
+signal boost_depleted(ship: Node)
+
 ## Emitted by `CameraRig` when the player's view changes. `view` is a `CameraRig.View` value
 ## (0 chase, 1 cockpit).
 signal camera_view_changed(view: int)

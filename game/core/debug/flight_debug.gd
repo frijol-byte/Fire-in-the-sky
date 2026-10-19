@@ -1,3 +1,4 @@
+class_name FlightDebug
 extends Node3D
 ## Debug scene: fly the Kestrel with flight assist through a field of marker pylons, with the
 ## real chase/cockpit camera (V or R3 switches views, hold Z for free look when the
@@ -27,7 +28,13 @@ func _exit_tree() -> void:
 
 func _process(_delta: float) -> void:
 	var local: Vector3 = _ship.local_velocity()
-	_readout.text = readout_text(-local.z, _ship.linear_velocity.length())
+	_readout.text = (
+		readout_text(-local.z, _ship.linear_velocity.length())
+		+ "\n"
+		+ power_text(
+			_ship.power().energy, _ship.power().capacity, _ship.controls.fa_off, _ship.is_boosting()
+		)
+	)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -38,6 +45,19 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Returns the speed readout: forward speed along the nose, and total speed.
 static func readout_text(forward: float, total: float) -> String:
 	return TranslationServer.translate("FLIGHT_DEBUG_SPEED") % [forward, total]
+
+
+## Returns the energy readout line with the flight assist and boost state.
+static func power_text(energy: float, capacity: float, fa_off: bool, boosting: bool) -> String:
+	var fa_key: String = "FLIGHT_DEBUG_FA_OFF" if fa_off else "FLIGHT_DEBUG_FA_ON"
+	var boost_key: String = "FLIGHT_DEBUG_BOOST" if boosting else "FLIGHT_DEBUG_NO_BOOST"
+	return (
+		TranslationServer.translate("FLIGHT_DEBUG_POWER") % [energy, capacity]
+		+ "   "
+		+ TranslationServer.translate(fa_key)
+		+ "   "
+		+ TranslationServer.translate(boost_key)
+	)
 
 
 func _build_pylons() -> void:

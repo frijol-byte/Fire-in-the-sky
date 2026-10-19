@@ -119,10 +119,12 @@ Ship (RigidBody3D, custom_integrator = true)
 - `FlightController` runs in `_integrate_forces`: it computes the desired velocity and angular
   velocity from the controls, then a PD controller produces thrust clamped by per-axis
   limits. With FA off it skips linear damping.
-- Implemented so far (M1-T2): `Ship` (`ships/ship.tscn`), `FlightController` (FA on), `ShipDef`/`Content`,
-  `PlayerPilot`. The controller is velocity-error based: it closes `1 - exp(-gain*dt)` of the error
-  each tick, clamped by per-axis thrust/mass, so it cannot overshoot. `PowerSystem` and drift/boost
-  are M1-T3.
+- Implemented so far (M1-T2, T3): `Ship` (`ships/ship.tscn`), `FlightController` (FA on and off,
+  boost), `PowerSystem`, `ShipDef`/`Content`, `PlayerPilot`. The controller is velocity-error based: it
+  closes `1 - exp(-gain*dt)` of the error each tick, clamped by per-axis thrust/mass, so it cannot
+  overshoot. With FA off the sticks are plain thrust (momentum is kept, capped by `speed_cap`); with
+  FA on, speed above the cap blends away in `fa_excess_bleed_time`. Boost drains `PowerSystem` and
+  latches off when it runs dry (`Events.boost_depleted`).
 - **Camera (M1-T4):** `CameraRig` (`ships/camera_rig.tscn`) is a *sibling* of the player's `Ship`, never
   a child, and follows it with `attach(ship)`. It updates every rendered frame. Chase view: the
   camera sits at `ShipDef.chase_offset`, its position and rotation lag the ship by the `chase_*_lag`

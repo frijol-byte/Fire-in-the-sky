@@ -50,6 +50,13 @@ extends ContentDef
 ## Multiplies forward thrust while boosting.
 @export var boost_thrust_multiplier: float = 2.0
 @export var boost_energy_per_second: float = 30.0
+## Energy needed to start a boost, so that a nearly empty capacitor cannot stutter it on and off.
+@export var boost_min_energy: float = 10.0
+
+@export_group("Flight assist (excess speed)")
+## Seconds flight assist takes to remove (95% of) any speed above the current cap, after boost
+## ends or FA comes back on.
+@export var fa_excess_bleed_time: float = 1.0
 
 @export_group("Camera")
 ## Where the chase camera sits, in the ship's axes: +Y up, +Z behind the ship (camera -Z is forward).
@@ -134,6 +141,8 @@ func problems() -> PackedStringArray:
 		"energy_capacity": energy_capacity,
 		"boost_max_speed": boost_max_speed,
 		"boost_thrust_multiplier": boost_thrust_multiplier,
+		"boost_energy_per_second": boost_energy_per_second,
+		"fa_excess_bleed_time": fa_excess_bleed_time,
 	}
 	for field: String in positive:
 		if positive[field] <= 0.0:
@@ -153,6 +162,10 @@ func problems() -> PackedStringArray:
 		result.append("canopy_path does not exist: %s" % canopy_path)
 	if boost_max_speed < max_speed:
 		result.append("boost_max_speed must not be below max_speed")
+	if energy_regen < 0.0 or energy_regen_delay < 0.0:
+		result.append("energy_regen and energy_regen_delay must not be negative")
+	if boost_min_energy < 0.0 or boost_min_energy > energy_capacity:
+		result.append("boost_min_energy must be between 0 and energy_capacity")
 	if model_path.is_empty() or not ResourceLoader.exists(model_path):
 		result.append("model_path does not exist: %s" % model_path)
 	return result

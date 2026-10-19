@@ -6,7 +6,7 @@
 ## Now
 - **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
   waiting**.
-- **What to start next:** M1-T3 (`docs/tasks/M1-flight.md`); M1-T1 is merged (#10), M1-T2 is in review. M1 can run while
+- **What to start next:** M1-T4 or M1-T6 (`docs/tasks/M1-flight.md`); M1-T1 and T2 are merged, M1-T3 is in review. M1 can run while
   the M0 playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
   0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
@@ -51,9 +51,9 @@
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
 | M1-T1 | Input layer & ShipControls | M0 | ✅ | #10 |
-| M1-T2 | Ship physics core (FA on) | T1 | 👀 | #11 |
-| M1-T3 | Drift (FA off), boost & energy | T2 | ⬜ | |
-| M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | 👀 | #13 |
+| M1-T2 | Ship physics core (FA on) | T1 | ✅ | #11 |
+| M1-T3 | Drift (FA off), boost & energy | T2 | ✅ | #12 |
+| M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ✅ | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ⬜ | |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
@@ -303,6 +303,29 @@ and keep all notes bullets from both sides.
     field of pylons (rigid chase camera until T4; Esc quits). It is not reachable from the
     boot screen; run it with `godot --path game res://core/debug/flight_debug.tscn`.
 
+- M1-T3 (2026-10-18): drift (FA off), boost and the energy capacitor. Things the next session must know:
+  - **`PowerSystem`** (`ships/power_system.gd`, a child node of `Ship`): `energy`, `capacity`,
+    `request(amount) -> bool` (all or nothing; a spend restarts the regen delay), `can_afford`,
+    `fraction()`, `tick(dt)`. `Ship` ticks it from `_integrate_forces`; read it with `ship.power()`.
+    Weapons and devices (M2) must spend through `request`.
+  - **`FlightController.compute()`** gained a `boosting` argument and now handles FA off. With FA
+    off the sticks are raw thrust (`stick x accel`, no damping); thrust cannot raise the speed past
+    the cap (`speed_cap`: `max_speed`, or `boost_max_speed` while boosting) but speed already above
+    it is kept. With FA on, speed above the cap is blended away by `limit_excess` (95% gone in
+    `ShipDef.fa_excess_bleed_time`, 1 s), which ignores thrust limits on purpose ("smooth blend").
+    That also applies when boost ends under FA, so the ship eases from 320 to 180 over ~1 s.
+  - **Boost** is decided in `FlightController._update_boost` (instance state): held, not locked,
+    and `energy >= boost_min_energy` to start; it drains `boost_energy_per_second * dt` through
+    `PowerSystem.request`. Boosting forces full forward throttle and multiplies forward thrust by
+    `boost_thrust_multiplier`. When a request fails the boost latches off until the button is
+    released (no on/off stutter at an almost-empty capacitor) and `Events.boost_depleted(ship)`
+    fires once. `ship.is_boosting()` is the state for HUD/VFX/audio. Pilot releasing the button does
+    not emit it.
+  - New `ShipDef` fields: `boost_min_energy` and `fa_excess_bleed_time` (in `kestrel.tres`; validated).
+  - Sims: `tests/sim/test_flight_drift.gd`, `test_flight_boost.gd` (SHIP_IDS lists only the Kestrel;
+    T7 adds the others). Unit: `test_power_system.gd`, `test_flight_controller_drift.gd`.
+  - `flight_debug.tscn` now has a second readout line: energy, FA ON/OFF and BOOST. Controls: B /
+    Shift = FA off, A / Space = boost.
 - M1-T4 (2026-10-18): chase and cockpit cameras. Things the next session must know:
   - **`CameraRig`** (`ships/camera_rig.tscn`, `class_name CameraRig`) is a sibling of the ship:
     `rig.attach(ship)` once the ship is in the tree. It reads `ship.def` (new `ShipDef` "Camera"
@@ -312,8 +335,8 @@ and keep all notes bullets from both sides.
     `rig.update(dt)` (see `tests/sim/test_camera_rig_sim.gd`). Each feel rule is a static function
     (`chase_pose_for`, `smooth_weight`, `clearance_step`, `boost_fov`, `shake_amplitude`,
     `free_look_basis`), unit tested. The T6 tuning overlay should edit the `ShipDef` camera fields.
-  - **T3 hook:** the FOV kick currently follows `ship.controls.boost` (held), in
-    `CameraRig._update_boost`. When boost/energy land, feed it the real "boosting and powered" state.
+  - **T3 hook (done at merge time):** the FOV kick follows `ship.is_boosting()` (boost held *and*
+    powered), in `CameraRig._update_boost`, so it drops when the capacitor runs dry.
   - **Shake:** `rig.shake(strength 0..1, seconds)`; nothing calls it yet (collisions/damage will).
     The `camera/shake` setting (0..1, default 1) scales it for accessibility.
   - **Free look:** new `free_look` action (`Z`, gamepad Paddle 3 = button 18, see the PR's Design

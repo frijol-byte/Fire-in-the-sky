@@ -292,8 +292,8 @@ func _update_free_look(delta: float) -> void:
 
 
 func _update_boost(delta: float, def: ShipDef) -> void:
-	# T3 (boost and energy) should feed the real "boosting and powered" state here.
-	var wanted: float = 1.0 if ship.controls.boost else 0.0
+	# Boost held *and* powered: the kick drops when the capacitor runs dry (M1-T3).
+	var wanted: float = 1.0 if ship.is_boosting() else 0.0
 	var tau: float = FOV_KICK_IN_TAU if wanted > _boost_amount else FOV_KICK_OUT_TAU
 	_boost_amount = lerpf(_boost_amount, wanted, smooth_weight(delta, tau))
 	if def.boost_fov_kick <= 0.0:

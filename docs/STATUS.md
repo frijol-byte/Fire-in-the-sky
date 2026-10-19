@@ -55,7 +55,7 @@
 | M1-T3 | Drift (FA off), boost & energy | T2 | ✅ | #12 |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | 👀 | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
-| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | 🔨 | |
+| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | 👀 | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest

@@ -55,7 +55,7 @@
 | M1-T3 | Drift (FA off), boost & energy | T2 | ✅ | #12 |
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | 👀 | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
-| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ⬜ | |
+| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | 🔨 | |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
@@ -357,6 +357,33 @@ and keep all notes bullets from both sides.
     the ship and camera step with the physics tick (M1-T5, "sense of speed", should decide whether
     to turn on `physics/common/physics_interpolation`). The "look at target" camera hold (GDD 6)
     waits for targeting (M2).
+- M1-T6 (2026-10-19): flight HUD, tuning overlay, bug capture and a minimal pause menu. Things the next
+  session must know:
+  - **Add three scenes to every flight scene** (T5's `flight_test.tscn` must): `ui/hud/flight_hud.tscn`
+    (inside a `CanvasLayer`; call `bind(ship)`), `ui/dev/dev_tools.tscn` (`bind(ship, rig)`) and
+    `ui/pause/pause_menu.tscn`. `core/debug/flight_debug.tscn` shows the wiring. The old debug readout
+    (and its `FLIGHT_DEBUG_*` strings and test) is gone; the HUD replaces it.
+  - **HUD** (`FlightHud`, `HudMath`): the velocity marker is the flight-path marker (mint ring with wings), the
+    nose is a white ring; off-screen or behind-the-camera markers pin to the screen edge, dimmed. It reads
+    `ship.controls.fa_off`, `ship.is_boosting()`, `ship.power()` and `Events.boost_depleted` ("BOOST EMPTY"
+    for 1.5 s). It only needs a camera, so the cockpit's holo plane can reuse it unchanged.
+  - **Tuning overlay** (`ui/dev/tuning_overlay.gd`, params in `tuning_param.gd`): edits the *live* `ShipDef`
+    resource. **Opening it pauses the game** (the sticks would otherwise fly the ship while navigating) and
+    keeps the camera updating, so FOV/lag changes show at once. `Ship.refresh_from_def()` re-applies mass and
+    the capacitor (`PowerSystem.retune`, which keeps the energy held); everything else is read every tick.
+    Add a `TuningParam` row (plus `TUNE_*` strings) when a `ShipDef` field should be tunable. The def is shared
+    by every ship of that id, which is fine for a dev tool. "Copy values" -> `TuningSnippet.save`.
+  - **Hotkeys** (`DevHotkeys`, raw events, not InputMap actions): F1 / Select (on release, so it does not fire
+    as the first half of the chord) toggles the overlay, F12 / Back + Start captures a bug report. `Select`
+    is also bound to `system_map` (GDD); nothing listens to that yet, revisit when the system map exists.
+  - **Bug capture** (`BugReport.capture`): `user://bug_reports/<timestamp>/` with `screenshot.png` (skipped on the
+    headless renderer), `log.txt` (the last 200 lines from the new `Log.recent_lines` ring buffer, `LogRing`)
+    and `state.json` (scene, version, renderer, input device, the ship's position/velocity/FA/boost/energy,
+    all `Settings`). A toast shows the folder path for 7 s.
+  - **Pause menu** (`PauseMenu`): Esc / Start pauses; Resume, Open bug report folder, Quit. Back + Start is
+    ignored as a pause. This is a stand-in until the game-flow task builds the real menu.
+  - Shot scene `hud_shot` (cruise, boost, drift turn, overlay open) with its driver; PNGs are in
+    `docs/previews/m1-t6-*.png`.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

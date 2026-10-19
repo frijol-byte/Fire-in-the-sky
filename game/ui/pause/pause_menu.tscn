@@ -1,0 +1,55 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/pause/pause_menu.gd" id="1_pause"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dim"]
+bg_color = Color(0.01, 0.015, 0.03, 0.78)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 44
+
+[node name="PauseMenu" type="CanvasLayer"]
+layer = 25
+script = ExtResource("1_pause")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dim")
+
+[node name="Center" type="CenterContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Column" type="VBoxContainer" parent="Panel/Center"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/Center/Column"]
+layout_mode = 2
+text = "PAUSE_TITLE"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="Panel/Center/Column"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "PAUSE_RESUME"
+
+[node name="BugFolder" type="Button" parent="Panel/Center/Column"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "PAUSE_BUG_FOLDER"
+
+[node name="Quit" type="Button" parent="Panel/Center/Column"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "PAUSE_QUIT"

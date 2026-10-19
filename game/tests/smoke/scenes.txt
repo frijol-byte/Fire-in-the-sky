@@ -5,3 +5,7 @@ res://core/debug/input_debug.tscn
 res://ships/ship.tscn
 res://core/debug/flight_debug.tscn
 res://ships/camera_rig.tscn
+res://ui/hud/flight_hud.tscn
+res://ui/dev/dev_tools.tscn
+res://ui/dev/tuning_overlay.tscn
+res://ui/pause/pause_menu.tscn

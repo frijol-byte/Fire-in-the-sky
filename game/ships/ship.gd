@@ -51,6 +51,13 @@ func power() -> PowerSystem:
 	return _power
 
 
+## Re-reads the values of `def` that are copied at spawn (mass, the capacitor). The flight
+## controller and camera read `def` every tick, so the tuning overlay only needs this one call.
+func refresh_from_def() -> void:
+	mass = def.mass
+	_power.retune(def)
+
+
 ## True while boost is firing.
 func is_boosting() -> bool:
 	return _flight.boosting

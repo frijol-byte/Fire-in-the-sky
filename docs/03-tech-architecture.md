@@ -136,6 +136,14 @@ Ship (RigidBody3D, custom_integrator = true)
   shake entry point (scaled by the `camera/shake` setting). Free look is the `camera/free_look`
   setting plus the held `free_look` action: `InputRouter` then zeroes the ship's pitch/yaw and
   hands the stick to the camera (`free_look_vector()`).
+- **Flight HUD & playtest tools (M1-T6):** `FlightHud` (`ui/hud/flight_hud.tscn`, `bind(ship)`) draws speed,
+  FA/boost state, the energy bar, a nose ring and a flight-path marker where the ship is really going
+  (`HudMath` holds the pure rules). `DevTools` (`ui/dev/dev_tools.tscn`, `bind(ship, rig)`) carries the
+  tuning overlay (F1 / Select: a slider per flight field of the player's `ShipDef` plus camera lag and FOV,
+  applied live, "Copy values" writes `user://tuning/<ship>.tres`) and bug capture (F12 / Back + Start:
+  `BugReport` writes a screenshot, `Log.recent_lines(200)` and a JSON state dump to
+  `user://bug_reports/<timestamp>/`). `PauseMenu` (`ui/pause/pause_menu.tscn`) pauses and opens that folder.
+  Every flight scene adds these three scenes.
 - **Sim tests** check: time to stop from max speed, top speed reached, turn rates, drift
   keeps momentum, boost drains energy. All within tolerances defined in the `ShipDef`.
 

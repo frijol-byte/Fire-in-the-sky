@@ -163,9 +163,17 @@ publish the release. Do it **after** merging the review PR:
    bottom of that milestone's file in `docs/tasks/`, for example
    [`M0-foundation.md`](../tasks/M0-foundation.md)).
 2. Whenever something is wrong **and the build has the feature** (it arrives in M1), press
-   **F12** (gamepad: Back + Start). It saves a screenshot and a state dump into the
-   bug-report folder; the in-game pause menu has an **Open bug-report folder** button. Until
-   then, take a normal screenshot with **Win + Shift + S** and note what happened.
+   **F12** (gamepad: **Back + Start**, i.e. Select + Start). It saves a screenshot, the last
+   200 log lines and a state dump into a new folder inside the bug-report folder, and shows
+   the folder's path on screen for a few seconds. The pause menu (**Esc** / **Start**) has an
+   **Open bug report folder** button that opens it. On Windows the folder is
+   `%APPDATA%\Godot\app_userdata\Fire in the Sky\bug_reports\`. Until a build has the feature,
+   take a normal screenshot with **Win + Shift + S** and note what happened.
+   **Tuning flight feel (M1):** press **F1** (gamepad: **Select**) to open the tuning
+   overlay. The game pauses; move a slider (left/right on the d-pad or stick) and close it to
+   fly with the new value. **Copy values** saves your numbers to `tuning\<ship>.tres` next to
+   the bug-report folder, copies them to the clipboard and shows the file path. Paste them
+   into the "Feel & tuning" part of your report.
 3. Copy [`docs/templates/playtest-report.md`](../templates/playtest-report.md) into any
    text editor (Notepad is fine) and fill it in. Rough notes are fine, even dictated on a
    phone. Gut reactions about *feel* ("floaty", "pointless", "I got lost") are the most

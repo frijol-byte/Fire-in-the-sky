@@ -55,13 +55,65 @@ INPUT_DEBUG_ACTION_FIRE_SECONDARY,Secondary
 INPUT_DEVICE_KEYBOARD_MOUSE,Keyboard + mouse
 INPUT_DEVICE_GAMEPAD,Gamepad
 SHIP_KESTREL_NAME,Kestrel
-FLIGHT_DEBUG_SPEED,Speed %.0f m/s (total %.0f)
-FLIGHT_DEBUG_POWER,Energy %.0f / %.0f
-FLIGHT_DEBUG_FA_ON,FA ON
-FLIGHT_DEBUG_FA_OFF,FA OFF
-FLIGHT_DEBUG_BOOST,BOOST
-FLIGHT_DEBUG_NO_BOOST,-
 ARENA_FLIGHT_TEST_NAME,Flight test arena
 ARENA_GATES,Gates passed: %d
-ARENA_HELP,%s boost    %s drift    %s camera    %s title screen
+ARENA_HELP,%s boost    %s drift    %s camera    %s pause
 BOOT_FLY_HINT,%s: fly the flight test arena
+HUD_SPEED,%.0f m/s
+HUD_FA_ON,FA ON
+HUD_FA_OFF,FA OFF
+HUD_BOOST_ACTIVE,BOOST
+HUD_BOOST_READY,BOOST READY
+HUD_BOOST_CHARGING,BOOST CHARGING
+HUD_BOOST_EMPTY,BOOST EMPTY
+HUD_ENERGY,ENERGY %.0f
+TUNE_TITLE,Flight tuning
+TUNE_HINT,Left/right changes a value. F1 or Select closes. The game is paused.
+TUNE_COPY,Copy values
+TUNE_RESET,Reset
+TUNE_CLOSE,Close
+TUNE_SAVED,Saved and copied: %s
+TUNE_SAVE_FAILED,Could not save the tuning values.
+TUNE_RESET_DONE,Values reset to how they were when this flight started.
+TUNE_GROUP_MASS,Mass and thrust
+TUNE_GROUP_SPEED,Speed limits
+TUNE_GROUP_TURN,Turning
+TUNE_GROUP_ASSIST,Flight assist
+TUNE_GROUP_ENERGY,Energy and boost
+TUNE_GROUP_CAMERA,Camera
+TUNE_MASS,Mass (kg)
+TUNE_THRUST_FORWARD,Forward thrust (N)
+TUNE_THRUST_REVERSE,Reverse thrust (N)
+TUNE_THRUST_LATERAL,Strafe thrust (N)
+TUNE_THRUST_VERTICAL,Vertical thrust (N)
+TUNE_MAX_SPEED,Top speed (m/s)
+TUNE_MAX_REVERSE_SPEED,Reverse speed (m/s)
+TUNE_MAX_STRAFE_SPEED,Strafe speed (m/s)
+TUNE_MAX_VERTICAL_SPEED,Vertical speed (m/s)
+TUNE_PITCH_RATE,Pitch rate (deg/s)
+TUNE_YAW_RATE,Yaw rate (deg/s)
+TUNE_ROLL_RATE,Roll rate (deg/s)
+TUNE_PITCH_ACCEL,Pitch accel (deg/s2)
+TUNE_YAW_ACCEL,Yaw accel (deg/s2)
+TUNE_ROLL_ACCEL,Roll accel (deg/s2)
+TUNE_FA_LINEAR_GAIN,Speed response (1/s)
+TUNE_FA_ANGULAR_GAIN,Turn response (1/s)
+TUNE_FA_BLEED_TIME,Excess speed bleed (s)
+TUNE_ENERGY_CAPACITY,Energy capacity
+TUNE_ENERGY_REGEN,Energy regen (/s)
+TUNE_ENERGY_REGEN_DELAY,Regen delay (s)
+TUNE_BOOST_MAX_SPEED,Boost top speed (m/s)
+TUNE_BOOST_THRUST,Boost thrust multiplier
+TUNE_BOOST_DRAIN,Boost drain (/s)
+TUNE_BOOST_MIN_ENERGY,Energy to start boost
+TUNE_CAMERA_POSITION_LAG,Camera position lag (s)
+TUNE_CAMERA_ROTATION_LAG,Camera rotation lag (s)
+TUNE_CAMERA_PULLBACK,Camera speed pullback (m)
+TUNE_BASE_FOV,Field of view (deg)
+TUNE_BOOST_FOV_KICK,Boost FOV kick (deg)
+BUG_REPORT_SAVED,Bug report saved: %s
+BUG_REPORT_FAILED,Could not save the bug report.
+PAUSE_TITLE,Paused
+PAUSE_RESUME,Resume
+PAUSE_BUG_FOLDER,Open bug report folder
+PAUSE_QUIT,Quit

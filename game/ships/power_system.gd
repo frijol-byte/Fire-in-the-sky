@@ -26,6 +26,15 @@ func configure(def: ShipDef) -> void:
 	_seconds_since_spend = regen_delay
 
 
+## Takes new capacitor size and regeneration values from `def` without refilling, keeping the
+## energy held (capped to the new capacity). The tuning overlay calls this while you fly.
+func retune(def: ShipDef) -> void:
+	capacity = def.energy_capacity
+	regen_per_second = def.energy_regen
+	regen_delay = def.energy_regen_delay
+	energy = minf(energy, capacity)
+
+
 ## Spends `amount` and returns true, or returns false and spends nothing when there is not
 ## enough. A successful spend restarts the regeneration delay.
 func request(amount: float) -> bool:

@@ -172,6 +172,10 @@ func test_the_arena_scene_runs_with_the_player_flying_and_boosting() -> void:
 	add_child(arena)
 	await SimHelper.step_physics(get_tree(), 2)
 	assert_object(arena.ship).is_not_null()
+	var hud: FlightHud = arena.get_node("Hud/FlightHud") as FlightHud
+	assert_object(hud.ship).is_same(arena.ship)
+	assert_object(arena.get_node("PauseMenu")).is_instanceof(PauseMenu)
+	assert_object(arena.get_node("DevTools")).is_instanceof(DevTools)
 	# The player's pilot would overwrite the scripted controls every tick.
 	for child: Node in arena.ship.get_children():
 		if child is PlayerPilot:
@@ -194,3 +198,15 @@ func test_the_arena_scene_runs_with_the_player_flying_and_boosting() -> void:
 	assert_int(most_solid).is_greater(0)
 	assert_float(top_speed).is_less_equal(FLIGHT_TEST_BOOST_TOP)
 	assert_float(top_speed).is_greater(100.0)
+
+
+func test_respawning_moves_the_hud_to_the_new_ship() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	var first: Ship = arena.ship
+	var second: Ship = arena.spawn_player(FLIGHT_TEST.spawn_ship_id)
+	await SimHelper.step_physics(get_tree(), 2)
+	assert_object(second).is_not_same(first)
+	assert_object((arena.get_node("Hud/FlightHud") as FlightHud).ship).is_same(second)

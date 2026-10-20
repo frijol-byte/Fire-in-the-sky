@@ -7,11 +7,14 @@ enum Level { DEBUG, INFO, WARN, ERROR }
 const LOG_DIR: String = "user://logs"
 const LOG_FILE: String = "user://logs/session.log"
 const LEVEL_NAMES: PackedStringArray = ["DEBUG", "INFO", "WARN", "ERROR"]
+## How many recent lines are kept in memory for bug reports.
+const RING_LINES: int = 200
 
 ## Lines below this level are dropped.
 var min_level: Level = Level.INFO
 
 var _file: FileAccess = null
+var _ring: LogRing = LogRing.new(RING_LINES)
 
 
 func _ready() -> void:
@@ -49,11 +52,18 @@ func error(channel: StringName, message: String) -> void:
 	push_error("[%s] %s" % [channel, message])
 
 
+## The last `count` log lines written this session (all `RING_LINES` kept when `count` is 0),
+## oldest first. Bug reports attach these.
+func recent_lines(count: int = 0) -> PackedStringArray:
+	return _ring.lines(count)
+
+
 func _write(level: Level, channel: StringName, message: String) -> void:
 	if level < min_level:
 		return
 	var stamp: String = Time.get_datetime_string_from_system()
 	var line: String = "[%s] [%s] [%s] %s" % [stamp, LEVEL_NAMES[level], channel, message]
+	_ring.push(line)
 	if _file != null:
 		_file.store_line(line)
 		_file.flush()

@@ -6,7 +6,8 @@ extends Node3D
 ## flight sounds.
 ##
 ## The ship is spawned by `spawn_player()` (the ship switcher of M1-T7 will call it again).
-## Pause (Esc / Start) goes back to the title screen.
+## It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
+## menu (Esc / Start), like every flight scene (M1-T6).
 
 const ARENA_ID: StringName = &"flight_test"
 const SHIP_SCENE: PackedScene = preload("res://ships/ship.tscn")
@@ -31,6 +32,8 @@ var gates_passed: int = 0
 @onready var _audio: ShipAudio = $ShipAudio
 @onready var _readout: Label = $Readout
 @onready var _help: Label = $Help
+@onready var _hud: FlightHud = $Hud/FlightHud
+@onready var _tools: DevTools = $DevTools
 
 
 func _ready() -> void:
@@ -59,21 +62,8 @@ func _exit_tree() -> void:
 func _process(_delta: float) -> void:
 	if ship == null:
 		return
-	var local: Vector3 = ship.local_velocity()
-	_readout.text = (
-		FlightDebug.readout_text(-local.z, ship.linear_velocity.length())
-		+ "\n"
-		+ FlightDebug.power_text(
-			ship.power().energy, ship.power().capacity, ship.controls.fa_off, ship.is_boosting()
-		)
-		+ "\n"
-		+ tr("ARENA_GATES") % gates_passed
-	)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause"):
-		Game.go_to_boot()
+	# Speed, flight assist, boost and energy are on the flight HUD; this is just the course.
+	_readout.text = tr("ARENA_GATES") % gates_passed
 
 
 ## Puts the player in a new ship of `ship_id` at the start, replacing the old one.
@@ -93,6 +83,8 @@ func spawn_player(ship_id: StringName) -> Ship:
 	_speed_fx.attach(ship)
 	_audio.attach(ship)
 	_field.follow(ship)
+	_hud.bind(ship)
+	_tools.bind(ship, _rig)
 	return ship
 
 

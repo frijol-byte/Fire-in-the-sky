@@ -1,8 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://core/debug/flight_debug.gd" id="1_dbg"]
 [ext_resource type="PackedScene" path="res://ships/ship.tscn" id="2_ship"]
 [ext_resource type="PackedScene" path="res://ships/camera_rig.tscn" id="3_rig"]
+[ext_resource type="PackedScene" path="res://ui/hud/flight_hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://ui/dev/dev_tools.tscn" id="5_tools"]
+[ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="6_pause"]
 
 [sub_resource type="Environment" id="Environment_space"]
 background_mode = 1
@@ -10,9 +13,6 @@ background_color = Color(0.015, 0.02, 0.05, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.4, 0.45, 0.6, 1)
 ambient_light_energy = 0.6
-
-[sub_resource type="LabelSettings" id="LabelSettings_readout"]
-font_size = 40
 
 [node name="FlightDebug" type="Node3D"]
 script = ExtResource("1_dbg")
@@ -27,9 +27,10 @@ transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 
 
 [node name="CameraRig" parent="." instance=ExtResource("3_rig")]
 
-[node name="Readout" type="Label" parent="."]
-offset_left = 48.0
-offset_top = 40.0
-offset_right = 900.0
-offset_bottom = 100.0
-label_settings = SubResource("LabelSettings_readout")
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="FlightHud" parent="Hud" instance=ExtResource("4_hud")]
+
+[node name="DevTools" parent="." instance=ExtResource("5_tools")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("6_pause")]

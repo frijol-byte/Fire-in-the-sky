@@ -1,0 +1,71 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/hud/flight_hud.gd" id="1_hud"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_speed"]
+font_size = 44
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.7)
+
+[sub_resource type="LabelSettings" id="LabelSettings_small"]
+font_size = 22
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.7)
+
+[node name="FlightHud" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="Speed" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -204.0
+offset_right = 300.0
+offset_bottom = -148.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_speed")
+horizontal_alignment = 1
+
+[node name="State" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -146.0
+offset_right = 300.0
+offset_bottom = -112.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1
+
+[node name="Energy" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -76.0
+offset_right = 300.0
+offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://world/ring_gate.gd" id="1_gate"]
+[ext_resource type="PackedScene" path="res://assets/models/props/ring_gate.glb" id="2_model"]
+
+[node name="RingGate" type="Node3D"]
+script = ExtResource("1_gate")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+
+[node name="Trigger" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 1

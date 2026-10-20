@@ -6,7 +6,7 @@
 ## Now
 - **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
   waiting**.
-- **What to start next:** M1-T4 or M1-T6 (`docs/tasks/M1-flight.md`); M1-T1 and T2 are merged, M1-T3 is in review. M1 can run while
+- **What to start next:** M1-T6 (`docs/tasks/M1-flight.md`) or M1-T7 once T5 is merged; M1-T1 to T4 are merged, M1-T5 is in review. M1 can run while
   the M0 playtest is pending; fixes from the playtest become cards first.
 - **Owner actions waiting:**
   0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
@@ -53,9 +53,9 @@
 | M1-T1 | Input layer & ShipControls | M0 | ✅ | #10 |
 | M1-T2 | Ship physics core (FA on) | T1 | ✅ | #11 |
 | M1-T3 | Drift (FA off), boost & energy | T2 | ✅ | #12 |
-| M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | 👀 | #13 |
-| M1-T5 | Flight arena & sense of speed | T2, T4 | ⬜ | |
-| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | 👀 | #14 |
+| M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ✅ | #13 |
+| M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
+| M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
@@ -357,6 +357,31 @@ and keep all notes bullets from both sides.
     the ship and camera step with the physics tick (M1-T5, "sense of speed", should decide whether
     to turn on `physics/common/physics_interpolation`). The "look at target" camera hold (GDD 6)
     waits for targeting (M2).
+- M1-T5 (2026-10-19): flight arena, sky, rocks, speed effects and placeholder audio. Things the next session must know:
+  - **Reaching it:** on the title screen press `interact` (G / gamepad Y) to fly `world/arenas/flight_test.tscn`
+    (`Game.go_to_flight_test()`). Since the T6 merge the arena carries T6's flight HUD, `DevTools` (F1 tuning, F12 bug capture)
+    and pause menu (Esc / Start; its Quit exits the game), plus its own gate counter and controls line. `spawn_player()` re-binds
+    the HUD and tools to the new ship.
+  - **`ArenaDef`** (`data/defs/arena_def.gd`, kind `arena`, `data/arenas/flight_test.tres`) holds sky palette, sun/fill/ambient/glow, the rock
+    field, collider pool, gates and the start. Tune the look there. `FlightTest.spawn_player(ship_id)` spawns/respawns the player's ship
+    (T7's switcher should call it).
+  - **Sky:** `SkyBaker` bakes `nebula_bake.gdshader` into a cubemap via six `SubViewport`s (needs a renderer; headless keeps a plain colour).
+    The bake takes a frame or two, so shots must be at frame >= 6. `shaders/nebula_sky.gdshader` shows the cubemap.
+  - **Rocks:** `RockField` (pure layout, seeded, clear lane along the course), `AsteroidField` (4 MultiMeshes), `RockColliders` (pool of 32 static
+    bodies that follows the ship: every rock the player can reach is solid, not just ~30 fixed ones). Bounce comes from `rock_bounce` in the
+    `ArenaDef`. Rocks/gates are physics layer 1 (the chase camera ray hits layer 1; move world geometry to its own layer when other ships exist).
+  - **Models:** `props/asteroid_a..d` (320 tris each, flat shaded, new `ROCK` role material -> `shaders/materials/rock.tres`) and `props/ring_gate`
+    (no collision hull; `RingGate` builds box colliders for the struts and a trigger for the opening).
+  - **Speed effects:** `SpeedFx` (dust + boost streaks, one shader, wraps specks around the camera: not GPUParticles), `EngineFx` (child of every
+    `Ship`: glow per `SOCKET_engine_*` + ribbon trail), `ShipAudio` (hum, hiss, whoosh). Sounds are synthesised by
+    `tools/audio/make_placeholder_audio.py` (CC0, deterministic), imported as PCM WAV (`compress/mode=0`; loop flags are in the `.import`).
+  - **Physics interpolation is now ON** (`project.godot`). `CameraRig` and `EngineFx` read `get_global_transform_interpolated()`; the rig and
+    trail meshes switch interpolation off for themselves. Do the same for anything that follows a ship from `_process`.
+  - **Shots/perf:** `arena_shot` (flight sequence) and `sky_shot` (all six cube faces + the sun). `ShotDirector` now frees the scene and waits
+    3 frames before quitting (playing audio otherwise counts as a leaked resource and fails `screenshot.sh`). `bash tools/perf_arena.sh` prints
+    frame-time/draw-call stats (software renderer, informative only).
+  - Judge in the real build (software rendering differs): bloom around the sun and engines, the colour/brightness of the nebula, how dark rocks
+    look on their shadowed side, dust/streak density and brightness, engine trail look, the audio (volumes, pitch range).
 - M1-T6 (2026-10-19): flight HUD, tuning overlay, bug capture and a minimal pause menu. Things the next
   session must know:
   - **Add three scenes to every flight scene** (T5's `flight_test.tscn` must): `ui/hud/flight_hud.tscn`

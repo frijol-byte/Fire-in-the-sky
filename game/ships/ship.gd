@@ -17,6 +17,7 @@ var model: ShipModel = null
 
 @onready var _flight: FlightController = $FlightController
 @onready var _power: PowerSystem = $PowerSystem
+@onready var _engine_fx: EngineFx = $EngineFx
 
 
 func _ready() -> void:
@@ -39,6 +40,7 @@ func _ready() -> void:
 	_flight.power = _power
 	_flight.boost_depleted.connect(_on_boost_depleted)
 	_build_model()
+	_engine_fx.setup(self)
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:

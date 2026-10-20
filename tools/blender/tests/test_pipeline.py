@@ -227,5 +227,93 @@ class CanopyTests(unittest.TestCase):
         self.assertEqual(json.loads(committed.read_text()), json.loads(json.dumps(self.data)))
 
 
+ASTEROIDS = [BLENDER_DIR / "recipes" / "props" / f"asteroid_{v}.py" for v in "abcd"]
+RING_GATE = BLENDER_DIR / "recipes" / "props" / "ring_gate.py"
+
+
+def build_prop(path: Path):
+    recipe = build.load_recipe(path)
+    common.clear_scene()
+    recipe.build()
+    return recipe, manifest.collect(recipe)
+
+
+class PropTestsMixin:
+    """Checks every prop recipe must pass; subclasses set `paths`."""
+
+    paths: list[Path] = []
+
+    def test_names_valid_and_in_the_props_category(self):
+        for path in self.paths:
+            with self.subTest(recipe=path.stem):
+                recipe, _data = build_prop(path)
+                common.validate_names(bpy.data.objects)
+                self.assertEqual(recipe.CATEGORY, "props")
+                self.assertEqual(recipe.ID, path.stem)
+
+    def test_triangle_budget_and_role_materials(self):
+        for path in self.paths:
+            with self.subTest(recipe=path.stem):
+                recipe, data = build_prop(path)
+                lo, hi = recipe.TRIANGLE_BUDGET
+                self.assertTrue(lo <= data["triangles"]["total"] <= hi, data["triangles"])
+                for obj in common.mesh_objects():
+                    for slot in obj.data.materials:
+                        self.assertIn(slot.name, materials.ROLES)
+
+    def test_build_is_deterministic(self):
+        for path in self.paths:
+            with self.subTest(recipe=path.stem):
+                _recipe, first = build_prop(path)
+                _recipe, second = build_prop(path)
+                self.assertEqual(json.loads(json.dumps(first)), json.loads(json.dumps(second)))
+
+    def test_committed_manifest_matches(self):
+        for path in self.paths:
+            with self.subTest(recipe=path.stem):
+                _recipe, data = build_prop(path)
+                committed = build.MODELS / "props" / f"{path.stem}.manifest.json"
+                self.assertTrue(committed.exists(), "run tools/blender/build.py --all and commit")
+                self.assertEqual(json.loads(committed.read_text()), json.loads(json.dumps(data)))
+
+
+class AsteroidTests(PropTestsMixin, unittest.TestCase):
+    paths = ASTEROIDS
+
+    def test_every_rock_has_a_convex_collision_hull(self):
+        for path in self.paths:
+            with self.subTest(recipe=path.stem):
+                _recipe, data = build_prop(path)
+                self.assertEqual(data["collision"], ["rock-colonly"])
+                hull = bpy.data.objects["rock-colonly"]
+                self.assertTrue(all(p.normal.length > 0.99 for p in hull.data.polygons))
+
+    def test_rocks_are_about_five_metres_in_radius_and_differ(self):
+        sizes = []
+        for path in self.paths:
+            _recipe, data = build_prop(path)
+            size = data["bounds"]["all_tiers"]["size"]
+            sizes.append(tuple(size))
+            self.assertTrue(4.0 <= max(size) / 2.0 <= 9.0, size)
+        self.assertEqual(len(set(sizes)), len(self.paths), "variants must differ in shape")
+
+
+class RingGateTests(PropTestsMixin, unittest.TestCase):
+    paths = [RING_GATE]
+
+    def test_the_opening_is_sixty_metres_and_faces_the_flight_axis(self):
+        _recipe, data = build_prop(RING_GATE)
+        size = data["bounds"]["all_tiers"]["size"]
+        # Blender: the ring lies in XZ (Godot XY); the flight axis Y (Godot Z) is the shallow one.
+        self.assertGreater(size[0], 66.0)
+        self.assertGreater(size[2], 66.0)
+        self.assertLess(size[1], 12.0)
+
+    def test_the_ring_is_not_collidable_by_hull(self):
+        # A convex hull of a ring would fill the opening; the game builds strut colliders instead.
+        _recipe, data = build_prop(RING_GATE)
+        self.assertEqual(data["collision"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

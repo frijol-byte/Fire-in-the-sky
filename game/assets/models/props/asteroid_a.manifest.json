@@ -1,0 +1,67 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        5.3979,
+        5.0524,
+        4.7246
+      ],
+      "min": [
+        -5.9392,
+        -4.7596,
+        -4.4767
+      ],
+      "size": [
+        11.3371,
+        9.812,
+        9.2013
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        5.3979,
+        5.0524,
+        4.7246
+      ],
+      "min": [
+        -5.9392,
+        -4.7596,
+        -4.4767
+      ],
+      "size": [
+        11.3371,
+        9.812,
+        9.2013
+      ]
+    }
+  },
+  "category": "props",
+  "collision": [
+    "rock-colonly"
+  ],
+  "id": "asteroid_a",
+  "parts": {
+    "rock": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 320
+    }
+  },
+  "sockets": [],
+  "tier_parts": {
+    "T0ONLY": [],
+    "T1": [],
+    "T2": [],
+    "T3": []
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 320,
+      "T1": 320,
+      "T2": 320,
+      "T3": 320
+    },
+    "total": 320
+  }
+}

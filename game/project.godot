@@ -157,6 +157,7 @@ locale/translations=PackedStringArray("res://localization/strings.en.translation
 [physics]
 
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 common/physics_ticks_per_second=60
 
 [rendering]

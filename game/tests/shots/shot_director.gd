@@ -9,6 +9,8 @@ extends Node
 ## Without that argument (for example when you press F6 in the editor) it just plays.
 
 const MANIFEST_ARG: String = "--shot-manifest="
+## Frames to wait between freeing the scene and quitting.
+const QUIT_FRAMES: int = 3
 
 ## Shots to take, in any order.
 @export var shots: Array[ShotDef] = []
@@ -32,7 +34,22 @@ func _process(_delta: float) -> void:
 	for shot: ShotDef in shots_on_frame(shots, frame):
 		_apply(shot)
 	if not _manifest_path.is_empty() and frame >= _last_frame + tail_frames:
-		get_tree().quit()
+		set_process(false)
+		_quit_cleanly()
+
+
+## Frees the rest of the scene and lets a few frames pass before quitting. A sound still playing
+## when the engine exits is reported as a leaked resource, which `tools/screenshot.sh` would count
+## as an error; the audio server only lets go of it a frame or two after the player is freed.
+func _quit_cleanly() -> void:
+	var scene: Node = get_tree().current_scene
+	if scene != null:
+		for child: Node in scene.get_children():
+			if child != self:
+				child.queue_free()
+	for _frame: int in QUIT_FRAMES:
+		await get_tree().process_frame
+	get_tree().quit()
 
 
 ## Returns the manifest path from `args`, or "" when the argument is absent.

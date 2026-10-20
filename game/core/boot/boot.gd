@@ -9,6 +9,8 @@ const DEV_VERSION: String = "dev"
 const TIER_INTERVAL: float = 3.0
 ## Turntable speed in radians per second.
 const TURN_SPEED: float = 0.45
+## The action that leaves the title screen for the flight test arena.
+const FLY_ACTION: StringName = &"interact"
 const TIER_NAME_KEYS: Array[StringName] = [
 	&"TIER_NAME_0", &"TIER_NAME_1", &"TIER_NAME_2", &"TIER_NAME_3"
 ]
@@ -19,6 +21,7 @@ var _elapsed_in_tier: float = 0.0
 @onready var _title: Label = %Title
 @onready var _version: Label = %Version
 @onready var _tier_name: Label = %TierName
+@onready var _fly_hint: Label = %FlyHint
 @onready var _pivot: Node3D = %Pivot
 @onready var _ship: ShipModel = %Ship
 
@@ -27,6 +30,8 @@ func _ready() -> void:
 	_title.text = tr("GAME_TITLE")
 	_version.text = tr("BOOT_VERSION") % read_version()
 	_show_tier(0)
+	_update_fly_hint()
+	Events.input_device_changed.connect(_on_input_device_changed)
 	Log.info("boot", "boot scene ready, version %s" % read_version())
 
 
@@ -36,6 +41,11 @@ func _process(delta: float) -> void:
 	if _elapsed_in_tier >= TIER_INTERVAL:
 		_elapsed_in_tier -= TIER_INTERVAL
 		_show_tier(next_tier(_tier))
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(FLY_ACTION) and not event.is_echo():
+		Game.go_to_flight_test()
 
 
 ## Returns the tier that follows `tier`, wrapping from the highest back to 0.
@@ -60,3 +70,11 @@ func _show_tier(tier: int) -> void:
 	_tier = tier
 	_ship.set_tier(tier)
 	_tier_name.text = tr("BOOT_TIER") % [tier, tr(tier_name_key(tier))]
+
+
+func _update_fly_hint() -> void:
+	_fly_hint.text = tr("BOOT_FLY_HINT") % InputRouter.glyph_for(FLY_ACTION)
+
+
+func _on_input_device_changed(_device: int) -> void:
+	_update_fly_hint()

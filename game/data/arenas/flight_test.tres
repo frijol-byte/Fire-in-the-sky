@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="ArenaDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/arena_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"flight_test"
+display_name_key = "ARENA_FLIGHT_TEST_NAME"
+spawn_ship_id = &"kestrel"
+spawn_position = Vector3(0, 0, 0)
+spawn_look_at = Vector3(0, 0, -1000)
+sky_seed = 3.0
+sky_cubemap_size = 1024
+sky_space_color = Color(0.012, 0.01, 0.02, 1)
+sky_nebula_deep = Color(0.25, 0.07, 0.02, 1)
+sky_nebula_main = Color(1, 0.45, 0.08, 1)
+sky_nebula_hot = Color(1, 0.82, 0.45, 1)
+sky_dust_lane_color = Color(0.02, 0.012, 0.01, 1)
+sky_nebula_scale = 1.6
+sky_nebula_strength = 1.0
+sky_star_density = 0.85
+sky_star_brightness = 1.5
+sky_sun_direction = Vector3(0.55, 0.28, -0.78)
+sky_sun_color = Color(0.85, 0.92, 1, 1)
+sky_sun_radius_deg = 1.4
+sun_light_energy = 1.5
+sun_light_color = Color(1, 0.93, 0.82, 1)
+fill_light_energy = 0.8
+fill_light_color = Color(0.9, 0.45, 0.25, 1)
+ambient_energy = 2.5
+glow_intensity = 0.9
+glow_bloom = 0.15
+glow_threshold = 0.9
+field_seed = 4242
+field_rock_count = 2000
+field_inner_radius = 90.0
+field_outer_radius = 2600.0
+field_density_bias = 1.5
+field_vertical_scale = 0.22
+field_min_scale = 0.5
+field_max_scale = 6.5
+field_scale_bias = 3.5
+field_lane_radius = 60.0
+collider_pool_size = 32
+collider_radius = 420.0
+rock_bounce = 0.35
+rock_friction = 0.3
+gate_transforms = Array[Transform3D]([Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -480), Transform3D(0.9762, 0.0126, -0.2166, -0, 0.9983, 0.0583, 0.2169, -0.0569, 0.9745, 380, 70, -1000), Transform3D(0.8284, -0.0133, 0.56, 0, 0.9997, 0.0237, -0.5602, -0.0196, 0.8282, 260, -60, -1650), Transform3D(-0.1544, 0.0305, 0.9875, 0, 0.9995, -0.0309, -0.988, -0.0048, -0.1543, -330, 40, -2050), Transform3D(-0.9858, 0.0025, 0.1679, 0, 0.9999, -0.0146, -0.168, -0.0144, -0.9857, -700, -30, -1500), Transform3D(-0.985, -0.019, -0.1713, 0, 0.9939, -0.1101, 0.1724, -0.1085, -0.979, -560, 60, -700)])
+gate_scale = 1.0

@@ -14,6 +14,7 @@ ROLES: dict[str, tuple[str, float, float, float, float]] = {
     "EMISSIVE_ENGINE": ("80CCFF", 0.0, 0.5, 8.0, 1.0),
     "EMISSIVE_LIGHT": ("FFE9B3", 0.0, 0.5, 5.0, 1.0),
     "CRYSTAL": ("BFFFF0", 0.0, 0.1, 0.5, 0.6),
+    "ROCK": ("7A5F4A", 0.0, 0.95, 0.0, 1.0),
     "DECAL_HAZARD": ("E8B923", 0.0, 0.6, 0.0, 1.0),
 }
 

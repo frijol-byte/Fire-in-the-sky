@@ -5,3 +5,5 @@ res://core/debug/input_debug.tscn
 res://ships/ship.tscn
 res://core/debug/flight_debug.tscn
 res://ships/camera_rig.tscn
+res://world/arenas/flight_test.tscn
+res://world/props/ring_gate.tscn

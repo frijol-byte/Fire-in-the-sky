@@ -61,3 +61,7 @@ FLIGHT_DEBUG_FA_ON,FA ON
 FLIGHT_DEBUG_FA_OFF,FA OFF
 FLIGHT_DEBUG_BOOST,BOOST
 FLIGHT_DEBUG_NO_BOOST,-
+ARENA_FLIGHT_TEST_NAME,Flight test arena
+ARENA_GATES,Gates passed: %d
+ARENA_HELP,%s boost    %s drift    %s camera    %s title screen
+BOOT_FLY_HINT,%s: fly the flight test arena

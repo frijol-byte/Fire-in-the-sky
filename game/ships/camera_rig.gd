@@ -75,6 +75,9 @@ var _noise: FastNoiseLite = FastNoiseLite.new()
 
 
 func _ready() -> void:
+	# The rig places the camera itself every rendered frame, from interpolated ship transforms;
+	# interpolating the camera's own transform as well would add a second, wrong smoothing.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_noise.seed = SHAKE_SEED
 	_noise.noise_type = FastNoiseLite.TYPE_PERLIN
 	_noise.frequency = 1.0
@@ -111,7 +114,7 @@ func attach(new_ship: Ship) -> void:
 	_boost_amount = 0.0
 	_clearance = 1.0
 	var target: Transform3D = _chase_target(Basis.IDENTITY)
-	_chase_offset = target.origin - ship.global_position
+	_chase_offset = target.origin - _ship_transform().origin
 	_chase_rotation = target.basis.get_rotation_quaternion()
 	update(0.0)
 
@@ -234,7 +237,14 @@ static func free_look_basis(look: Vector2) -> Basis:
 
 
 func _chase_target(look: Basis) -> Transform3D:
-	return chase_pose_for(ship.global_transform, ship.def, look, _speed_fraction())
+	return chase_pose_for(_ship_transform(), ship.def, look, _speed_fraction())
+
+
+## Where the ship is drawn this frame. With physics interpolation on, that is between the last two
+## physics ticks, so the camera moves smoothly at any frame rate (the tick-stepped
+## `global_transform` would make it judder above 60 Hz).
+func _ship_transform() -> Transform3D:
+	return ship.get_global_transform_interpolated()
 
 
 func _speed_fraction() -> float:
@@ -244,7 +254,7 @@ func _speed_fraction() -> float:
 ## Advances the lagged chase state and returns the chase pose, pulled in clear of geometry.
 func _update_chase(delta: float) -> Transform3D:
 	var def: ShipDef = ship.def
-	var ship_position: Vector3 = ship.global_position
+	var ship_position: Vector3 = _ship_transform().origin
 	var target: Transform3D = _chase_target(free_look_basis(_look))
 	_chase_offset = _chase_offset.lerp(
 		target.origin - ship_position, smooth_weight(delta, def.chase_position_lag)
@@ -278,9 +288,9 @@ func _clear_fraction(pivot: Vector3, wanted: Vector3) -> float:
 
 ## The eye pose in the cockpit view, without free look or shake.
 func _cockpit_base() -> Transform3D:
-	var eye: Transform3D = ship.global_transform * Transform3D(Basis.IDENTITY, FALLBACK_EYE)
+	var eye: Transform3D = _ship_transform() * Transform3D(Basis.IDENTITY, FALLBACK_EYE)
 	if _socket != null:
-		eye = _socket.global_transform
+		eye = _socket.get_global_transform_interpolated()
 	eye.basis = eye.basis.orthonormalized()
 	return eye
 

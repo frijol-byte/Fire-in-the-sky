@@ -38,6 +38,7 @@ const MATERIALS: Dictionary = {
 	"EMISSIVE_ENGINE": "res://shaders/materials/emissive_engine.tres",
 	"EMISSIVE_LIGHT": "res://shaders/materials/emissive_light.tres",
 	"CRYSTAL": "res://shaders/materials/crystal.tres",
+	"ROCK": "res://shaders/materials/rock.tres",
 }
 
 ## Materials whose colour comes from the ship's paint (see `ShipModel.set_paint`).

@@ -4,8 +4,12 @@ extends GdUnitTestSuite
 const TICKS: int = 240
 
 
-func _run() -> Array[FlightSim.Sample]:
-	var ship: Ship = FlightSim.spawn(self)
+func ship_params() -> Array[Array]:
+	return FlightSim.ship_params()
+
+
+func _run(ship_id: StringName) -> Array[FlightSim.Sample]:
+	var ship: Ship = FlightSim.spawn(self, ship_id)
 	var samples: Array[FlightSim.Sample] = []
 	# A maneuver that touches every axis: accelerate and turn, then reverse and roll.
 	var script: Array[ShipControls] = [
@@ -21,12 +25,14 @@ func _run() -> Array[FlightSim.Sample]:
 	return samples
 
 
-func test_same_inputs_give_identical_flights() -> void:
+func test_same_inputs_give_identical_flights(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
 	# The first physics frame of a suite is not a full tick for a freshly added body, which would
 	# shift the first run by one tick. Let it pass before recording anything.
 	await get_tree().physics_frame
-	var first: Array[FlightSim.Sample] = await _run()
-	var second: Array[FlightSim.Sample] = await _run()
+	var first: Array[FlightSim.Sample] = await _run(ship_id)
+	var second: Array[FlightSim.Sample] = await _run(ship_id)
 	assert_int(second.size()).is_equal(first.size())
 	for index: int in first.size():
 		assert_vector(second[index].position).is_equal(first[index].position)

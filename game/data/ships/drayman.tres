@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="ShipDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ship_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"drayman"
+display_name_key = "SHIP_DRAYMAN_NAME"
+model_path = "res://assets/models/ships/drayman.glb"
+mass = 30000.0
+thrust_forward = 900000.0
+thrust_reverse = 600000.0
+thrust_lateral = 540000.0
+thrust_vertical = 540000.0
+max_speed = 110.0
+max_reverse_speed = 55.0
+max_strafe_speed = 55.0
+max_vertical_speed = 40.0
+max_angular_rate_deg = Vector3(40, 40, 70)
+angular_accel_deg = Vector3(160, 160, 260)
+fa_linear_gain = 6.0
+fa_angular_gain = 12.0
+energy_capacity = 150.0
+energy_regen = 10.0
+energy_regen_delay = 1.5
+boost_max_speed = 200.0
+boost_thrust_multiplier = 2.5
+boost_energy_per_second = 25.0
+boost_min_energy = 15.0
+fa_excess_bleed_time = 1.0
+chase_offset = Vector3(0, 8, 32)
+chase_look_ahead = 80.0
+chase_position_lag = 0.2
+chase_rotation_lag = 0.28
+chase_speed_pullback = 6.0
+base_fov = 72.0
+boost_fov_kick = 7.0
+canopy_path = "res://assets/models/props/canopy_human_light.glb"
+paint_primary = Color(0.353, 0.373, 0.4, 1)
+paint_secondary = Color(0.886, 0.631, 0.118, 1)
+primary_slots = 2
+secondary_slots = 1
+device_slots = 2

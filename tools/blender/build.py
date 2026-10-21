@@ -1,6 +1,6 @@
 """Blender asset builder (run with the bpy venv).
 
-  tools/blender/.venv/bin/python tools/blender/build.py --recipe ships/test_kestrel
+  tools/blender/.venv/bin/python tools/blender/build.py --recipe ships/kestrel
   tools/blender/.venv/bin/python tools/blender/build.py --all [--no-previews]
 
 For each recipe: build the scene, validate names and budgets, export
@@ -21,6 +21,7 @@ sys.path.insert(0, str(HERE))
 import bpy  # noqa: E402
 
 import manifest as manifest_mod  # noqa: E402
+import materials  # noqa: E402
 from kit import common  # noqa: E402
 
 RECIPES = HERE / "recipes"
@@ -75,6 +76,8 @@ def build_recipe(path: Path, previews: bool = True) -> dict:
     recipe = load_recipe(path)
     common.clear_scene()
     recipe.build()
+    for role, hex_color in getattr(recipe, "PALETTE", {}).items():
+        materials.tint(role, hex_color)
     common.validate_names(bpy.data.objects)
 
     data = manifest_mod.collect(recipe)
@@ -99,7 +102,8 @@ def build_recipe(path: Path, previews: bool = True) -> dict:
         if getattr(recipe, "PREVIEW", "ship") == "eye":
             previews_mod.render_eye_view(out, title, list(recipe.INFO))
         else:
-            previews_mod.render_contact_sheet(out, title, manifest_mod.info_lines(data))
+            info = list(getattr(recipe, "INFO", None) or manifest_mod.info_lines(data))
+            previews_mod.render_contact_sheet(out, title, info)
         print(f"[build] {recipe.ID}: preview -> docs/previews/{recipe.ID}.png")
     return data
 

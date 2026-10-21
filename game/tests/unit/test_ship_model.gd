@@ -1,9 +1,9 @@
 extends GdUnitTestSuite
-## Imported `test_kestrel.glb`: root script, socket discovery by tier, tier part visibility,
+## Imported `kestrel.glb`: root script, socket discovery by tier, tier part visibility,
 ## role materials and paint.
 
-const KESTREL: PackedScene = preload("res://assets/models/ships/test_kestrel.glb")
-const MANIFEST_PATH: String = "res://assets/models/ships/test_kestrel.manifest.json"
+const KESTREL: PackedScene = preload("res://assets/models/ships/kestrel.glb")
+const MANIFEST_PATH: String = "res://assets/models/ships/kestrel.manifest.json"
 
 
 func _make_ship(tier: int = 0) -> ShipModel:

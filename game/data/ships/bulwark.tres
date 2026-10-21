@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="ShipDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ship_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"bulwark"
+display_name_key = "SHIP_BULWARK_NAME"
+model_path = "res://assets/models/ships/bulwark.glb"
+mass = 10000.0
+thrust_forward = 450000.0
+thrust_reverse = 300000.0
+thrust_lateral = 280000.0
+thrust_vertical = 280000.0
+max_speed = 140.0
+max_reverse_speed = 70.0
+max_strafe_speed = 70.0
+max_vertical_speed = 55.0
+max_angular_rate_deg = Vector3(65, 65, 110)
+angular_accel_deg = Vector3(290, 290, 440)
+fa_linear_gain = 6.0
+fa_angular_gain = 12.0
+energy_capacity = 120.0
+energy_regen = 11.0
+energy_regen_delay = 1.3
+boost_max_speed = 260.0
+boost_thrust_multiplier = 2.2
+boost_energy_per_second = 30.0
+boost_min_energy = 12.0
+fa_excess_bleed_time = 1.0
+chase_offset = Vector3(0, 5, 19)
+chase_look_ahead = 60.0
+chase_position_lag = 0.15
+chase_rotation_lag = 0.22
+chase_speed_pullback = 4.0
+base_fov = 75.0
+boost_fov_kick = 8.0
+canopy_path = "res://assets/models/props/canopy_human_light.glb"
+paint_primary = Color(0.894, 0.906, 0.925, 1)
+paint_secondary = Color(0.106, 0.208, 0.408, 1)
+primary_slots = 2
+secondary_slots = 2
+device_slots = 2

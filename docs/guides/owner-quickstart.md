@@ -169,6 +169,9 @@ publish the release. Do it **after** merging the review PR:
    **Open bug report folder** button that opens it. On Windows the folder is
    `%APPDATA%\Godot\app_userdata\Fire in the Sky\bug_reports\`. Until a build has the feature,
    take a normal screenshot with **Win + Shift + S** and note what happened.
+   **Switching ships (M1):** in the flight arena press **1 / 2 / 3** (gamepad: d-pad up / right /
+   down) to jump into the Kestrel (light fighter), Bulwark (heavy fighter) or Drayman (armed
+   freighter). You restart at the beginning of the course in the ship you picked.
    **Tuning flight feel (M1):** press **F1** (gamepad: **Select**) to open the tuning
    overlay. The game pauses; move a slider (left/right on the d-pad or stick) and close it to
    fly with the new value. **Copy values** saves your numbers to `tuning\<ship>.tres` next to

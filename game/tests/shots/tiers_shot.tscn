@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="PackedScene" path="res://assets/models/ships/test_kestrel.glb" id="1_ship"]
+[ext_resource type="PackedScene" path="res://assets/models/ships/kestrel.glb" id="1_ship"]
 [ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="2_dir"]
 [ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="3_def"]
 

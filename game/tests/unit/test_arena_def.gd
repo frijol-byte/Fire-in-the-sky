@@ -51,3 +51,31 @@ func test_light_direction_points_away_from_the_sun() -> void:
 	var arena: ArenaDef = _copy()
 	arena.sky_sun_direction = Vector3(0.0, 2.0, 0.0)
 	assert_vector(arena.light_direction()).is_equal_approx(Vector3.DOWN, Vector3.ONE * 0.0001)
+
+
+func test_the_arena_offers_all_three_ships_in_slot_order() -> void:
+	assert_array(FLIGHT_TEST.selectable_ship_ids).is_equal([&"kestrel", &"bulwark", &"drayman"])
+	for ship_id: StringName in FLIGHT_TEST.selectable_ship_ids:
+		assert_object(Content.ship(ship_id)).is_not_null()
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, 1)).is_equal("kestrel")
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, 2)).is_equal("bulwark")
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, 3)).is_equal("drayman")
+
+
+func test_a_slot_without_a_ship_selects_nothing() -> void:
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, 0)).is_equal("")
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, 4)).is_equal("")
+	assert_str(FlightTest.ship_for_slot(FLIGHT_TEST, -1)).is_equal("")
+	assert_str(FlightTest.ship_for_slot(null, 1)).is_equal("")
+	var arena: ArenaDef = _copy()
+	arena.selectable_ship_ids = [&"kestrel"]
+	assert_str(FlightTest.ship_for_slot(arena, 2)).is_equal("")
+
+
+func test_problems_flags_a_bad_ship_list() -> void:
+	var arena: ArenaDef = _copy()
+	arena.selectable_ship_ids = [&"kestrel", &"kestrel"]
+	assert_array(arena.problems()).is_not_empty()
+	arena = _copy()
+	arena.selectable_ship_ids = [&"kestrel", &"bulwark", &"drayman", &"kestrel"]
+	assert_array(arena.problems()).is_not_empty()

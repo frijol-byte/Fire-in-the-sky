@@ -210,3 +210,42 @@ func test_respawning_moves_the_hud_to_the_new_ship() -> void:
 	await SimHelper.step_physics(get_tree(), 2)
 	assert_object(second).is_not_same(first)
 	assert_object((arena.get_node("Hud/FlightHud") as FlightHud).ship).is_same(second)
+
+
+func _press_slot(slot: int) -> void:
+	var action: String = "device_%d" % slot
+	Input.action_press(action)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	Input.action_release(action)
+	await get_tree().physics_frame
+
+
+func test_the_device_slots_switch_the_player_ship() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	assert_str(arena.ship.def.id).is_equal("kestrel")
+	for pair: Array in [[2, &"bulwark"], [3, &"drayman"], [1, &"kestrel"]]:
+		var before: Ship = arena.ship
+		await _press_slot(pair[0] as int)
+		assert_str(arena.ship.def.id).is_equal(String(pair[1] as StringName))
+		assert_object(arena.ship).is_not_same(before)
+		# The old ship is gone at once, the new one stands at the start with the HUD bound.
+		assert_bool(is_instance_valid(before) and before.is_inside_tree()).is_false()
+		assert_vector(arena.ship.global_position).is_equal_approx(
+			FLIGHT_TEST.spawn_position, Vector3.ONE * 5.0
+		)
+		assert_object((arena.get_node("Hud/FlightHud") as FlightHud).ship).is_same(arena.ship)
+		assert_object(arena.get_node("CameraRig").get("ship")).is_same(arena.ship)
+
+
+func test_pressing_the_current_ships_slot_keeps_the_ship() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	var first: Ship = arena.ship
+	await _press_slot(1)
+	assert_object(arena.ship).is_same(first)

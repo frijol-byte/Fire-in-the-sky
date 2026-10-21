@@ -78,6 +78,7 @@ func _build_model() -> void:
 	var packed: PackedScene = load(def.model_path) as PackedScene
 	model = packed.instantiate() as ShipModel
 	add_child(model)
+	model.set_paint(def.paint_primary, def.paint_secondary)
 	_adopt_collision(model)
 
 

@@ -5,7 +5,8 @@ extends Node3D
 ## builds it from that data and wires the player's ship to the camera, the speed effects and the
 ## flight sounds.
 ##
-## The ship is spawned by `spawn_player()` (the ship switcher of M1-T7 will call it again).
+## The ship is spawned by `spawn_player()`. The ship switcher (device slots 1-3: keys 1/2/3 or the
+## D-pad) calls it again with the arena's `selectable_ship_ids`.
 ## It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
 ## menu (Esc / Start), like every flight scene (M1-T6).
 
@@ -59,17 +60,32 @@ func _exit_tree() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
+func _physics_process(_delta: float) -> void:
+	var wanted: StringName = ship_for_slot(def, InputRouter.controls.device)
+	if wanted != &"" and ship != null and wanted != ship.def.id:
+		spawn_player(wanted)
+
+
 func _process(_delta: float) -> void:
 	if ship == null:
 		return
-	# Speed, flight assist, boost and energy are on the flight HUD; this is just the course.
-	_readout.text = tr("ARENA_GATES") % gates_passed
+	# Speed, flight assist, boost and energy are on the flight HUD; this is the ship and the course.
+	_readout.text = (
+		"%s\n%s"
+		% [
+			tr("ARENA_SHIP") % [tr(ship.def.display_name_key), _switch_glyphs()],
+			tr("ARENA_GATES") % gates_passed,
+		]
+	)
 
 
 ## Puts the player in a new ship of `ship_id` at the start, replacing the old one.
 func spawn_player(ship_id: StringName) -> Ship:
 	if ship != null:
+		# Out of the tree at once, so the old body cannot push against the new one.
+		remove_child(ship)
 		ship.queue_free()
+		ship = null
 	var new_ship: Ship = SHIP_SCENE.instantiate() as Ship
 	new_ship.def = Content.ship(ship_id)
 	new_ship.name = "Ship"
@@ -86,6 +102,14 @@ func spawn_player(ship_id: StringName) -> Ship:
 	_hud.bind(ship)
 	_tools.bind(ship, _rig)
 	return ship
+
+
+## The ship the device slot (1-3, 0 = none pressed) selects in `arena`, or `&""` if the slot is
+## empty or the arena has no such ship.
+static func ship_for_slot(arena: ArenaDef, slot: int) -> StringName:
+	if arena == null or slot < 1 or slot > arena.selectable_ship_ids.size():
+		return &""
+	return arena.selectable_ship_ids[slot - 1]
 
 
 ## The world environment for `arena`: the baked `sky`, or a plain colour when there is none.
@@ -144,6 +168,13 @@ static func course_line(arena: ArenaDef) -> PackedVector3Array:
 
 func _on_gate_passed(_ship: Ship) -> void:
 	gates_passed += 1
+
+
+func _switch_glyphs() -> String:
+	var glyphs: PackedStringArray = []
+	for slot: int in def.selectable_ship_ids.size():
+		glyphs.append(InputRouter.glyph_for(StringName("device_%d" % (slot + 1))))
+	return " ".join(glyphs)
 
 
 func _on_input_device_changed(_device: int) -> void:

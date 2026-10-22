@@ -5,6 +5,8 @@ extends RefCounted
 ## same `Ship` scene the game does.
 
 const SHIP_SCENE: PackedScene = preload("res://ships/ship.tscn")
+## The ships every flight sim is run for.
+const SHIP_IDS: Array[StringName] = [&"kestrel", &"bulwark", &"drayman"]
 
 
 ## One recorded tick.
@@ -17,6 +19,14 @@ class Sample:
 	var local_velocity: Vector3 = Vector3.ZERO
 	## Angular velocity in the ship's own axes.
 	var local_angular: Vector3 = Vector3.ZERO
+
+
+## `SHIP_IDS` as gdUnit test parameter sets: `[[&"kestrel"], [&"bulwark"], ...]`.
+static func ship_params() -> Array[Array]:
+	var result: Array[Array] = []
+	for ship_id: StringName in SHIP_IDS:
+		result.append([ship_id])
+	return result
 
 
 ## Creates a ship of `ship_id` at the origin, facing -Z, and adds it to `parent`.

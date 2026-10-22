@@ -1,4 +1,4 @@
-"""test_kestrel: placeholder light fighter (~14 m) used to prove the Blender pipeline.
+"""kestrel: placeholder light fighter (~14 m), the first ship of the Blender pipeline.
 
 Brief: role = light fighter. Silhouette keywords = dart, swept delta wings, twin tail fins,
 needle nose. Faction cues (Solar Concord stand-in) = light-grey hull, navy trim, blue-white
@@ -12,7 +12,7 @@ import math
 
 from kit import cockpits, common, engines, greebles, hulls, wings
 
-ID = "test_kestrel"
+ID = "kestrel"
 CATEGORY = "ships"
 TRIANGLE_BUDGET = (3000, 8000)  # art bible 3.3: fighter, including tier parts
 

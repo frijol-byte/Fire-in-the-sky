@@ -3,36 +3,36 @@
   "bounds": {
     "T0": {
       "max": [
-        5.06,
-        7.0,
-        3.35
+        6.65,
+        17.2,
+        4.49
       ],
       "min": [
-        -5.06,
-        -7.01,
-        -0.8493
+        -6.65,
+        -16.91,
+        -1.819
       ],
       "size": [
-        10.12,
-        14.01,
-        4.1993
+        13.3,
+        34.11,
+        6.309
       ]
     },
     "all_tiers": {
       "max": [
-        6.4,
-        7.5,
-        3.35
+        6.65,
+        17.2,
+        4.49
       ],
       "min": [
-        -6.4,
-        -7.01,
-        -0.8493
+        -6.65,
+        -16.91,
+        -1.819
       ],
       "size": [
-        12.8,
-        14.51,
-        4.1993
+        13.3,
+        34.11,
+        6.309
       ]
     }
   },
@@ -40,107 +40,127 @@
   "collision": [
     "hull-colonly"
   ],
-  "id": "test_kestrel",
+  "id": "drayman",
   "parts": {
-    "T0ONLY_stock_cowl": {
+    "T0ONLY_stock_beacon": {
       "hidden_when_upgraded": true,
       "min_tier": 0,
-      "triangles": 44
+      "triangles": 88
     },
-    "T1_armor_plate_L": {
+    "T1_pod_armor_L": {
       "hidden_when_upgraded": false,
       "min_tier": 1,
-      "triangles": 132
+      "triangles": 264
     },
-    "T1_armor_plate_R": {
+    "T1_pod_armor_R": {
       "hidden_when_upgraded": false,
       "min_tier": 1,
-      "triangles": 132
+      "triangles": 264
     },
-    "T1_dorsal_armor": {
+    "T1_spine_armor": {
       "hidden_when_upgraded": false,
       "min_tier": 1,
       "triangles": 88
     },
-    "T2_engine_pod_L": {
+    "T2_spine_engine_L": {
       "hidden_when_upgraded": false,
       "min_tier": 2,
-      "triangles": 508
+      "triangles": 236
     },
-    "T2_engine_pod_R": {
+    "T2_spine_engine_R": {
       "hidden_when_upgraded": false,
       "min_tier": 2,
-      "triangles": 508
+      "triangles": 236
     },
-    "T2_engine_pod_glow_L": {
+    "T2_spine_engine_glow_L": {
       "hidden_when_upgraded": false,
       "min_tier": 2,
-      "triangles": 72
+      "triangles": 36
     },
-    "T2_engine_pod_glow_R": {
+    "T2_spine_engine_glow_R": {
       "hidden_when_upgraded": false,
       "min_tier": 2,
-      "triangles": 72
+      "triangles": 36
     },
-    "T3_nose_cannon": {
+    "T3_side_gun_L": {
       "hidden_when_upgraded": false,
       "min_tier": 3,
-      "triangles": 68
+      "triangles": 112
     },
-    "T3_wing_extension_L": {
+    "T3_side_gun_R": {
       "hidden_when_upgraded": false,
       "min_tier": 3,
-      "triangles": 44
+      "triangles": 112
     },
-    "T3_wing_extension_R": {
+    "T3_turret_fore": {
       "hidden_when_upgraded": false,
       "min_tier": 3,
-      "triangles": 44
+      "triangles": 228
     },
     "antenna": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 28
+      "triangles": 56
     },
-    "canopy_frame": {
-      "hidden_when_upgraded": false,
-      "min_tier": 0,
-      "triangles": 224
-    },
-    "canopy_glass": {
+    "bridge": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
       "triangles": 44
     },
-    "engine_L": {
+    "canopy_frame": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 232
+      "triangles": 148
     },
-    "engine_R": {
+    "canopy_glass": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 232
+      "triangles": 32
     },
-    "engine_glow_L": {
+    "cargo_band_L": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 36
+      "triangles": 132
     },
-    "engine_glow_R": {
+    "cargo_band_R": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 36
+      "triangles": 132
     },
-    "gun_pod_L": {
+    "cargo_pod_L": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 160
+      "triangles": 1104
     },
-    "gun_pod_R": {
+    "cargo_pod_R": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 160
+      "triangles": 1104
+    },
+    "chin_gun_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 112
+    },
+    "chin_gun_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 112
+    },
+    "engine": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 972
+    },
+    "engine_glow": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 144
+    },
+    "frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 264
     },
     "hull": {
       "hidden_when_upgraded": false,
@@ -152,50 +172,45 @@
       "min_tier": 0,
       "triangles": 88
     },
-    "spine": {
+    "nav_lights": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 60
+      "triangles": 48
     },
-    "tail_fin_L": {
-      "hidden_when_upgraded": false,
-      "min_tier": 0,
-      "triangles": 44
-    },
-    "tail_fin_R": {
-      "hidden_when_upgraded": false,
-      "min_tier": 0,
-      "triangles": 44
-    },
-    "vents": {
+    "pod_strut_L": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
       "triangles": 264
     },
-    "wing_L": {
+    "pod_strut_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 264
+    },
+    "spine_stripe": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 48
+    },
+    "tail_vane_L": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
       "triangles": 44
     },
-    "wing_R": {
+    "tail_vane_R": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
       "triangles": 44
     },
-    "wing_stripe_L": {
+    "turret": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 88
+      "triangles": 228
     },
-    "wing_stripe_R": {
+    "vents": {
       "hidden_when_upgraded": false,
       "min_tier": 0,
-      "triangles": 88
-    },
-    "wingtip_lights": {
-      "hidden_when_upgraded": false,
-      "min_tier": 0,
-      "triangles": 24
+      "triangles": 748
     }
   },
   "sockets": [
@@ -204,8 +219,8 @@
       "kind": "cockpit_cam",
       "location": [
         0.0,
-        1.3,
-        0.97
+        13.3,
+        2.5
       ],
       "min_tier": 0,
       "name": "SOCKET_cockpit_cam_0",
@@ -219,9 +234,9 @@
       "index": 0,
       "kind": "engine",
       "location": [
-        0.75,
-        -7.05,
-        -0.05
+        1.2,
+        -17.4,
+        0.35
       ],
       "min_tier": 0,
       "name": "SOCKET_engine_0",
@@ -235,9 +250,9 @@
       "index": 1,
       "kind": "engine",
       "location": [
-        -0.75,
-        -7.05,
-        -0.05
+        -1.2,
+        -17.4,
+        0.35
       ],
       "min_tier": 0,
       "name": "SOCKET_engine_1",
@@ -248,12 +263,44 @@
       ]
     },
     {
+      "index": 2,
+      "kind": "engine",
+      "location": [
+        1.2,
+        -17.4,
+        -0.65
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_2",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 3,
+      "kind": "engine",
+      "location": [
+        -1.2,
+        -17.4,
+        -0.65
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_3",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
       "index": 0,
       "kind": "primary",
       "location": [
-        2.9,
         0.9,
-        -0.1287
+        17.3,
+        -0.9
       ],
       "min_tier": 0,
       "name": "SOCKET_primary_0",
@@ -267,9 +314,9 @@
       "index": 1,
       "kind": "primary",
       "location": [
-        -2.9,
-        0.9,
-        -0.1287
+        -0.9,
+        17.3,
+        -0.9
       ],
       "min_tier": 0,
       "name": "SOCKET_primary_1",
@@ -284,8 +331,8 @@
       "kind": "primary",
       "location": [
         0.0,
-        7.5,
-        -0.2
+        17.3,
+        -0.9
       ],
       "min_tier": 3,
       "name": "SOCKET_primary_2",
@@ -300,11 +347,43 @@
       "kind": "secondary",
       "location": [
         0.0,
-        3.0,
-        -0.5
+        8.6,
+        -1.5
       ],
       "min_tier": 0,
       "name": "SOCKET_secondary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "turret",
+      "location": [
+        0.0,
+        -3.0,
+        2.1
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_turret_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "turret",
+      "location": [
+        0.0,
+        5.0,
+        2.4
+      ],
+      "min_tier": 3,
+      "name": "SOCKET_turret_1",
       "rotation_euler": [
         0.0,
         0.0,
@@ -314,32 +393,32 @@
   ],
   "tier_parts": {
     "T0ONLY": [
-      "T0ONLY_stock_cowl"
+      "T0ONLY_stock_beacon"
     ],
     "T1": [
-      "T1_armor_plate_L",
-      "T1_armor_plate_R",
-      "T1_dorsal_armor"
+      "T1_pod_armor_L",
+      "T1_pod_armor_R",
+      "T1_spine_armor"
     ],
     "T2": [
-      "T2_engine_pod_L",
-      "T2_engine_pod_R",
-      "T2_engine_pod_glow_L",
-      "T2_engine_pod_glow_R"
+      "T2_spine_engine_L",
+      "T2_spine_engine_R",
+      "T2_spine_engine_glow_L",
+      "T2_spine_engine_glow_R"
     ],
     "T3": [
-      "T3_nose_cannon",
-      "T3_wing_extension_L",
-      "T3_wing_extension_R"
+      "T3_side_gun_L",
+      "T3_side_gun_R",
+      "T3_turret_fore"
     ]
   },
   "triangles": {
     "by_tier": {
-      "T0": 2148,
-      "T1": 2456,
-      "T2": 3616,
-      "T3": 3772
+      "T0": 6384,
+      "T1": 6912,
+      "T2": 7456,
+      "T3": 7908
     },
-    "total": 3816
+    "total": 7996
   }
 }

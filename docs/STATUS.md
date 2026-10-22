@@ -56,7 +56,7 @@
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ✅ | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
-| M1-T7 | Three ship profiles + ship switcher | T5 | ⬜ | |
+| M1-T7 | Three ship profiles + ship switcher | T5 | 👀 | #16 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -271,8 +271,8 @@ and keep all notes bullets from both sides.
     newtons (acceleration = thrust / mass, see `accel_*()`), per-axis speed limits, turn rates and
     angular accelerations (degrees in the file, `*_rad()` helpers), FA gains, and the energy/boost
     params T3 will use (`boost_*`, `energy_*`, unused so far). `problems()` validates a def.
-    `data/ships/kestrel.tres` uses the GDD 4.4 light-fighter numbers; it still points at
-    `test_kestrel.glb` until T7 renames it.
+    `data/ships/kestrel.tres` uses the GDD 4.4 light-fighter numbers; it pointed at
+    `test_kestrel.glb` until M1-T7 renamed it to `kestrel.glb`.
   - **`Content`** now scans `res://data/` for every `.tres` that is a `ContentDef` and indexes it by
     `kind()` + `id` (`Content.ship(id)`, `Content.ids(kind)`). Invalid defs are logged with
     `Log.error` and skipped, which fails the smoke test. Adding content needs no list to edit.
@@ -364,7 +364,7 @@ and keep all notes bullets from both sides.
     the HUD and tools to the new ship.
   - **`ArenaDef`** (`data/defs/arena_def.gd`, kind `arena`, `data/arenas/flight_test.tres`) holds sky palette, sun/fill/ambient/glow, the rock
     field, collider pool, gates and the start. Tune the look there. `FlightTest.spawn_player(ship_id)` spawns/respawns the player's ship
-    (T7's switcher should call it).
+    (M1-T7's switcher calls it).
   - **Sky:** `SkyBaker` bakes `nebula_bake.gdshader` into a cubemap via six `SubViewport`s (needs a renderer; headless keeps a plain colour).
     The bake takes a frame or two, so shots must be at frame >= 6. `shaders/nebula_sky.gdshader` shows the cubemap.
   - **Rocks:** `RockField` (pure layout, seeded, clear lane along the course), `AsteroidField` (4 MultiMeshes), `RockColliders` (pool of 32 static
@@ -409,6 +409,33 @@ and keep all notes bullets from both sides.
     ignored as a pause. This is a stand-in until the game-flow task builds the real menu.
   - Shot scene `hud_shot` (cruise, boost, drift turn, overlay open) with its driver; PNGs are in
     `docs/previews/m1-t6-*.png`.
+
+- M1-T7 (2026-10-21): three player ships and the ship switcher. Things the next session must know:
+  - **Ships:** `kestrel` (light fighter, Concord), `bulwark` (heavy fighter, Concord, 18 m) and `drayman` (armed
+    freighter, Meridian, 35 m). Recipes in `tools/blender/recipes/ships/`, defs in `data/ships/`. `test_kestrel`
+    is now `kestrel` everywhere (recipe, `.glb`, `.import`, manifest, preview, shots, tests). The speeds, accels and turn
+    rates are the GDD 4.4 table; mass, thrust, reverse/strafe/vertical limits, energy and boost numbers beyond the
+    table are placeholders chosen so the table holds (accel = thrust / mass) and boost can reach its top speed
+    before the capacitor empties. Tune them in the overlay, then paste the values into a report.
+  - **New `ShipDef` fields** `paint_primary` / `paint_secondary` (group "Look"); `Ship` applies them with
+    `ShipModel.set_paint` when it builds the model, so each ship has its faction colours. Recipes may set `PALETTE`
+    (role -> hex) to tint the Blender previews the same way (`materials.tint`), and `INFO` for the contact-sheet text.
+  - **Switcher:** `ArenaDef.selectable_ship_ids` (max 3) maps device slots 1-3 (keys 1/2/3, D-pad up/right/down) to
+    ships; `FlightTest._physics_process` reads `InputRouter.controls.device` and calls `spawn_player()`, which now removes
+    the old ship from the tree at once. It respawns at the start of the course. The ship name and the slot glyphs are in
+    the arena's top-left text.
+  - **Sims:** `FlightSim.SHIP_IDS` / `ship_params()` feed gdUnit parameterised tests (`_test_parameters := ship_params()`);
+    every `test_flight_*` sim runs once per ship, and `test_ship_roster_sim.gd` / `test_ship_roster.gd` check
+    each ship's model, sockets, collision, paint, engine fx and both cameras. A test fails if a ship def is added without
+    being listed in `FlightSim.SHIP_IDS`. Anything that depends on a ship's speed or duration must read it from the def
+    (the drift and boost sims did not for the 40 deg/s freighter or its 6 s capacitor).
+  - **Shots:** `roster_shot` (the three ships side by side) and `switcher_shot` (the arena with each ship); PNGs are in
+    `docs/previews/m1-t7-*.png` next to the three contact sheets (`kestrel.png`, `bulwark.png`, `drayman.png`).
+    `ShotDirector` moves its camera one frame late: a scene with one fixed viewpoint should place its own camera
+    (see `roster_shot_driver.gd`), or take shots at least 3 frames after a camera move.
+  - **Not done / for later:** engine glow colour is still blue-white for every ship (`EngineFx` constants; the Meridian
+    freighter should be warm yellow), and the Drayman uses the Concord canopy prop in the cockpit view. Both are
+    cosmetic and wait for the art pass or a card in M8.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_

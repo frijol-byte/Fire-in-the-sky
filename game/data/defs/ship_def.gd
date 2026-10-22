@@ -76,6 +76,12 @@ extends ContentDef
 ## Canopy frame shown in the cockpit view (a prop `.glb`).
 @export_file("*.glb") var canopy_path: String = ""
 
+@export_group("Look")
+## Faction paint, set on the model's `PAINT_PRIMARY` / `PAINT_SECONDARY` parts at spawn
+## (the defaults are the paint shader's own).
+@export var paint_primary: Color = Color(0.30, 0.38, 0.52)
+@export var paint_secondary: Color = Color(0.86, 0.46, 0.12)
+
 @export_group("Slots (placeholder)")
 @export var primary_slots: int = 2
 @export var secondary_slots: int = 1

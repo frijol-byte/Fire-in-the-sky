@@ -3,7 +3,11 @@ extends GdUnitTestSuite
 ## blends excess speed away when it comes back on.
 
 const SECONDS: int = 60
-const SHIP_IDS: Array[StringName] = [&"kestrel"]
+
+
+## Every test below runs once per player ship (GDD 4.4).
+func ship_params() -> Array[Array]:
+	return FlightSim.ship_params()
 
 
 func _spawn(ship_id: StringName) -> Ship:
@@ -18,32 +22,36 @@ func _drift(thrust: Vector3 = Vector3.ZERO, rotate: Vector3 = Vector3.ZERO) -> S
 	return controls
 
 
-func test_drift_turn_keeps_the_velocity_while_the_nose_flips() -> void:
-	for ship_id: StringName in SHIP_IDS:
-		var def: ShipDef = Content.ship(ship_id)
-		var ship: Ship = _spawn(ship_id)
-		var start: Vector3 = Vector3(0, 0, -def.max_speed * 0.8)
-		ship.linear_velocity = start
-		# Full yaw for long enough to turn well past 180 degrees.
-		var samples: Array[FlightSim.Sample] = await FlightSim.fly(
-			get_tree(), ship, _drift(Vector3.ZERO, Vector3(0, 1, 0)), 3 * SECONDS
+func test_drift_turn_keeps_the_velocity_while_the_nose_flips(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
+	var start: Vector3 = Vector3(0, 0, -def.max_speed * 0.8)
+	ship.linear_velocity = start
+	# Full yaw for long enough to turn well past 180 degrees at this ship's turn rate.
+	var turn_seconds: float = 250.0 / def.max_angular_rate_deg.y
+	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
+		get_tree(), ship, _drift(Vector3.ZERO, Vector3(0, 1, 0)), ceili(turn_seconds * 60.0)
+	)
+	var flipped_at: int = -1
+	for sample: FlightSim.Sample in samples:
+		# The velocity vector in the world must not move at all.
+		assert_vector(sample.basis * sample.local_velocity).is_equal_approx(
+			start, Vector3.ONE * 0.05
 		)
-		var flipped_at: int = -1
-		for sample: FlightSim.Sample in samples:
-			# The velocity vector in the world must not move at all.
-			assert_vector(sample.basis * sample.local_velocity).is_equal_approx(
-				start, Vector3.ONE * 0.05
-			)
-			if flipped_at < 0 and (sample.basis * Vector3(0, 0, -1)).z > 0.99:
-				flipped_at = sample.tick
-		assert_int(flipped_at).is_greater(0)
-		# Nose now points backward along the travel direction, yet speed is unchanged.
-		assert_float(ship.linear_velocity.length()).is_equal_approx(start.length(), 0.1)
+		if flipped_at < 0 and (sample.basis * Vector3(0, 0, -1)).z > 0.99:
+			flipped_at = sample.tick
+	assert_int(flipped_at).is_greater(0)
+	# Nose now points backward along the travel direction, yet speed is unchanged.
+	assert_float(ship.linear_velocity.length()).is_equal_approx(start.length(), 0.1)
 
 
-func test_idle_sticks_keep_the_speed_for_ten_seconds() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_idle_sticks_keep_the_speed_for_ten_seconds(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	ship.linear_velocity = Vector3(0, 0, -def.max_speed)
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
 		get_tree(), ship, _drift(), 10 * SECONDS
@@ -52,9 +60,11 @@ func test_idle_sticks_keep_the_speed_for_ten_seconds() -> void:
 	assert_float(samples[-1].position.z).is_less(-def.max_speed * 9.5)
 
 
-func test_fa_off_thrust_accelerates_at_the_ships_forward_accel() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_fa_off_thrust_accelerates_at_the_ships_forward_accel(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
 		get_tree(), ship, _drift(Vector3(0, 0, 1)), SECONDS
 	)
@@ -63,18 +73,22 @@ func test_fa_off_thrust_accelerates_at_the_ships_forward_accel() -> void:
 	)
 
 
-func test_fa_off_thrust_stops_at_the_speed_cap() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_fa_off_thrust_stops_at_the_speed_cap(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
 		get_tree(), ship, _drift(Vector3(0, 0, 1)), 8 * SECONDS
 	)
 	assert_float(-samples[-1].local_velocity.z).is_equal_approx(def.max_speed, def.max_speed * 0.03)
 
 
-func test_rotation_stays_assisted_with_fa_off() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_rotation_stays_assisted_with_fa_off(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
 		get_tree(), ship, _drift(Vector3.ZERO, Vector3(0, 1, 0)), SECONDS
 	)
@@ -87,9 +101,11 @@ func test_rotation_stays_assisted_with_fa_off() -> void:
 	assert_float(stopped[-1].local_angular.length()).is_less(0.01)
 
 
-func test_turning_back_on_flight_assist_stops_a_drifting_ship() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_turning_back_on_flight_assist_stops_a_drifting_ship(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	ship.linear_velocity = Vector3(0, 0, -def.max_speed)
 	await FlightSim.fly(get_tree(), ship, _drift(), SECONDS)
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(
@@ -99,9 +115,11 @@ func test_turning_back_on_flight_assist_stops_a_drifting_ship() -> void:
 	assert_float(FlightSim.first_time_at_or_below(speed, def.max_speed * 0.01)).is_greater(0.0)
 
 
-func test_excess_speed_blends_away_in_about_a_second_when_fa_returns() -> void:
-	var def: ShipDef = Content.ship(&"kestrel")
-	var ship: Ship = _spawn(&"kestrel")
+func test_excess_speed_blends_away_in_about_a_second_when_fa_returns(
+	ship_id: StringName, _test_parameters := ship_params()
+) -> void:
+	var def: ShipDef = Content.ship(ship_id)
+	var ship: Ship = _spawn(ship_id)
 	ship.linear_velocity = Vector3(0, 0, -def.boost_max_speed)
 	# Hold full forward throttle with FA on: only the speed limiter acts on the excess.
 	var samples: Array[FlightSim.Sample] = await FlightSim.fly(

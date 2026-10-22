@@ -55,8 +55,11 @@ INPUT_DEBUG_ACTION_FIRE_SECONDARY,Secondary
 INPUT_DEVICE_KEYBOARD_MOUSE,Keyboard + mouse
 INPUT_DEVICE_GAMEPAD,Gamepad
 SHIP_KESTREL_NAME,Kestrel
+SHIP_BULWARK_NAME,Bulwark
+SHIP_DRAYMAN_NAME,Drayman
 ARENA_FLIGHT_TEST_NAME,Flight test arena
 ARENA_GATES,Gates passed: %d
+ARENA_SHIP,%s    switch ship: %s
 ARENA_HELP,%s boost    %s drift    %s camera    %s pause
 BOOT_FLY_HINT,%s: fly the flight test arena
 HUD_SPEED,%.0f m/s

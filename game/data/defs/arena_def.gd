@@ -10,6 +10,8 @@ extends ContentDef
 @export var display_name_key: String = ""
 ## Ship the player starts in (a `ShipDef` id).
 @export var spawn_ship_id: StringName = &"kestrel"
+## Ships the player can switch to in this arena: slot 1 (key 1 / D-pad up) is the first, and so on.
+@export var selectable_ship_ids: Array[StringName] = [&"kestrel"]
 ## Where the player starts and which way the nose points.
 @export var spawn_position: Vector3 = Vector3.ZERO
 @export var spawn_look_at: Vector3 = Vector3(0.0, 0.0, -1000.0)
@@ -99,6 +101,11 @@ func problems() -> PackedStringArray:
 		result.append("display_name_key is empty")
 	if spawn_ship_id == &"":
 		result.append("spawn_ship_id is empty")
+	if selectable_ship_ids.size() > 3:
+		result.append("selectable_ship_ids has more entries than device slots (3)")
+	for ship_id: StringName in selectable_ship_ids:
+		if selectable_ship_ids.count(ship_id) > 1:
+			result.append("selectable_ship_ids lists %s twice" % ship_id)
 	if spawn_position.distance_to(spawn_look_at) < 1.0:
 		result.append("spawn_look_at must be away from spawn_position")
 	if sky_sun_direction.length() < 0.001:

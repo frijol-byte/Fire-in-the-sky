@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://b3k7fits0boot"]
 
 [ext_resource type="Script" path="res://core/boot/boot.gd" id="1_boot"]
-[ext_resource type="PackedScene" path="res://assets/models/ships/test_kestrel.glb" id="2_ship"]
+[ext_resource type="PackedScene" path="res://assets/models/ships/kestrel.glb" id="2_ship"]
 
 [sub_resource type="Environment" id="Environment_sky"]
 background_mode = 1

@@ -49,3 +49,18 @@ def get(role: str) -> bpy.types.Material:
         bsdf.inputs["Emission Strength"].default_value = emission
     mat.diffuse_color = color
     return mat
+
+
+def tint(role: str, hex_color: str) -> None:
+    """Changes the stand-in colour of `role` in this scene (a recipe's faction palette).
+
+    Godot paints ships from `ShipDef.paint_*` and the shared role materials, so this only
+    changes the previews and the colour stored in the exported glTF.
+    """
+    mat = get(role)
+    color = hex_to_linear(hex_color)
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = color
+    if bsdf.inputs["Emission Strength"].default_value > 0.0:
+        bsdf.inputs["Emission Color"].default_value = color
+    mat.diffuse_color = color

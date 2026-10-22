@@ -224,6 +224,10 @@ Ship (RigidBody3D, custom_integrator = true)
 - An InputMap action per verb. `InputRouter` handles device switching (glyphs update live),
   deadzones and response curves, and rebinding saved in `Settings`.
 - `ShipControls` is the only thing gameplay reads, which keeps a later touch layer cheap.
+- Mouse flight is a virtual joystick around the screen centre (deadzone ring, max radius). Flight
+  scenes capture the cursor, which then stays at the centre, so `InputRouter` adds up mouse motion
+  into the stick instead (held at the max radius; recentred on a gamepad switch and on respawn via
+  `recenter_mouse()`). The HUD draws the ring and a dot where the stick points.
 
 ## 6. Performance budgets
 

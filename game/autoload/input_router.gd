@@ -114,6 +114,9 @@ var last_device: Device = Device.KEYBOARD_MOUSE
 var controls: ShipControls = ShipControls.new()
 
 var _mouse_seen: bool = false
+## The mouse's motion added up, in pixels from the screen center (y down), held inside the
+## virtual stick's max radius. A captured cursor stays at the center, so this is the stick then.
+var _mouse_offset: Vector2 = Vector2.ZERO
 var _ticks_since_target_press: int = 1 << 30
 
 
@@ -191,10 +194,15 @@ func free_look_vector() -> Vector2:
 func observe_event(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_mouse_seen = true
+		_mouse_offset = accumulate_mouse_offset(
+			_mouse_offset, (event as InputEventMouseMotion).relative, _mouse_radius_px()
+		)
 	var device: int = event_device(event)
 	if device < 0 or device == last_device:
 		return
 	last_device = device as Device
+	if last_device == Device.GAMEPAD:
+		recenter_mouse()
 	Log.info("input", "device changed to %s" % Device.keys()[device])
 	Events.input_device_changed.emit(device)
 
@@ -264,6 +272,50 @@ static func mouse_stick(
 	return offset / distance * pow(magnitude, exponent)
 
 
+## The captured-mouse virtual stick after a mouse motion of `relative` pixels: the motion adds up
+## and is held at `max_radius_px`, so moving the mouse back eases the turn off at once.
+static func accumulate_mouse_offset(
+	offset: Vector2, relative: Vector2, max_radius_px: float
+) -> Vector2:
+	return (offset + relative).limit_length(maxf(max_radius_px, 0.0))
+
+
+## Puts the mouse virtual stick back in the center (no turn). Call it when the player gets a new
+## ship, so a leftover deflection does not turn it.
+func recenter_mouse() -> void:
+	_mouse_offset = Vector2.ZERO
+
+
+## Where the mouse virtual stick points, in pixels from the screen center (x right, y down).
+func mouse_offset() -> Vector2:
+	var viewport: Viewport = get_viewport()
+	return virtual_stick_offset(
+		Input.mouse_mode == Input.MOUSE_MODE_CAPTURED,
+		_mouse_offset,
+		viewport.get_mouse_position(),
+		viewport.get_visible_rect().size
+	)
+
+
+## The mouse virtual stick's offset from the screen center: where a visible `cursor` is, or, when
+## the cursor is `captured` (the OS keeps it at the center), the mouse's motion added up.
+static func virtual_stick_offset(
+	captured: bool, accumulated: Vector2, cursor: Vector2, view_size: Vector2
+) -> Vector2:
+	return accumulated if captured else cursor - view_size * 0.5
+
+
+## True while the mouse steers the ship: mouse flight is on, the mouse has moved, the player
+## last used keyboard/mouse and free look is not taking the aim input.
+func mouse_flight_active() -> bool:
+	return (
+		bool(Settings.get_value(SETTING_MOUSE_FLIGHT, DEFAULT_MOUSE_FLIGHT))
+		and _mouse_seen
+		and last_device == Device.KEYBOARD_MOUSE
+		and not free_look_active()
+	)
+
+
 ## Returns the command for a `target_nearest` press that comes `ticks_since_last_press` ticks
 ## after the previous one: a double-tap targets the nearest ship of any kind.
 static func resolve_target_tap(ticks_since_last_press: int, window_ticks: int) -> int:
@@ -317,13 +369,21 @@ func _mouse_look(exponent: float) -> Vector2:
 		return Vector2.ZERO
 	if not _mouse_seen or last_device != Device.KEYBOARD_MOUSE:
 		return Vector2.ZERO
-	var viewport: Viewport = get_viewport()
-	var size: Vector2 = viewport.get_visible_rect().size
-	var offset: Vector2 = viewport.get_mouse_position() - size * 0.5
-	var deadzone: float = float(Settings.get_value(SETTING_MOUSE_DEADZONE, DEFAULT_MOUSE_DEADZONE))
-	var radius: float = float(Settings.get_value(SETTING_MOUSE_RADIUS, DEFAULT_MOUSE_RADIUS))
-	var stick: Vector2 = mouse_stick(offset, deadzone * size.y, radius * size.y, exponent)
+	var stick: Vector2 = mouse_stick(
+		mouse_offset(), mouse_deadzone_px(), _mouse_radius_px(), exponent
+	)
 	return Vector2(stick.x, -stick.y)
+
+
+## The mouse virtual stick's deadzone ring, in pixels (the HUD draws it).
+func mouse_deadzone_px() -> float:
+	var deadzone: float = float(Settings.get_value(SETTING_MOUSE_DEADZONE, DEFAULT_MOUSE_DEADZONE))
+	return deadzone * get_viewport().get_visible_rect().size.y
+
+
+func _mouse_radius_px() -> float:
+	var radius: float = float(Settings.get_value(SETTING_MOUSE_RADIUS, DEFAULT_MOUSE_RADIUS))
+	return radius * get_viewport().get_visible_rect().size.y
 
 
 func _device_slot_pressed() -> int:

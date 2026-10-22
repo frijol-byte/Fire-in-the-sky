@@ -4,17 +4,20 @@
 > session's briefing.
 
 ## Now
-- **Phase:** M0 — Foundation: review gate ✅ clean (`docs/reviews/M0.md`); **owner playtest
-  waiting**.
-- **What to start next:** M1-T6 (`docs/tasks/M1-flight.md`) or M1-T7 once T5 is merged; M1-T1 to T4 are merged, M1-T5 is in review. M1 can run while
-  the M0 playtest is pending; fixes from the playtest become cards first.
+- **Phase:** M1 — Flight: review gate ✅ clean (`docs/reviews/M1.md`); **owner playtest
+  waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
+- **What to start next:** M2-T1 (`docs/tasks/M2-combat-core.md`). M2 can run while the M1
+  playtest is pending; fixes from the playtest become cards first and go ahead of M2 work.
 - **Owner actions waiting:**
-  0. Merge the M0 review-gate PR (#9), then **publish the `playtest-M0` release** from
-     GitHub's Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest
-     release yourself"; sessions can't push tags). When the release run is green, download
-     it, play, and tick the checklist at the bottom of `docs/tasks/M0-foundation.md`.
-  1. M0-T4 is merged (#6): turn on branch protection for `main` requiring the
-     `check-and-build` check (clicks are in the M0-T4 PR description).
+  0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
+     Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
+     yourself"). When the release run is green, download it and play with a gamepad for
+     ~20 minutes using the checklist at the bottom of `docs/tasks/M1-flight.md`. While the
+     game starts, tick the four M0 lines at the bottom of `docs/tasks/M0-foundation.md` too
+     (Windows start, turning ship on the title screen, version, your opinion of the shapes):
+     one session covers both milestones.
+  1. If not done yet: turn on branch protection for `main` requiring the `check-and-build`
+     check (clicks are in the M0-T4 PR description, #6).
   2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
      convenient (needed before M6/M7).
 
@@ -23,7 +26,7 @@
 | # | Milestone | State | Review | Playtest release |
 |---|---|---|---|---|
 | M0 | Foundation | 🧪 playtest | ✅ [M0](reviews/M0.md) | `playtest-M0` |
-| M1 | Flight | 🔨 | — | — |
+| M1 | Flight | 🧪 playtest | ✅ [M1](reviews/M1.md) | `playtest-M1` |
 | M2 | Combat core | ⬜ | — | — |
 | M3 | AI depth & challenge | ⬜ | — | — |
 | M4 | World & stations | ⬜ | — | — |
@@ -56,7 +59,7 @@
 | M1-T4 | Cameras: chase & cockpit | T2, M0-T7 | ✅ | #13 |
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
-| M1-T7 | Three ship profiles + ship switcher | T5 | 👀 | #16 |
+| M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -437,6 +440,19 @@ and keep all notes bullets from both sides.
     freighter should be warm yellow), and the Drayman uses the Concord canopy prop in the cockpit view. Both are
     cosmetic and wait for the art pass or a card in M8.
 
+- M1 review gate (2026-10-22): clean; report in `docs/reviews/M1.md`. Things the next session must know:
+  - **Mouse flight works under a captured cursor now.** A captured cursor stays at the screen centre, so the
+    old "offset of the cursor from the centre" stick never moved in the arena. `InputRouter` now adds up mouse
+    motion into a virtual stick held at the max radius (`accumulate_mouse_offset`, `virtual_stick_offset`,
+    `mouse_offset()`), recentres it on a switch to the gamepad and on `recenter_mouse()` (the arena calls it on
+    every spawn). The HUD draws the deadzone ring and a dot where the stick points while
+    `InputRouter.mouse_flight_active()`. Headless runs cannot capture the mouse, so the capture branch is tested
+    through the pure functions; it was checked live under Xvfb with `xdotool`.
+  - The HUD's nose and flight-path markers read `get_global_transform_interpolated()` like the camera.
+  - M2 cards have "Notes from the M1 gate" bullets (physics layers, interpolation resets for pooled
+    projectiles, the device-slot clash with the ship switcher, where pilots/durability plug in); read them with the card.
+  - No long sims exist yet (`game/tests/sim/long/` is empty); the first should arrive with M2-T5 (AI duels).
+
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_
 
@@ -451,3 +467,23 @@ works, from script-generated ship to a Windows build.
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**. Close the window to quit.
 - Playtest checklist: bottom of `docs/tasks/M0-foundation.md`.
+
+### M1 Flight (playtest-M1)
+The first build you can fly. Press **Y** on the gamepad (G on the keyboard) on the title screen to
+enter the flight test arena: an amber nebula, an asteroid belt and a course of ring gates.
+
+- **Fly:** left stick moves, right stick turns, bumpers roll. **A** boosts (it drains the energy
+  bar), hold **B** to drift with flight assist off (the green marker shows where you are really
+  going), **R3** switches between the chase and cockpit views.
+- **Three ships:** D-pad up / right / down (keys 1 / 2 / 3) puts you in the Kestrel (light
+  fighter), the Bulwark (heavy fighter) or the Drayman (armed freighter).
+- **Tuning:** Select (F1) opens the tuning overlay and pauses. Move the sliders, fly, and press
+  "Copy values" when something feels right; paste the text into your playtest report.
+- **Bug capture:** Back + Start (F12) saves a screenshot and the game state. The pause menu
+  (Start / Esc) opens the folder.
+- **Free look:** hold Z (or back paddle 3, if your pad has paddles) and look around with the right
+  stick or mouse. Up/down thrust is R / F (paddles 1 / 2).
+- **Mouse and keyboard** work too: the mouse steers (a small dot shows how far), WASD moves.
+- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
+  **More info → Run anyway**.
+- Playtest checklist: bottom of `docs/tasks/M1-flight.md`.

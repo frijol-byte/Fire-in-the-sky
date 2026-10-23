@@ -172,7 +172,7 @@ Card format: **Size** S ≈ small session, M ≈ full session, L ≈ consider sp
 
 ## M0 review gate & playtest checklist
 - [x] Opus gate run (`06` §5), `docs/reviews/M0.md` written
-- [ ] `playtest-M0` release published (owner, from the Releases page; see owner quickstart §5)
+- [x] `playtest-M0` release published (owner, from the Releases page; see owner quickstart §5)
 - [ ] The Windows build starts on the owner's PC
 - [ ] The ship rotates and changes visibly through T0 → T3
 - [ ] The version number is visible

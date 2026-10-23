@@ -94,6 +94,7 @@ func spawn_player(ship_id: StringName) -> Ship:
 		Basis.looking_at(def.spawn_look_at - def.spawn_position, Vector3.UP), def.spawn_position
 	)
 	new_ship.add_child(PlayerPilot.new())
+	InputRouter.recenter_mouse()
 	ship = new_ship
 	_rig.attach(ship)
 	_speed_fx.attach(ship)

@@ -162,4 +162,6 @@ Play the flight arena with a gamepad for ~20 minutes, then answer:
 - [ ] Do you feel the speed? (dust, trails, FOV)
 - [ ] Chase vs cockpit: is either uncomfortable?
 - [ ] Anything confusing about the HUD?
+- [ ] (Optional, 5 min) Mouse + keyboard: does the mouse steer smoothly? The dot near the
+      center shows how far you are steering.
 - Paste the copied tuning values into the report.

@@ -3,7 +3,8 @@ extends Control
 ## Flight HUD v0 (art bible 7: minimal modern). Bottom center: speed, flight assist and boost
 ## state, and the energy bar. In the view: a ring where the nose points and a flight-path marker
 ## where the ship is actually going. With flight assist on the two sit together; drifting (FA off)
-## pulls them apart, which is how you read your momentum. The same HUD is later drawn on the
+## pulls them apart, which is how you read your momentum. With mouse flight, a faint ring in the
+## center and a dot show where the mouse virtual stick points. The same HUD is later drawn on the
 ## cockpit's holo plane, so it only needs a camera, not a particular view.
 
 const NOSE_RADIUS: float = 11.0
@@ -13,6 +14,7 @@ const LINE_WIDTH: float = 2.0
 const BAR_WIDTH: float = 480.0
 const BAR_HEIGHT: float = 8.0
 const BAR_BOTTOM_OFFSET: float = 92.0
+const MOUSE_DOT_RADIUS: float = 5.0
 ## How long "BOOST EMPTY" shows after the capacitor runs dry.
 const DEPLETED_SECONDS: float = 1.5
 const COLOR_MAIN: Color = Color(0.92, 0.96, 1.0, 0.95)
@@ -20,6 +22,8 @@ const COLOR_VELOCITY: Color = Color(0.4, 1.0, 0.85, 0.95)
 const COLOR_OUTLINE: Color = Color(0.0, 0.0, 0.0, 0.55)
 const COLOR_WARN: Color = Color(1.0, 0.45, 0.25, 1.0)
 const COLOR_BAR_BACK: Color = Color(1.0, 1.0, 1.0, 0.18)
+const COLOR_MOUSE: Color = Color(0.92, 0.96, 1.0, 0.85)
+const COLOR_MOUSE_RING: Color = Color(0.92, 0.96, 1.0, 0.35)
 
 var ship: Ship = null
 
@@ -53,10 +57,10 @@ func _draw() -> void:
 	var camera: Camera3D = get_viewport().get_camera_3d()
 	if camera == null:
 		return
-	var origin: Vector3 = ship.global_position
-	var nose: HudMath.Marker = HudMath.marker_for(
-		camera, origin, -ship.global_basis.z, size, EDGE_MARGIN
-	)
+	# Where the ship is drawn this frame (physics interpolation), like the camera that follows it.
+	var drawn: Transform3D = ship.get_global_transform_interpolated()
+	var origin: Vector3 = drawn.origin
+	var nose: HudMath.Marker = HudMath.marker_for(camera, origin, -drawn.basis.z, size, EDGE_MARGIN)
 	if nose.on_screen:
 		draw_arc(nose.position, NOSE_RADIUS, 0.0, TAU, 32, COLOR_OUTLINE, LINE_WIDTH + 3.0, true)
 		draw_arc(nose.position, NOSE_RADIUS, 0.0, TAU, 32, COLOR_MAIN, LINE_WIDTH, true)
@@ -66,7 +70,17 @@ func _draw() -> void:
 			camera, origin, ship.linear_velocity, size, EDGE_MARGIN
 		)
 		_draw_velocity_marker(velocity)
+	if InputRouter.mouse_flight_active():
+		_draw_mouse_stick(InputRouter.mouse_offset(), InputRouter.mouse_deadzone_px())
 	_draw_energy_bar()
+
+
+## The mouse virtual stick: its deadzone ring in the center and a dot where it points.
+func _draw_mouse_stick(offset: Vector2, deadzone: float) -> void:
+	var center: Vector2 = size * 0.5
+	draw_arc(center, deadzone, 0.0, TAU, 32, COLOR_MOUSE_RING, 1.5, true)
+	draw_circle(center + offset, MOUSE_DOT_RADIUS + 2.0, COLOR_OUTLINE)
+	draw_circle(center + offset, MOUSE_DOT_RADIUS, COLOR_MOUSE)
 
 
 ## The flight path marker: a ring with a wing on each side and a fin on top. Pinned to the screen

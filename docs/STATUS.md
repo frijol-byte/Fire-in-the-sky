@@ -6,8 +6,9 @@
 ## Now
 - **Phase:** M1 — Flight: review gate ✅ clean (`docs/reviews/M1.md`); **owner playtest
   waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
-- **What to start next:** M2-T1 (`docs/tasks/M2-combat-core.md`). M2 can run while the M1
-  playtest is pending; fixes from the playtest become cards first and go ahead of M2 work.
+- **What to start next:** **M1-F1** (`docs/tasks/M1-flight.md`): your new pad layout and sharper
+  thrusters. M2-T1 (`docs/tasks/M2-combat-core.md`) can run at the same time; M2-T2 waits for M1-F1
+  (it moves the fire buttons).
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -60,6 +61,7 @@
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
+| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | ⬜ | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

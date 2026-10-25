@@ -56,6 +56,11 @@ great and reads clearly.
     `ship.model.get_sockets(&"primary")` is already tier-aware (`SOCKET_primary_2` only at T3).
   - Put the dummies in `data/arenas/flight_test.tres` (`ArenaDef`), not in code, and keep
     `FlightTest.spawn_player()` working for the switcher.
+  - **Fire buttons (owner decision, 2026-10-25, see M1-F1):** RT/LT are now throttle/brake. Bind
+    `fire_primary` to **A** and `fire_secondary` to **X** on the gamepad, and remove their exemption in
+    `test_input_router.gd`. Boost is on A today: move it (L3 click is the suggested home; cruise drive,
+    also on L3, has no gameplay until M4) and list the choice under "Design questions". Target-nearest
+    leaves X in M2-T3.
 
 ### M2-T3 · Targeting, lead indicator & aim assist
 - **Size:** M · **Depends on:** T2 · **Read:** GDD §7.3
@@ -81,6 +86,9 @@ great and reads clearly.
     (`InputRouter.mouse_offset()`); "mouse gets none by default" applies to it.
   - The "look at target" camera hold (GDD §6) was deferred from M1-T4 to here: add it to
     `CameraRig` (a static pose function + unit test, like `chase_pose_for`).
+  - X becomes secondary fire in M2-T2 (owner decision). Give `target_nearest` (tap / double-tap) a new
+    gamepad button and list it under "Design questions"; B is free since M1-F1, but the owner wants to
+    keep the option of putting drift back there, so ask before using it.
 
 ### M2-T4 · Secondaries & countermeasures
 - **Size:** M · **Depends on:** T3 · **Read:** GDD §7.2

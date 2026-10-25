@@ -47,5 +47,7 @@ func test_mismatched_dummy_arrays_are_flagged() -> void:
 	var arena: ArenaDef = (
 		(Content.get_def(&"arena", &"flight_test") as ArenaDef).duplicate() as ArenaDef
 	)
-	arena.dummy_rails = PackedVector3Array()
+	# Assigned, not cleared: `duplicate()` shares the arrays with the real resource.
+	var no_rails: Array[Vector3] = []
+	arena.dummy_rails = no_rails
 	assert_array(arena.problems()).is_not_empty()

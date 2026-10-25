@@ -547,6 +547,10 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
   - **VFX/SFX:** `CombatFx` (muzzle flash, impact flash, sparks, 3D sounds, all pooled), `ShieldFx` (the shield
     ripple, a child of every `Ship` and `TargetDummy`, driven by `Events.ship_damaged`). New WAVs are made by
     `tools/audio/make_placeholder_audio.py`. CPUParticles amount must not change after creation (separate pools per hit kind).
+  - **Gotcha:** `PackedVector3Array` (any Packed array) properties written in a `.tres` came out **empty in the
+    exported build** (CI's boot check caught it; the editor and gdUnit read them fine). Use typed arrays such as
+    `Array[Vector3]` in `*Def` resources. To check locally: `godot --headless --path game --export-pack Linux x.pck`,
+    then `godot --headless --main-pack x.pck --quit-after 120`.
   - **Tests:** `tests/sim/combat_sim.gd` (`CombatSim`) spawns managers, dummies and walls for sims. Parameterised
     tests need a local `ship_params()` method in the suite (`_test_parameters := FlightSim.ship_params()` is
     silently not run; the T1 durability sim had that bug and is fixed here).

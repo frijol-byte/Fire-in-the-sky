@@ -87,8 +87,8 @@ extends ContentDef
 ## One entry per dummy, in parallel arrays: its `DummyDef` id, where it stands and how far its
 ## rail runs from there (zero: it stands still).
 @export var dummy_ids: Array[StringName] = []
-@export var dummy_origins: PackedVector3Array = []
-@export var dummy_rails: PackedVector3Array = []
+@export var dummy_origins: Array[Vector3] = []
+@export var dummy_rails: Array[Vector3] = []
 
 @export_group("Gates")
 ## One transform per ring gate: the ring lies in the local XY plane and is flown through

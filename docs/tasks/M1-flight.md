@@ -153,6 +153,55 @@ in-game overlay, and the chosen values are saved into the ship data.
 
 ---
 
+### M1-F1 · Gamepad flight layout: throttle on triggers, thrusters on the left stick, sharper thrusters
+- **Size:** M · **Depends on:** M1 gate · **Read:** GDD §4.1–4.4 and §5, architecture §5.1 and §5.9,
+  `docs/reviews/M1.md`
+- **Why (owner, after the M1 playtest build):** flying feels right, but the ship can't make small
+  up/down (vertical) adjustments on a standard pad (vertical thrust sits on back paddles it doesn't have),
+  and the side/vertical thrusters feel "very floaty". Turning the ship stays the main way to change
+  direction; the thrusters should help adjust the path while moving.
+- **Do (owner decisions, 2026-10-25):**
+  - **Gamepad layout** (keyboard and mouse don't change: W/S throttle, A/D strafe, R/F up/down):
+    | Input | Before | After |
+    |---|---|---|
+    | RT (analog) | fire primary | **throttle forward** (`thrust_forward`) |
+    | LT (analog) | fire secondary | **brake / reverse** (`thrust_back`) |
+    | Left stick X | strafe | strafe left/right (unchanged) |
+    | Left stick Y | throttle forward/back | **up/down thrust** (`thrust_up` / `thrust_down`; stick up = ship up) |
+    | B | flight assist off (drift) | **unbound for now** (keep the action, its keyboard key `Shift`, the code and its sims; only the gamepad binding goes. The owner will give it a new button or trigger later) |
+    | Paddles 1/2 | up/down thrust | unbound (left stick does it) |
+    | `fire_primary` / `fire_secondary` | RT / LT | **no gamepad binding until M2-T2**, which puts them on A / X (owner decision); mouse buttons stay |
+    Everything else stays (A boost, X target, Y interact, LB/RB roll, R3 camera, L3 cruise, D-pad).
+  - Shaping: the triggers are single axes (`shape_axis`); the left stick stays one radial-deadzone stick
+    (`shape_stick`, now strafe + vertical). Throttle is `RT − LT`, so `ShipControls.thrust` keeps its
+    meaning and `FlightController` needs no input changes. `InputRouter.ACTIONS` keeps every action.
+  - **Sharper thrusters:** today the Kestrel's side thrust is 35 m/s² against a 90 m/s strafe limit
+    (about 2.6 s to full strafe, and as long to stop). Make lateral and vertical response quick and
+    crisp, keeping the three classes distinct (freighter slowest), e.g. roughly 2.5–3× today's
+    lateral/vertical thrust in each `data/ships/*.tres`. If thrust alone can't give a crisp start *and*
+    stop, add a separate FA gain for the strafe/vertical axes to `ShipDef` (and a tuning-overlay slider)
+    rather than raising `fa_linear_gain`, which also changes forward speed. Keep forward/turning feel as is.
+  - **Docs:** update GDD §5 (table above; the D-pad's ship switcher in `flight_test` is a demo-only
+    stand-in, devices take the D-pad in M2) and the GDD §4.4 strafe column to the new values (owner
+    consent given for both; `00-decisions.md` is untouched). Update the arena help line, the
+    `playtest-M1` controls in STATUS release notes for the next build, and owner quickstart if it lists
+    pad controls.
+  - **D-pad note:** in `flight_test.tscn`'s top-left text and the GDD, say the 1/2/3 ship switch is
+    temporary for the demos; the D-pad belongs to devices from M2.
+- **Tests:**
+  - Update `test_input_router.gd` / `test_input_router_runtime.gd`: RT gives `thrust.z` +1, LT −1, both
+    cancel; left stick Y gives `thrust.y`; pitch/yaw/roll untouched. The "every action has a gamepad event"
+    test gets an explicit, commented exemption list for `flight_assist_off`, `fire_primary`,
+    `fire_secondary` (the M2-T2 card removes the fire exemptions).
+  - New sim per ship (`FlightSim.SHIP_IDS`): full strafe and full vertical reach 90% of their speed
+    limit within a per-ship time (store the target in `ShipDef`, e.g. `strafe_response_time`, validated
+    in `problems()`), and stop again within the same time with no overshoot. Every existing flight sim
+    must still pass.
+- **Acceptance:** tests pass; the PR's "What to try" walks the owner through the new pad layout; a shot of
+  the arena with the updated help line.
+
+---
+
 ## M1 review gate & playtest checklist
 Play the flight arena with a gamepad for ~20 minutes, then answer:
 - [ ] Does turning feel responsive, or floaty/twitchy? (Use the overlay to fix it, then "Copy values")

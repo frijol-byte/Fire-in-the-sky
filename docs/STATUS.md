@@ -61,7 +61,7 @@
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
-| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | 👀 | |
+| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | 👀 | #19 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

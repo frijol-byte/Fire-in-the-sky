@@ -61,7 +61,8 @@ SHIP_DRAYMAN_NAME,Drayman
 ARENA_FLIGHT_TEST_NAME,Flight test arena
 ARENA_GATES,Gates passed: %d
 ARENA_SHIP,%s    (demo only) switch ship: %s
-ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s target (tap / double-tap)    %s look at target    %s camera    %s pause
+ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s camera    %s pause
+ARENA_HELP_TARGET,%s target (tap / double-tap)    %s look at target
 ARENA_HELP_DRIFT,    %s drift
 BOOT_FLY_HINT,%s: fly the flight test arena
 HUD_SPEED,%.0f m/s

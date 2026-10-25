@@ -20,13 +20,13 @@ move_camera = false
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("4_def")
 label = "3_lead"
-frame = 95
+frame = 48
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_3"]
 script = ExtResource("4_def")
 label = "4_arrow"
-frame = 108
+frame = 98
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_4"]
@@ -38,13 +38,13 @@ move_camera = false
 [sub_resource type="Resource" id="Resource_5"]
 script = ExtResource("4_def")
 label = "6_friendly"
-frame = 200
+frame = 188
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_6"]
 script = ExtResource("4_def")
 label = "7_lost"
-frame = 245
+frame = 250
 move_camera = false
 
 [node name="TargetingShot" type="Node3D"]

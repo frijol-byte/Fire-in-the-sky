@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="SecondaryDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/secondary_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"homing_missile"
+display_name_key = "SECONDARY_HOMING_MISSILE_NAME"
+mode = 0
+damage_type = 2
+damage = 55.0
+splash_radius_m = 16.0
+splash_edge_fraction = 0.35
+ammo = 6
+cooldown = 1.5
+salvo_count = 1
+salvo_interval = 0.08
+spread_deg = 0.0
+launch_speed = 120.0
+max_speed = 290.0
+acceleration = 160.0
+lifetime = 8.0
+radius = 0.5
+arm_distance_m = 40.0
+fuse_radius_m = 12.0
+lock_time = 1.2
+lock_range_m = 1200.0
+lock_cone_deg = 20.0
+turn_rate_deg = 55.0
+nav_gain = 4.0
+ignite_delay = 0.35
+seeker_cone_deg = 110.0
+color = Color(1.0, 0.7, 0.35, 1)
+streak_length = 9.0
+streak_width = 0.9
+launch_flash_size = 3.0
+blast_color = Color(1.0, 0.6, 0.25, 1)
+launch_sfx = "res://assets/audio/sfx/missile_launch.wav"
+launch_sfx_db = -4.0

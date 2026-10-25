@@ -100,6 +100,9 @@ static func ship_state(ship: Ship) -> Dictionary:
 		"armor_capacity": durability.armor_capacity,
 		"hull_capacity": durability.hull_capacity,
 		"devices_disabled": durability.devices_disabled(),
+		"secondary_ammo": ship.secondaries().ammo,
+		"secondary_lock": ship.secondaries().lock.progress,
+		"flares_cooldown": ship.devices().cooldown_left(1),
 		"target": targeting.target.name if targeting.target != null else "",
 		"target_lock": Targeting.Lock.keys()[targeting.lock] if targeting.target != null else "",
 	}

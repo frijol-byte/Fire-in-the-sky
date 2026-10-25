@@ -34,11 +34,9 @@ var _pool: Array[Projectile] = []
 var _free: PackedInt32Array = []
 var _active_count: int = 0
 var _serial: int = 0
-var _query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
-var _ray: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
-var _shapes: Dictionary[float, SphereShape3D] = {}
-var _multimesh: MultiMesh = MultiMesh.new()
-var _streaks: MultiMeshInstance3D = MultiMeshInstance3D.new()
+var _caster: SweepCaster = SweepCaster.new(PhysicsLayers.PROJECTILE_MASK)
+var _multimesh: MultiMesh = null
+var _streaks: MultiMeshInstance3D = null
 
 
 ## The manager of the scene `node` is in, or null.
@@ -59,10 +57,6 @@ func _ready() -> void:
 	add_to_group(GROUP)
 	_build_pool()
 	_build_streaks()
-	_query.collision_mask = PhysicsLayers.PROJECTILE_MASK
-	_query.collide_with_areas = false
-	_ray.collision_mask = PhysicsLayers.PROJECTILE_MASK
-	_ray.collide_with_areas = false
 	if fx == null:
 		fx = CombatFx.new()
 		fx.name = "CombatFx"
@@ -137,12 +131,18 @@ func draw_streaks(fraction: float) -> void:
 ## Transform of a streak whose head is at `head`, flying along `direction`: a box as long as the
 ## weapon's tracer, trailing behind the head.
 static func streak_transform(head: Vector3, direction: Vector3, weapon: WeaponDef) -> Transform3D:
+	return streak_at(head, direction, weapon.tracer_length, weapon.tracer_width)
+
+
+## Transform of a streak `length` metres long and `width` wide whose head is at `head`, flying
+## along `direction`. Missiles and flares are drawn with the same shader.
+static func streak_at(
+	head: Vector3, direction: Vector3, length: float, width: float
+) -> Transform3D:
 	var up: Vector3 = Vector3.UP if absf(direction.y) < 0.99 else Vector3.RIGHT
 	var basis: Basis = Basis.looking_at(direction, up)
-	basis = basis.scaled_local(
-		Vector3(weapon.tracer_width, weapon.tracer_width, weapon.tracer_length)
-	)
-	return Transform3D(basis, head - direction * weapon.tracer_length * 0.5)
+	basis = basis.scaled_local(Vector3(width, width, length))
+	return Transform3D(basis, head - direction * length * 0.5)
 
 
 func _take_slot() -> Projectile:
@@ -186,43 +186,10 @@ func _advance(shot: Projectile, delta: float) -> void:
 	_land(shot, contact)
 
 
-## Sweeps the shot's sphere along `motion`. Returns {} when nothing is in the way, otherwise the
-## first contact: {position (shot centre when it touched), point, normal, collider}.
+## Sweeps the shot's sphere along `motion` (see `SweepCaster.cast`).
 func _cast(shot: Projectile, motion: Vector3) -> Dictionary:
-	if motion.length_squared() < 0.000001:
-		return {}
 	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
-	_query.shape = _shape_for(shot.weapon.projectile_radius)
-	_query.transform = Transform3D(Basis.IDENTITY, shot.position)
-	_query.motion = motion
-	_query.exclude = shot.exclude
-	var fractions: PackedFloat32Array = space.cast_motion(_query)
-	if fractions.size() < 2 or fractions[0] >= 1.0:
-		return {}
-	var touching: Vector3 = shot.position + motion * fractions[1]
-	_query.transform = Transform3D(Basis.IDENTITY, touching)
-	_query.motion = Vector3.ZERO
-	var rest: Dictionary = space.get_rest_info(_query)
-	if not rest.is_empty():
-		return {
-			"position": touching,
-			"point": rest["point"] as Vector3,
-			"normal": rest["normal"] as Vector3,
-			"collider": instance_from_id(rest["collider_id"] as int),
-		}
-	# The sweep stopped just short of contact: a ray along the path finds what is there.
-	_ray.from = shot.position
-	_ray.to = touching + motion.normalized() * shot.weapon.projectile_radius * 2.0
-	_ray.exclude = shot.exclude
-	var ray_hit: Dictionary = space.intersect_ray(_ray)
-	if ray_hit.is_empty():
-		return {}
-	return {
-		"position": touching,
-		"point": ray_hit["position"] as Vector3,
-		"normal": ray_hit["normal"] as Vector3,
-		"collider": ray_hit["collider"] as Object,
-	}
+	return _caster.cast(space, shot.position, motion, shot.weapon.projectile_radius, shot.exclude)
 
 
 func _land(shot: Projectile, contact: Dictionary) -> void:
@@ -244,14 +211,6 @@ func _land(shot: Projectile, contact: Dictionary) -> void:
 	_retire(shot)
 
 
-func _shape_for(radius: float) -> SphereShape3D:
-	if not _shapes.has(radius):
-		var shape: SphereShape3D = SphereShape3D.new()
-		shape.radius = radius
-		_shapes[radius] = shape
-	return _shapes[radius]
-
-
 func _build_pool() -> void:
 	for index: int in capacity:
 		var shot: Projectile = Projectile.new()
@@ -263,20 +222,30 @@ func _build_pool() -> void:
 
 
 func _build_streaks() -> void:
+	_streaks = make_streaks(capacity)
+	_multimesh = _streaks.multimesh
+	add_child(_streaks)
+
+
+## A `MultiMeshInstance3D` of `count` streaks (all hidden) drawn with the streak shader: instance
+## colour is the streak colour, `streak_at` gives the transform. Missiles and flares use it too.
+static func make_streaks(count: int) -> MultiMeshInstance3D:
 	var mesh: QuadMesh = QuadMesh.new()
 	mesh.size = Vector2.ONE
 	var material: ShaderMaterial = ShaderMaterial.new()
 	material.shader = STREAK_SHADER
 	mesh.material = material
-	_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	_multimesh.use_colors = true
-	_multimesh.mesh = mesh
-	_multimesh.instance_count = capacity
-	_multimesh.visible_instance_count = 0
-	_streaks.name = "Streaks"
-	_streaks.top_level = true
-	_streaks.multimesh = _multimesh
-	_streaks.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_streaks.extra_cull_margin = 16384.0
-	_streaks.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	add_child(_streaks)
+	var multimesh: MultiMesh = MultiMesh.new()
+	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.use_colors = true
+	multimesh.mesh = mesh
+	multimesh.instance_count = count
+	multimesh.visible_instance_count = 0
+	var streaks: MultiMeshInstance3D = MultiMeshInstance3D.new()
+	streaks.name = "Streaks"
+	streaks.top_level = true
+	streaks.multimesh = multimesh
+	streaks.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	streaks.extra_cull_margin = 16384.0
+	streaks.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	return streaks

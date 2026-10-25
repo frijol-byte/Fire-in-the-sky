@@ -19,7 +19,6 @@ signal overheated(group: StringName, mount: WeaponMount)
 signal cooled(group: StringName, mount: WeaponMount)
 
 const GROUP_PRIMARY: StringName = &"primary"
-const GROUP_SECONDARY: StringName = &"secondary"
 ## Fixed seed of the spread; sims call `seed_spread` to get another sequence.
 const SPREAD_SEED: int = 7919
 
@@ -69,7 +68,6 @@ func rebuild() -> void:
 	for socket: Marker3D in _ship.model.get_sockets(GROUP_PRIMARY):
 		primary.append(WeaponMount.create(weapon, socket, primary.size()))
 	_mounts[GROUP_PRIMARY] = primary
-	_mounts[GROUP_SECONDARY] = []
 
 
 ## Seeds the random spread, for repeatable sims.
@@ -122,10 +120,7 @@ func tick(delta: float) -> void:
 		return
 	var controls: ShipControls = _ship.controls
 	for group: StringName in _mounts:
-		var holding: bool = (
-			controls.fire_primary if group == GROUP_PRIMARY else controls.fire_secondary
-		)
-		_tick_group(group, holding, delta)
+		_tick_group(group, controls.fire_primary, delta)
 
 
 ## The direction a shot leaves `mount` before spread: towards the aim point within the gimbal
@@ -172,8 +167,7 @@ static func spread_direction(direction: Vector3, spread_deg: float, u: float, v:
 
 func _tick_group(group: StringName, holding: bool, delta: float) -> void:
 	var list: Array = _mounts[group]
-	var disabled: bool = _group_disabled(group)
-	var firing: bool = holding and not disabled and not _ship.durability().is_destroyed()
+	var firing: bool = holding and not _ship.durability().is_destroyed()
 	if firing and not _holding.get(group, false):
 		for mount: WeaponMount in list:
 			mount.stagger_start(list.size())
@@ -183,11 +177,6 @@ func _tick_group(group: StringName, holding: bool, delta: float) -> void:
 			cooled.emit(group, mount)
 		if firing and mount.can_fire():
 			_fire(group, mount)
-
-
-## Ion hits switch off missiles and devices (GDD 7.1); the primary guns keep working.
-func _group_disabled(group: StringName) -> bool:
-	return group == GROUP_SECONDARY and _ship.durability().devices_disabled()
 
 
 func _fire(group: StringName, mount: WeaponMount) -> void:

@@ -29,8 +29,15 @@ const SOUND_HIT_ARMOR: AudioStreamWAV = preload("res://assets/audio/sfx/hit_armo
 const SOUND_HIT_HULL: AudioStreamWAV = preload("res://assets/audio/sfx/hit_hull.wav")
 const SOUND_HIT_ROCK: AudioStreamWAV = preload("res://assets/audio/sfx/hit_rock.wav")
 const SOUND_OVERHEAT: AudioStreamWAV = preload("res://assets/audio/sfx/weapon_overheat.wav")
+const SOUND_EXPLOSION: AudioStreamWAV = preload("res://assets/audio/sfx/explosion.wav")
 const HIT_SOUND_DB: float = -6.0
 const OVERHEAT_SOUND_DB: float = -8.0
+const EXPLOSION_SOUND_DB: float = -2.0
+## An explosion is a hot flash a little bigger than its blast radius over a white core, and sparks.
+const EXPLOSION_FLASH_FACTOR: float = 1.5
+const EXPLOSION_CORE_FACTOR: float = 0.55
+const EXPLOSION_FLASH_TIME: float = 0.4
+const EXPLOSION_CORE_TIME: float = 0.2
 
 
 class Flash:
@@ -108,14 +115,35 @@ func impact(point: Vector3, normal: Vector3, weapon: WeaponDef, result: DamageRe
 	play(hit_stream(kind), point, HIT_SOUND_DB)
 
 
-## Plays `stream` at `position` on the next sound slot (the oldest sound is cut off when all are busy).
-func play(stream: AudioStream, position: Vector3, volume_db: float) -> void:
+## An explosion of blast radius `radius` metres at `position`: a flash over a white core, a burst
+## of sparks and a boom. Missiles and rockets use it (`harmless` ones just a small one).
+func explosion(position: Vector3, radius: float, color: Color) -> void:
+	_start_flash(position, color, radius * EXPLOSION_FLASH_FACTOR, EXPLOSION_FLASH_TIME)
+	_start_flash(position, Color.WHITE, radius * EXPLOSION_CORE_FACTOR, EXPLOSION_CORE_TIME)
+	_emit_sparks(ImpactKind.HULL, position, Vector3.UP, color)
+	play(SOUND_EXPLOSION, position, EXPLOSION_SOUND_DB)
+
+
+## A flash of `size` metres at `position` that fades away over `time` seconds.
+func flash(position: Vector3, color: Color, size: float, time: float = FLASH_TIME) -> void:
+	_start_flash(position, color, size, time)
+
+
+## The sound at `path` (loaded once).
+func load_sound(path: String) -> AudioStream:
+	return _stream(path)
+
+
+## Plays `stream` at `position` on the next sound slot (the oldest sound is cut off when all are
+## busy). `pitch` is a pitch multiplier.
+func play(stream: AudioStream, position: Vector3, volume_db: float, pitch: float = 1.0) -> void:
 	if stream == null or _players.is_empty():
 		return
 	var player: AudioStreamPlayer3D = _players[_next_player]
 	_next_player = (_next_player + 1) % _players.size()
 	player.stream = stream
 	player.volume_db = volume_db
+	player.pitch_scale = pitch
 	player.global_position = position
 	player.play()
 

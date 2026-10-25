@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generates the placeholder flight and combat sounds as WAV files: engine hum, boost whoosh,
-dust hiss, the two weapons' shots, hit sounds for shield, armor, hull and rock, and the overheat vent.
+dust hiss, the two weapons' shots, hit sounds for shield, armor, hull and rock, the overheat vent,
+and the missile sounds (launches, explosion, lock beeps, incoming-missile warning, flare launch).
 
 Everything is synthesised from maths and a seeded random generator, so the files are original
 work released as CC0 and a rebuild is byte-identical. Python standard library only.
@@ -214,6 +215,111 @@ def weapon_overheat() -> list[float]:
     return _normalise(out, 0.7)
 
 
+def missile_launch() -> list[float]:
+    """A missile leaving the rail: a thump, then a rushing roar that swells and thins out."""
+    count = int(RATE * 0.9)
+    rng = random.Random(10010)
+    raw = _noise(rng, count)
+    out = []
+    low1 = low2 = 0.0
+    for i in range(count):
+        t = i / RATE
+        cutoff = 400.0 + 2600.0 * min(t / 0.5, 1.0)
+        alpha = 1.0 - math.exp(-2.0 * math.pi * cutoff / RATE)
+        low1 += alpha * (raw[i] - low1)
+        low2 += alpha * (low1 - low2)
+        swell = min(t / 0.12, 1.0) * math.exp(-2.2 * max(t - 0.15, 0.0))
+        thump = math.sin(2.0 * math.pi * (70.0 - 25.0 * min(t * 5.0, 1.0)) * t) * math.exp(-t * 11.0)
+        out.append(low2 * swell * 2.4 + thump * 0.9)
+    return _normalise(out, 0.9)
+
+
+def rocket_launch() -> list[float]:
+    """A rocket's sharp whoosh: shorter and brighter than the missile's."""
+    count = int(RATE * 0.35)
+    rng = random.Random(11011)
+    raw = _highpass(_lowpass(_noise(rng, count), 5000.0), 600.0)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        thump = math.sin(2.0 * math.pi * 95.0 * t) * math.exp(-t * 30.0)
+        out.append(raw[i] * min(t / 0.03, 1.0) * math.exp(-t * 9.0) * 1.8 + thump * 0.7)
+    return _normalise(out, 0.8)
+
+
+def explosion() -> list[float]:
+    """A big blast: a crack of noise, a deep boom that drops from 90 to 38 Hz and a rumbling tail."""
+    count = int(RATE * 1.4)
+    rng = random.Random(12012)
+    noise = _noise(rng, count)
+    rumble = _lowpass(_lowpass(noise, 380.0), 380.0)
+    crack = _lowpass(noise, 4200.0)
+    out, phase = [], 0.0
+    for i in range(count):
+        t = i / RATE
+        phase += 2.0 * math.pi * (38.0 + 52.0 * math.exp(-t * 7.0)) / RATE
+        boom = math.sin(phase) * math.exp(-t * 3.2)
+        out.append(
+            boom * 1.0 + rumble[i] * math.exp(-t * 2.6) * 5.0 + crack[i] * math.exp(-t * 28.0) * 1.7
+        )
+    return _normalise(out, 0.95)
+
+
+def lock_beep() -> list[float]:
+    """A short clean blip (1 kHz); the game plays it higher as the lock closes."""
+    count = int(RATE * 0.07)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        envelope = min(i / 90.0, 1.0) * min((count - i) / 250.0, 1.0)
+        out.append((math.sin(2.0 * math.pi * 1000.0 * t) + 0.25 * math.sin(2.0 * math.pi * 2000.0 * t)) * envelope)
+    return _normalise(out, 0.7)
+
+
+def lock_ready() -> list[float]:
+    """The lock-acquired tone: two rising notes that finish on a held one."""
+    count = int(RATE * 0.38)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        freq = 1200.0 if t < 0.09 else (1600.0 if t < 0.18 else 2000.0)
+        envelope = min(i / 80.0, 1.0) * (1.0 if t < 0.28 else max(0.0, 1.0 - (t - 0.28) / 0.1))
+        out.append(math.sin(2.0 * math.pi * freq * t) * envelope)
+    return _normalise(out, 0.7)
+
+
+def missile_warning() -> list[float]:
+    """The incoming-missile alarm: two alternating square-ish tones, harsh on purpose."""
+    count = int(RATE * 0.32)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        freq = 880.0 if t < 0.16 else 660.0
+        wave_value = math.sin(2.0 * math.pi * freq * t)
+        wave_value = max(-0.6, min(0.6, wave_value * 1.8)) + 0.2 * math.sin(2.0 * math.pi * freq * 3.0 * t)
+        local = t % 0.16
+        envelope = min(local / 0.006, 1.0) * min((0.16 - local) / 0.01, 1.0)
+        out.append(wave_value * envelope)
+    return _normalise(out, 0.7)
+
+
+def flare_launch() -> list[float]:
+    """Flares popping out: a handful of quick crackles over a bright hiss."""
+    count = int(RATE * 0.7)
+    rng = random.Random(13013)
+    hiss = _highpass(_lowpass(_noise(rng, count), 7000.0), 2200.0)
+    pops = [0.0, 0.05, 0.11, 0.17]
+    out = []
+    for i in range(count):
+        t = i / RATE
+        value = hiss[i] * min(t / 0.04, 1.0) * math.exp(-t * 4.5) * 1.4
+        for start in pops:
+            if t >= start:
+                value += rng.uniform(-1.0, 1.0) * math.exp(-(t - start) * 180.0) * 1.1
+        out.append(value)
+    return _normalise(out, 0.8)
+
+
 FILES = {
     "engine_hum.wav": engine_hum,
     "dust_hiss.wav": dust_hiss,
@@ -225,6 +331,13 @@ FILES = {
     "hit_hull.wav": hit_hull,
     "hit_rock.wav": hit_rock,
     "weapon_overheat.wav": weapon_overheat,
+    "missile_launch.wav": missile_launch,
+    "rocket_launch.wav": rocket_launch,
+    "explosion.wav": explosion,
+    "lock_beep.wav": lock_beep,
+    "lock_ready.wav": lock_ready,
+    "missile_warning.wav": missile_warning,
+    "flare_launch.wav": flare_launch,
 }
 
 

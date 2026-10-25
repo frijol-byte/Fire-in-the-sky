@@ -24,6 +24,8 @@ var _target_radius: float = 6.0
 @onready var _power: PowerSystem = $PowerSystem
 @onready var _durability: Durability = $Durability
 @onready var _weapons: WeaponSystem = $WeaponSystem
+@onready var _secondaries: SecondarySystem = $SecondarySystem
+@onready var _devices: DeviceSystem = $DeviceSystem
 @onready var _targeting: Targeting = $Targeting
 @onready var _shield_fx: ShieldFx = $ShieldFx
 @onready var _engine_fx: EngineFx = $EngineFx
@@ -54,6 +56,8 @@ func _ready() -> void:
 	_build_model()
 	_engine_fx.setup(self)
 	_weapons.configure(self)
+	_secondaries.configure(self)
+	_devices.configure(self)
 	add_to_group(Targeting.GROUP)
 	var bounds: AABB = ShieldFx.bounds_of(model, self)
 	_target_radius = bounds.size.length() * 0.5
@@ -79,6 +83,16 @@ func durability() -> Durability:
 ## The ship's guns. They fire while `controls.fire_primary` is held.
 func weapons() -> WeaponSystem:
 	return _weapons
+
+
+## The ship's missiles or rockets. They launch while `controls.fire_secondary` is held / pressed.
+func secondaries() -> SecondarySystem:
+	return _secondaries
+
+
+## The ship's devices (flares). `controls.device` uses one.
+func devices() -> DeviceSystem:
+	return _devices
 
 
 ## The ship's target selection and lock. The pilot's `controls.target_cmd` drives it.

@@ -54,6 +54,16 @@ func weapon(id: StringName) -> WeaponDef:
 	return get_def(&"weapon", id) as WeaponDef
 
 
+## Returns the secondary weapon def (missile, rocket pod) with `id`, or `null`.
+func secondary(id: StringName) -> SecondaryDef:
+	return get_def(&"secondary", id) as SecondaryDef
+
+
+## Returns the device def (flares...) with `id`, or `null`.
+func device(id: StringName) -> DeviceDef:
+	return get_def(&"device", id) as DeviceDef
+
+
 ## Returns the target dummy def with `id`, or `null`.
 func dummy(id: StringName) -> DummyDef:
 	return get_def(&"dummy", id) as DummyDef

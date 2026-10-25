@@ -198,6 +198,38 @@ Against a Kestrel (100 shield / 60 armor / 80 hull) a perfectly aimed pair of la
 autocannons about 3 s but with spread and a roughly 4.5 s overheat limit. Both guns converge on a point 300-350 m
 ahead, so their shots cross on the reticle.
 
+**Secondary starting values (M2-T4, to tune in the M2 playtest; the numbers live in
+`data/secondaries/*.tres` and `data/devices/flares.tres`).**
+
+| | Homing Missile | Rocket Pod |
+|---|---|---|
+| Fitted to | Kestrel, Drayman | Bulwark |
+| Fire | Hold the secondary button on a locked target, release to launch | Press (or hold) to fire a salvo of 6 |
+| Damage (type) | 55 (Explosive), blast radius 16 m, 35% at the edge | 14 per rocket (Explosive), blast radius 7 m, 40% at the edge |
+| Ammo, cooldown | 6, 1.5 s | 24 rockets, 1.5 s after a salvo |
+| Speed | launches at the ship's velocity + 120 m/s, accelerates to 290 m/s | launches at +220 m/s, accelerates to 420 m/s, 2 s of flight |
+| Guidance | Proportional navigation (gain 4), turns at most 55 deg/s, steers after 0.35 s, seeker sees 110 deg either side of its nose, self-destructs after 8 s | none (spread 1.2 deg) |
+| Fuse | Contact, or within 12 m of its target after 40 m of flight | Contact |
+
+- **Lock-on:** a target must be the selected, locked target (7.3), within 20 degrees of the nose and 1200 m.
+  The lock builds in 1.2 s with beeps that speed up and rise in pitch, then a lock tone; the HUD ring
+  around the target fills up and says LOCK. Release while locked to launch. Release early, lose the
+  target, run out of ammo or take an ion hit and nothing launches. Lock lost drains faster than it builds.
+- **Beating a missile:** it tops out at 290 m/s, below the Kestrel's boost (320 m/s), so **boosting straight
+  away outruns it** (it burns out after 8 s). Crossing its path late enough with a **boost-drift** (flight
+  assist off, nose turned across, boost) beats its turn rate: it flies past, loses the target out of its seeker
+  view, and goes off harmlessly. Flares are the answer when you cannot out-fly it.
+- **Blast:** every ship or drone near the blast takes damage through `Durability.apply`, strongest at
+  the centre; the ship that fired is never hurt by its own blast.
+- **Incoming-missile warning:** while a homing missile is steering at the player, the HUD shows a flashing
+  MISSILE INCOMING banner with the distance, a marker on the missile (an arrow on the screen edge if it is out
+  of view) and an alarm that beeps faster the closer it is. A missile fooled by a flare stops counting.
+- **Countermeasure Flares** (device slot 1; keys 1-3 / D-pad pick the slot): throws 4 flares, 8 s cooldown, no
+  energy. Every missile that is hunting the ship and within 700 m is rolled **once** per use: 65% of them
+  chase a flare instead (a flare burns for 4 s; when it goes out, or the target is destroyed, the missile
+  flies on unguided). Missiles launched after the flares are out are not helped by them. An ion hit disables
+  devices and missile launchers for its duration.
+
 **Devices** (active abilities with cooldowns): Shield Booster, Countermeasure Flares, EMP
 Pulse (short range), Repair Nanites. **Turrets** (on ships with a turret slot): auto-fire at
 the locked target or the nearest threat.

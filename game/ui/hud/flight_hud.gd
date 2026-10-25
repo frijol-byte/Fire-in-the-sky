@@ -35,7 +35,10 @@ var _depleted_left: float = 0.0
 @onready var _state: Label = $State
 @onready var _energy: Label = $Energy
 @onready var _weapon: Label = $Weapon
+@onready var _secondary: Label = $Secondary
+@onready var _device: Label = $Device
 @onready var _targets: TargetHud = $TargetHud
+@onready var _warning: MissileWarning = $MissileWarning
 
 
 func _ready() -> void:
@@ -47,6 +50,7 @@ func _ready() -> void:
 func bind(new_ship: Ship) -> void:
 	ship = new_ship
 	_targets.bind(new_ship)
+	_warning.bind(new_ship)
 	_refresh()
 
 
@@ -160,6 +164,32 @@ func _refresh() -> void:
 	_weapon.add_theme_color_override(
 		"font_color", COLOR_WARN if overheated or starved else COLOR_MAIN
 	)
+	_refresh_secondary()
+	_refresh_device()
+
+
+## The secondary weapon's line (name, ammo and lock) at the bottom left.
+func _refresh_secondary() -> void:
+	var secondaries: SecondarySystem = ship.secondaries()
+	var disabled: bool = ship.durability().devices_disabled()
+	_secondary.text = secondary_text(
+		secondaries.def,
+		secondaries.ammo,
+		secondaries.lock,
+		secondaries.cooldown_left(),
+		secondaries.is_firing_salvo(),
+		disabled
+	)
+	var warn: bool = disabled or (secondaries.def != null and secondaries.ammo <= 0)
+	_secondary.add_theme_color_override("font_color", COLOR_WARN if warn else COLOR_MAIN)
+
+
+## The flares' line (name and ready or cooldown) at the bottom right.
+func _refresh_device() -> void:
+	var devices: DeviceSystem = ship.devices()
+	_device.text = device_text(devices.device_in(1), devices.cooldown_left(1))
+	var disabled: bool = ship.durability().devices_disabled()
+	_device.add_theme_color_override("font_color", COLOR_WARN if disabled else COLOR_MAIN)
 
 
 func _on_boost_depleted(depleted_ship: Node) -> void:
@@ -183,6 +213,47 @@ static func weapon_text(weapon: WeaponDef, overheated: bool, starved: bool) -> S
 	elif starved:
 		text += "     " + TranslationServer.translate("HUD_NO_ENERGY")
 	return text
+
+
+## "HOMING MISSILE  6", with the lock or reload state after it. Empty without a secondary.
+static func secondary_text(
+	def: SecondaryDef, ammo: int, lock: MissileLock, cooldown: float, salvo: bool, disabled: bool
+) -> String:
+	if def == null:
+		return ""
+	var text: String = (
+		TranslationServer.translate("HUD_SECONDARY")
+		% [TranslationServer.translate(def.display_name_key), ammo]
+	)
+	var note: String = ""
+	if disabled:
+		note = "HUD_DISABLED"
+	elif ammo <= 0 and not salvo:
+		note = "HUD_NO_AMMO"
+	elif lock.state == MissileLock.State.LOCKED:
+		note = "HUD_LOCKED"
+	elif lock.state == MissileLock.State.LOCKING:
+		return (
+			text
+			+ "     "
+			+ TranslationServer.translate("HUD_LOCKING") % roundi(lock.progress * 100.0)
+		)
+	elif cooldown > 0.0 and not salvo:
+		note = "HUD_RELOADING"
+	return text if note.is_empty() else text + "     " + TranslationServer.translate(note)
+
+
+## "FLARES  READY", or "FLARES  5 s" while it cools down. Empty without a device.
+static func device_text(def: DeviceDef, cooldown: float) -> String:
+	if def == null:
+		return ""
+	var state: String = TranslationServer.translate("HUD_DEVICE_READY")
+	if cooldown > 0.0:
+		state = TranslationServer.translate("HUD_DEVICE_COOLDOWN") % ceilf(cooldown)
+	return (
+		TranslationServer.translate("HUD_DEVICE")
+		% [TranslationServer.translate(def.display_name_key), state]
+	)
 
 
 ## "FA ON   BOOST READY".

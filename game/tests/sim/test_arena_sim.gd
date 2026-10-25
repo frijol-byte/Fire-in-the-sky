@@ -245,24 +245,26 @@ func test_respawning_moves_the_hud_to_the_new_ship() -> void:
 	assert_object((arena.get_node("Hud/FlightHud") as FlightHud).ship).is_same(second)
 
 
-func _press_slot(slot: int) -> void:
-	var action: String = "device_%d" % slot
-	Input.action_press(action)
+## Sends a key press to the arena the way the viewport does for keys nothing else handled.
+func _press_key(arena: FlightTest, keycode: Key, echo: bool = false) -> void:
+	var key: InputEventKey = InputEventKey.new()
+	key.physical_keycode = keycode
+	key.pressed = true
+	key.echo = echo
+	arena._unhandled_key_input(key)
 	await get_tree().physics_frame
-	await get_tree().physics_frame
-	Input.action_release(action)
 	await get_tree().physics_frame
 
 
-func test_the_device_slots_switch_the_player_ship() -> void:
+func test_the_function_keys_switch_the_player_ship() -> void:
 	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
 	_track(arena)
 	add_child(arena)
 	await SimHelper.step_physics(get_tree(), 2)
 	assert_str(arena.ship.def.id).is_equal("kestrel")
-	for pair: Array in [[2, &"bulwark"], [3, &"drayman"], [1, &"kestrel"]]:
+	for pair: Array in [[KEY_F3, &"bulwark"], [KEY_F4, &"drayman"], [KEY_F2, &"kestrel"]]:
 		var before: Ship = arena.ship
-		await _press_slot(pair[0] as int)
+		await _press_key(arena, pair[0] as Key)
 		assert_str(arena.ship.def.id).is_equal(String(pair[1] as StringName))
 		assert_object(arena.ship).is_not_same(before)
 		# The old ship is gone at once, the new one stands at the start with the HUD bound.
@@ -274,11 +276,79 @@ func test_the_device_slots_switch_the_player_ship() -> void:
 		assert_object(arena.get_node("CameraRig").get("ship")).is_same(arena.ship)
 
 
-func test_pressing_the_current_ships_slot_keeps_the_ship() -> void:
+func test_a_repeating_key_or_a_device_key_does_not_switch_ships() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	await _press_key(arena, KEY_F3, true)
+	assert_str(arena.ship.def.id).is_equal("kestrel")
+	for keycode: Key in [KEY_1, KEY_2, KEY_3, KEY_F1]:
+		await _press_key(arena, keycode)
+	assert_str(arena.ship.def.id).is_equal("kestrel")
+
+
+func test_pressing_the_current_ships_key_keeps_the_ship() -> void:
 	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
 	_track(arena)
 	add_child(arena)
 	await SimHelper.step_physics(get_tree(), 2)
 	var first: Ship = arena.ship
-	await _press_slot(1)
+	await _press_key(arena, KEY_F2)
 	assert_object(arena.ship).is_same(first)
+
+
+func test_the_arena_has_a_missile_manager() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	assert_object(MissileManager.for_node(arena)).is_same(arena.get_node("MissileManager"))
+
+
+func test_a_device_press_throws_flares_and_does_not_switch_ships() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	for child: Node in arena.ship.get_children():
+		if child is PlayerPilot:
+			child.free()
+	var ship_id: StringName = arena.ship.def.id
+	var press: ShipControls = ShipControls.new()
+	press.device = 2
+	arena.ship.controls = press
+	await SimHelper.step_physics(get_tree(), 3)
+	# Slot 2 is the Bulwark in the old switcher: now it does nothing at all.
+	assert_str(arena.ship.def.id).is_equal(ship_id)
+	var manager: MissileManager = arena.get_node("MissileManager") as MissileManager
+	assert_int(manager.active_flares().size()).is_equal(0)
+	press = ShipControls.new()
+	press.device = 1
+	arena.ship.controls = press
+	await SimHelper.step_physics(get_tree(), 3)
+	assert_str(arena.ship.def.id).is_equal(ship_id)
+	assert_int(manager.active_flares().size()).is_greater(0)
+
+
+func test_the_player_locks_and_launches_a_missile_at_the_dummy_ahead() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	for child: Node in arena.ship.get_children():
+		if child is PlayerPilot:
+			child.free()
+	var first: TargetDummy = arena.get_node("Dummies").get_child(0) as TargetDummy
+	arena.ship.targeting().select(first)
+	var held: ShipControls = ShipControls.new()
+	held.fire_secondary = true
+	for _tick: int in 85:
+		arena.ship.controls = held
+		await get_tree().physics_frame
+	assert_bool(arena.ship.secondaries().lock.is_locked()).is_true()
+	arena.ship.controls = ShipControls.new()
+	var shield: float = first.durability().shield
+	await SimHelper.step_physics(get_tree(), 240)
+	assert_float(first.durability().shield).is_less(shield)
+	assert_int(arena.ship.secondaries().ammo).is_equal(arena.ship.secondaries().def.ammo - 1)

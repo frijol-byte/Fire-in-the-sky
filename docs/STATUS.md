@@ -8,7 +8,8 @@
   waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
 - **What to start next:** M1-F1 (new pad layout, sharper thrusters) is merged; the build to playtest
   now also has **guns** (M2-T2: fire on **A** / **X**, boost on **L3**; shoot the target dummies in
-  the arena). **M2-T3** (targeting, lead indicator, aim assist) can start once M2-T2 is merged.
+  the arena). **M2-T3** (targeting, lead indicator, aim assist; PR open) adds the target button
+  (**Y**: tap / double-tap), brackets, the lead ring and aim assist. **M2-T4** (secondaries) is next.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -67,8 +68,9 @@
 
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
-| M2-T1 | Damage model & Durability | M1 | 👀 | #20 |
-| M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | 👀 | #21 |
+| M2-T1 | Damage model & Durability | M1 | ✅ | #20 |
+| M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
+| M2-T3 | Targeting, lead indicator & aim assist | T2 | 👀 | #22 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -518,6 +520,34 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
 
+- M2-T3 (2026-10-25): targeting, lead indicator and aim assist. Things the next session must know:
+  - **Buttons (owner may change):** `target_nearest` moved from X to **Y** (shared with `interact`, which has no
+    gameplay until M4); B stays free for drift. New hold action `look_at_target` = **B** key / **Paddle 4** (the
+    camera keeps the target in view; pure function `CameraRig.look_at_target_angles`). Test
+    `test_input_router.gd` pins both choices.
+  - **`Targeting`** (`combat/targeting.gd`, child of `Ship`, `ship.targeting()`): runs `controls.target_cmd` (and
+    sets it back to NONE, so a controls object reused between ticks does not repeat it), holds `target`, `lock`
+    (LOCKED / OUT_OF_RANGE / OCCLUDED), `lead_point`/`has_lead`. Signals `target_changed`, `lock_lost`. The
+    selection rules are the static `Targeting.choose` (tap = nearest hostile in the 15 degree cone, repeat tap
+    cycles by distance, double-tap = nearest of any side). `CYCLE_SUBSYSTEM` is accepted and ignored until M7.
+  - **What can be targeted:** nodes in group `Targeting.GROUP` with `target_name/stance/velocity/radius()` and
+    `durability()`. `Ship` and `TargetDummy` have them. `Ship.stance` (default HOSTILE) is for whoever spawns an
+    enemy or ally (M2-T5 / M6); `DummyDef.stance` places neutral and friendly drones in the arena
+    (`dummy_neutral.tres`, `dummy_ally.tres`).
+  - **Numbers are data:** `data/combat/targeting_default.tres` (`TargetingDef`: cone, lock range 1500 m, 2 s
+    lock-loss grace, friction zone and strength) and `data/difficulty/{easy,normal,hard}.tres` (`DifficultyDef`
+    stub, only `aim_assist_scale` so far). Settings keys (no options menu yet): `game/difficulty`,
+    `accessibility/aim_assist`, `controls/aim_assist_mouse` (all in `AimAssist`).
+  - **Aim assist** only for the ship with `Targeting.is_player` (set by `PlayerPilot`): magnetism = the weapon
+    gimbal pointed at the lead point (`WeaponSystem.gimbal_scale` = strength); friction = `InputRouter.aim_friction`
+    scaling `look_input()` (the free-look camera uses `look_input(false)`). Mouse: none by default.
+    **The AI must not use either**; M2-T5 reads `Lead.solve` and writes `ShipControls`.
+  - **HUD:** `TargetHud` (child of `FlightHud`): markers, edge arrows, lead ring, panel. `HudMath` got `marker_at`
+    (a world point, `marker_for` now calls it), `projected_radius`, `bracket_strokes`, `arrow_points`.
+  - **Lead:** `Lead.solve/time_to_hit` take `inherit_velocity` (false for every current weapon: shots do not
+    inherit the ship's speed). M2-T4's homing missile does not use it.
+  - Shot scene `targeting_shot` (driver `targeting_shot_driver.gd`): markers, lock, lead, edge arrow, look at
+    target, friendly bracket, lock lost.
 - M2-T2 (2026-10-25): weapons framework, Pulse Laser, Autocannon, projectiles, hit VFX, target dummies.
   Things the next session must know:
   - **Layers** are in `core/physics_layers.gd` (`PhysicsLayers`: WORLD 1, SHIPS 2, TARGETS 4; masks for ship,

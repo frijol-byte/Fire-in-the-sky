@@ -97,3 +97,43 @@ func test_the_kestrel_camera_data_is_valid() -> void:
 	assert_str(found).contains("chase_offset.z")
 	assert_str(found).contains("lag")
 	assert_str(found).contains("canopy_path")
+
+
+func test_look_at_target_points_the_camera_at_the_target() -> void:
+	var basis: Basis = Basis.IDENTITY
+	# Dead ahead: no turn. To the right: yaw right. Above: pitch up.
+	assert_vector(CameraRig.look_at_target_angles(basis, Vector3(0, 0, -300))).is_equal_approx(
+		Vector2.ZERO, Vector2.ONE * 0.0001
+	)
+	var right: Vector2 = CameraRig.look_at_target_angles(basis, Vector3(300, 0, 0))
+	assert_float(right.x).is_equal_approx(PI * 0.5, 0.0001)
+	assert_float(right.y).is_equal_approx(0.0, 0.0001)
+	var above: Vector2 = CameraRig.look_at_target_angles(basis, Vector3(0, 300, -300))
+	assert_float(above.y).is_equal_approx(PI * 0.25, 0.0001)
+	var left: Vector2 = CameraRig.look_at_target_angles(basis, Vector3(-100, 0, -100))
+	assert_float(left.x).is_equal_approx(-PI * 0.25, 0.0001)
+
+
+func test_look_at_target_follows_the_ships_own_axes() -> void:
+	# A ship yawed 90 degrees to the left: a target at world -Z is to its right.
+	var basis: Basis = Basis(Vector3.UP, deg_to_rad(90.0))
+	var angles: Vector2 = CameraRig.look_at_target_angles(basis, Vector3(0, 0, -300))
+	assert_float(angles.x).is_equal_approx(deg_to_rad(90.0), 0.0001)
+
+
+func test_look_at_target_agrees_with_the_free_look_basis() -> void:
+	# Rotating the ship's forward by the free-look basis must land on the target direction.
+	var to_target: Vector3 = Vector3(120, 80, -200)
+	var angles: Vector2 = CameraRig.look_at_target_angles(Basis.IDENTITY, to_target)
+	var pointing: Vector3 = CameraRig.free_look_basis(angles) * Vector3(0, 0, -1)
+	assert_vector(pointing).is_equal_approx(to_target.normalized(), Vector3.ONE * 0.0001)
+
+
+func test_look_at_target_is_limited_like_free_look() -> void:
+	var behind: Vector2 = CameraRig.look_at_target_angles(Basis.IDENTITY, Vector3(1, 0, 300))
+	assert_float(behind.x).is_equal_approx(CameraRig.FREE_LOOK_MAX_YAW, 0.0001)
+	var straight_up: Vector2 = CameraRig.look_at_target_angles(Basis.IDENTITY, Vector3(0, 300, 0))
+	assert_float(straight_up.y).is_equal_approx(CameraRig.FREE_LOOK_MAX_PITCH, 0.0001)
+	assert_vector(CameraRig.look_at_target_angles(Basis.IDENTITY, Vector3.ZERO)).is_equal(
+		Vector2.ZERO
+	)

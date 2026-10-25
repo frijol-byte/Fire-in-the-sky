@@ -182,9 +182,19 @@ Ship (RigidBody3D, custom_integrator = true)
   function `Durability.apply(info)`, whose type multipliers are unit-tested. The multipliers are
   data (`DamageTable`, `data/combat/damage_table.tres`); `Durability` is a child node of `Ship`
   (`ship.durability()`), and emits `Events.ship_damaged` / `Events.ship_destroyed`.
-- **Lead calculation** is a pure function (unit-tested with moving targets).
-- **Aim assist** lives in `InputRouter` → `ShipControls` (magnetism and friction), never in the
-  weapons.
+- **Lead calculation** is a pure function (`Lead.solve`, unit-tested with moving targets).
+- **Targeting** (`combat/targeting.gd`, a child of `Ship`, `ship.targeting()`) runs `controls.target_cmd`
+  (`NEAREST_HOSTILE` tap and cycle, `NEAREST_ANY` double-tap), keeps the selected `target`, and checks
+  the lock each tick (range and a ray against WORLD; dropped after `TargetingDef.lock_loss_seconds`).
+  Anything with the `Targeting.GROUP` group and the methods `target_name`, `target_stance`,
+  `target_velocity`, `target_radius` and `durability` can be targeted (ships and `TargetDummy`).
+  `TargetHud` (a child of `FlightHud`) draws brackets, edge arrows, the lead indicator and the panel
+  from `HudMath`'s pure rules.
+- **Aim assist** (`AimAssist`, pure rules; strength = `DifficultyDef.aim_assist_scale` × the
+  `accessibility/aim_assist` setting, zero for the mouse). Only the ship flagged `Targeting.is_player`
+  (by `PlayerPilot`) gets it. Magnetism is the weapon gimbal (`WeaponSystem.set_aim_point` with the
+  lead point, `gimbal_scale` = strength); friction is `InputRouter.aim_friction`, which scales the aim
+  stick in `look_input()`. The AI never gets either: it writes `ShipControls` like everyone.
 
 ### 5.3 AI
 - `AIPilot` runs a **utility AI** for picking behaviors (Pursue, AttackRun, BreakOff, Evade,

@@ -213,6 +213,13 @@ func _update_help() -> void:
 			InputRouter.glyph_for(&"pause"),
 		]
 	)
+	_help.text += (
+		"\n"
+		+ (
+			tr("ARENA_HELP_TARGET")
+			% [InputRouter.glyph_for(&"target_nearest"), InputRouter.glyph_for(&"look_at_target")]
+		)
+	)
 	# The drift button is optional: the gamepad has none for now (see GDD 5).
 	var drift: String = InputRouter.glyph_for(&"flight_assist_off")
 	if drift != tr("GLYPH_UNBOUND"):

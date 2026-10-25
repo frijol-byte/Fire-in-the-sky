@@ -14,11 +14,17 @@ extends RigidBody3D
 var controls: ShipControls = ShipControls.new()
 ## The instanced `.glb`, available once the ship is in the tree.
 var model: ShipModel = null
+## Whose side this ship is on, as other ships' targeting and the HUD see it. Whoever spawns an
+## enemy or an ally sets it (factions arrive in M6).
+var stance: Targeting.Stance = Targeting.Stance.HOSTILE
+
+var _target_radius: float = 6.0
 
 @onready var _flight: FlightController = $FlightController
 @onready var _power: PowerSystem = $PowerSystem
 @onready var _durability: Durability = $Durability
 @onready var _weapons: WeaponSystem = $WeaponSystem
+@onready var _targeting: Targeting = $Targeting
 @onready var _shield_fx: ShieldFx = $ShieldFx
 @onready var _engine_fx: EngineFx = $EngineFx
 
@@ -48,7 +54,9 @@ func _ready() -> void:
 	_build_model()
 	_engine_fx.setup(self)
 	_weapons.configure(self)
+	add_to_group(Targeting.GROUP)
 	var bounds: AABB = ShieldFx.bounds_of(model, self)
+	_target_radius = bounds.size.length() * 0.5
 	_shield_fx.setup(self, bounds.get_center(), bounds.size * 0.5)
 
 
@@ -71,6 +79,29 @@ func durability() -> Durability:
 ## The ship's guns. They fire while `controls.fire_primary` is held.
 func weapons() -> WeaponSystem:
 	return _weapons
+
+
+## The ship's target selection and lock. The pilot's `controls.target_cmd` drives it.
+func targeting() -> Targeting:
+	return _targeting
+
+
+## The methods below make a ship a valid target for `Targeting` (see its header).
+func target_name() -> String:
+	return tr(def.display_name_key)
+
+
+func target_stance() -> Targeting.Stance:
+	return stance
+
+
+func target_velocity() -> Vector3:
+	return linear_velocity
+
+
+## Roughly how big the ship looks, in metres: half the diagonal of its hull's bounding box.
+func target_radius() -> float:
+	return _target_radius
 
 
 ## Re-reads the values of `def` that are copied at spawn (mass, the capacitor). The flight

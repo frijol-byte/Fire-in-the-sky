@@ -5,7 +5,8 @@ extends Control
 ## where the ship is actually going. With flight assist on the two sit together; drifting (FA off)
 ## pulls them apart, which is how you read your momentum. With mouse flight, a faint ring in the
 ## center and a dot show where the mouse virtual stick points. The same HUD is later drawn on the
-## cockpit's holo plane, so it only needs a camera, not a particular view.
+## cockpit's holo plane, so it only needs a camera, not a particular view. The target brackets, edge
+## arrows, lead indicator and target panel are drawn by the `TargetHud` child.
 
 const NOSE_RADIUS: float = 11.0
 const VELOCITY_RADIUS: float = 18.0
@@ -34,6 +35,7 @@ var _depleted_left: float = 0.0
 @onready var _state: Label = $State
 @onready var _energy: Label = $Energy
 @onready var _weapon: Label = $Weapon
+@onready var _targets: TargetHud = $TargetHud
 
 
 func _ready() -> void:
@@ -44,6 +46,7 @@ func _ready() -> void:
 ## Shows the flight data of `new_ship`.
 func bind(new_ship: Ship) -> void:
 	ship = new_ship
+	_targets.bind(new_ship)
 	_refresh()
 
 

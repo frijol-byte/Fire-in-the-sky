@@ -124,17 +124,18 @@ virtual-stick layout. Everything is rebindable.
 | LB / RB | Roll left / right |
 | A | Fire primary weapons (hold) |
 | B | Unbound for now (flight assist off / drift keeps its action and the `Shift` key; the owner will give it a gamepad button or trigger later) |
-| X | Fire secondary weapon (hold to lock missiles). Until M2-T3 it also still carries "target nearest", which then moves to another button |
-| Y | Interact / dock / pick up (context) |
+| X | Fire secondary weapon (hold to lock missiles) |
+| Y | Target: tap = nearest hostile (cycles to the next one on a repeat tap), double-tap = nearest of any side. Also interact / dock / pick up (context; no gameplay before M4, so the two share the button for now) |
 | D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target (from M2; in the flight test arena the D-pad / keys 1-2-3 switch ships, a temporary demo stand-in) |
 | L3 | Boost (hold). Cruise drive (toward the selected destination) shares it until M4, when it gets its own input |
 | R3 | Camera: chase ↔ cockpit |
+| Paddle 4 / `B` (hold) | Look at target: the camera keeps the selected target in view while the ship keeps flying |
 | Paddle 3 / `Z` (hold) | Free look: the right stick turns the camera while the ship keeps flying (settings flag, off by default) |
 | Start / Select | Pause menu / system map |
 
 **Mouse + keyboard:** the mouse steers a virtual joystick from screen center (pitch/yaw),
 WASD thrusts and strafes, R/F move vertically, Q/E roll, left/right mouse buttons fire,
-Space boosts, Shift holds FA off, T targets.
+Space boosts, Shift holds FA off, T targets (tap / double-tap), B holds look-at-target.
 
 **Touch (Android, post-slice):** left virtual stick = thrust/strafe, right drag = aim, and
 on-screen buttons for fire, boost and drift. Aim assist is stronger on touch.
@@ -145,7 +146,9 @@ on-screen buttons for fire, boost and drift. Aim assist is stronger on touch.
   geometry.
 - **Cockpit cam:** a minimal canopy frame (one per faction × size class) with a holographic
   HUD.
-- Optional "look at target" hold (keeps the camera tracking the locked target).
+- "Look at target" hold (`look_at_target`): while held, the camera swings round the ship to keep the
+  selected target in view (limited like free look: 150 degrees of yaw, 60 of pitch). It does nothing
+  without a target, and free look wins if both are held.
 - **Free look** (hold, off by default in settings): the aim stick turns the camera instead of the
   ship. Camera shake can be scaled or turned off in settings.
 
@@ -200,12 +203,32 @@ Pulse (short range), Repair Nanites. **Turrets** (on ships with a turret slot): 
 the locked target or the nearest threat.
 
 ### 7.3 Targeting & aim help
-- Lock-on cycles targets. The **lead indicator** shows where to shoot. Off-screen targets get
-  edge arrows.
-- **Aim assist (gamepad/touch):** light bullet magnetism plus reticle "friction" near targets.
-  Its strength is set by difficulty and an accessibility slider. Mouse gets none by default.
+- **Selecting** (`target_nearest`): a tap picks the nearest **hostile** inside the reticle cone (15°
+  around the nose; if none is in the cone, the nearest hostile at all). Tapping again cycles to the
+  next hostile further away, wrapping to the nearest. A **double-tap** (within 0.3 s) picks the nearest
+  target of **any** side (neutral and friendly too). Targets hidden behind a rock cannot be picked.
+- **Lock:** the selected target is *locked* while it is within 1500 m and in line of sight. Out of range
+  or behind a rock the lock is lost (the bracket fades and the panel says why); after 2 s without it
+  the target is dropped. A destroyed target is dropped at once. Aim assist and the lead indicator only
+  work on a locked target. The numbers are in `data/combat/targeting_default.tres`.
+- **HUD:** every target in range has a small marker, and the selected one has brackets whose **shape**
+  tells whose side it is on (square corners = hostile, round arcs = neutral, diamond = friendly; colour
+  agrees: red, yellow, green). Hostile targets you cannot see get **edge arrows** (the six nearest),
+  the selected target always has one. The **lead indicator** (a small ring) shows where to shoot; it
+  turns green when the nose ring is on it, and is faint when the target is beyond the gun's range. A
+  panel at the right shows the selected target's name, side, distance and shield, armor and hull bars.
+- The **lead indicator** is `Lead.solve`: where a shot of the primary weapon's speed meets the target
+  if it keeps its velocity. A target that outruns the shot has no solution and the aim falls back to
+  its position.
+- **Aim assist (gamepad/touch):** light bullet magnetism plus reticle "friction" near the locked
+  target. Magnetism bends the guns toward the lead point by up to the weapon's gimbal (3°) times the
+  assist strength; friction slows the right stick (down to 45% right on the target at full strength,
+  starting 6° out). Strength = the difficulty's `aim_assist_scale` (easy 1.0, normal 0.7, hard 0.4)
+  times the accessibility slider (`accessibility/aim_assist`, default 1). **The mouse gets none** unless
+  the player turns on `controls/aim_assist_mouse`. There is no options menu yet, so these are settings
+  keys only.
 - **Subsystem targeting:** on capital ships, D-pad cycles subsystems (turrets, shield
-  generators, engines, hangars).
+  generators, engines, hangars). Not built yet (M7).
 
 ### 7.4 Feedback (pillar 1)
 Hit markers, a shield-impact ripple on the target, damage-direction indicators, a distinct

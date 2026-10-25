@@ -80,6 +80,7 @@ static func ship_state(ship: Ship) -> Dictionary:
 		return {}
 	var power: PowerSystem = ship.power()
 	var durability: Durability = ship.durability()
+	var targeting: Targeting = ship.targeting()
 	return {
 		"id": str(ship.def.id) if ship.def != null else "",
 		"position": json_safe(ship.global_position),
@@ -99,6 +100,8 @@ static func ship_state(ship: Ship) -> Dictionary:
 		"armor_capacity": durability.armor_capacity,
 		"hull_capacity": durability.hull_capacity,
 		"devices_disabled": durability.devices_disabled(),
+		"target": targeting.target.name if targeting.target != null else "",
+		"target_lock": Targeting.Lock.keys()[targeting.lock] if targeting.target != null else "",
 	}
 
 

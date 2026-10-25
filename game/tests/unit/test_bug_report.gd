@@ -89,6 +89,19 @@ func test_ship_state_describes_the_ship() -> void:
 	assert_float(state["armor"]).is_equal(ship.def.armor_capacity)
 	assert_float(state["hull"]).is_equal(ship.def.hull_capacity)
 	assert_bool(state["devices_disabled"]).is_false()
+	assert_str(state["target"]).is_empty()
+
+
+func test_ship_state_names_the_selected_target() -> void:
+	var ship: Ship = _spawn_ship()
+	var target: Node3D = auto_free(Node3D.new())
+	target.name = "Dummy0"
+	add_child(target)
+	ship.targeting().target = target
+	var state: Dictionary = BugReport.ship_state(ship)
+	assert_str(state["target"]).is_equal("Dummy0")
+	assert_str(state["target_lock"]).is_equal("LOCKED")
+	ship.targeting().target = null
 
 
 func test_ship_state_is_empty_without_a_ship() -> void:

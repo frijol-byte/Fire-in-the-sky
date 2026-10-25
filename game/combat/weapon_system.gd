@@ -25,6 +25,9 @@ const SPREAD_SEED: int = 7919
 
 ## Whether a locked target's lead point may bend the aim (see above).
 var gimbal_enabled: bool = true
+## Fraction (0..1) of each weapon's `gimbal_deg` the aim assist allows: `Targeting` sets it to the
+## assist strength, so an easier difficulty bends the shots further.
+var gimbal_scale: float = 1.0
 ## Set when a mount could not fire because the capacitor was short; cleared by a shot.
 var energy_starved: bool = false
 
@@ -133,7 +136,8 @@ func aim_direction(mount: WeaponMount) -> Vector3:
 	var weapon: WeaponDef = mount.weapon
 	if _has_aim_point and gimbal_enabled and weapon.gimbal_deg > 0.0:
 		var wanted: Vector3 = (_aim_point - origin).normalized()
-		return limit_angle(forward, wanted, deg_to_rad(weapon.gimbal_deg))
+		var limit: float = AimAssist.gimbal_limit_deg(weapon.gimbal_deg, gimbal_scale)
+		return limit_angle(forward, wanted, deg_to_rad(limit))
 	if weapon.convergence_m > 0.0:
 		return (_ship.global_position + forward * weapon.convergence_m - origin).normalized()
 	return forward

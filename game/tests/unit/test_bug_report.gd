@@ -85,6 +85,10 @@ func test_ship_state_describes_the_ship() -> void:
 	assert_array(state["velocity"]).has_size(3)
 	assert_float(state["energy"]).is_equal(ship.def.energy_capacity)
 	assert_bool(state["boosting"]).is_false()
+	assert_float(state["shield"]).is_equal(ship.def.shield_capacity)
+	assert_float(state["armor"]).is_equal(ship.def.armor_capacity)
+	assert_float(state["hull"]).is_equal(ship.def.hull_capacity)
+	assert_bool(state["devices_disabled"]).is_false()
 
 
 func test_ship_state_is_empty_without_a_ship() -> void:

@@ -18,3 +18,11 @@ signal boost_depleted(ship: Node)
 ## Emitted by `CameraRig` when the player's view changes. `view` is a `CameraRig.View` value
 ## (0 chase, 1 cockpit).
 signal camera_view_changed(view: int)
+
+## Emitted by `Durability` when a hit took health from a ship. `ship` is the ship that was hit,
+## `info` the hit and `result` how much each layer lost. Hit markers, damage indicators, impact
+## VFX and audio hook in here.
+signal ship_damaged(ship: Node, info: DamageInfo, result: DamageResult)
+
+## Emitted by `Durability` once, when a hit empties a ship's hull. `info` is the killing hit.
+signal ship_destroyed(ship: Node, info: DamageInfo)

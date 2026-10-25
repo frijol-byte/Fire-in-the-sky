@@ -63,6 +63,12 @@
 | M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
 | M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | 👀 | #19 |
 
+## M2 tasks (Combat core)
+
+| Card | Title | Depends on | State | PR |
+|---|---|---|---|---|
+| M2-T1 | Damage model & Durability | M1 | 👀 | #20 |
+
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
 **Editing this file (to avoid merge conflicts between parallel sessions):** change only your
@@ -510,3 +516,25 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
+
+- M2-T1 (2026-10-25): damage model and `Durability`. Things the next session must know:
+  - **One entry point:** `ship.durability().apply(DamageInfo)` (`combat/durability.gd`). It returns a `DamageResult`
+    (health lost per layer, `destroyed`, `ion_disabled`) for hit markers and impact VFX. Build hits with
+    `DamageInfo.make(amount, type, source, hit_point, subsystem)`; types are `DamageInfo.Type` (ENERGY, KINETIC,
+    EXPLOSIVE, ION). Collisions are unchanged: rock bumps still hurt nothing.
+  - **Math:** a hit is multiplied by the layer's `DamageTable` multiplier; what a layer cannot absorb carries on to
+    the next layer converted back to raw damage (so a multiplier only applies to what that layer took). Empty or
+    immune (x0) layers pass the hit on. Hull overkill is not reported. Any hit with amount > 0 restarts the shield
+    regen delay, even one that only reaches the armor. Armor never regenerates (stations will repair it).
+  - **Data:** `DamageTable` (`data/defs/damage_table.gd`, `data/combat/damage_table.tres`, id `default`,
+    `Content.damage_table()`) holds the GDD 7.1 table as one `Vector3` (shield, armor, hull) per type plus
+    `ion_disable_seconds`. `ShipDef` has a new "Durability" group (`shield_capacity`, `armor_capacity`,
+    `hull_capacity`, `shield_regen`, `shield_regen_delay` = 4 s); all three ships have values (placeholders to tune).
+  - **Ion:** a status, not a layer. Any ion hit with amount > 0 sets the `ion` status to `ion_disable_seconds`
+    (a new hit restarts it, no stacking). Devices, missiles and turrets must check
+    `ship.durability().devices_disabled()` (M2-T4 and later); nothing reads it yet.
+  - **Events:** `Events.ship_damaged(ship, info, result)` (only for hits that took health) and
+    `Events.ship_destroyed(ship, info)` (once). The ship is not freed or hidden on destruction: that is M2-T6, which
+    can call `durability().restore()` on respawn.
+  - `BugReport.ship_state` now has shield/armor/hull, their capacities and `devices_disabled`. The F1 tuning overlay has
+    no durability sliders yet.

@@ -79,6 +79,7 @@ static func ship_state(ship: Ship) -> Dictionary:
 	if ship == null or not ship.is_inside_tree():
 		return {}
 	var power: PowerSystem = ship.power()
+	var durability: Durability = ship.durability()
 	return {
 		"id": str(ship.def.id) if ship.def != null else "",
 		"position": json_safe(ship.global_position),
@@ -91,6 +92,13 @@ static func ship_state(ship: Ship) -> Dictionary:
 		"boosting": ship.is_boosting(),
 		"energy": power.energy,
 		"energy_capacity": power.capacity,
+		"shield": durability.shield,
+		"armor": durability.armor,
+		"hull": durability.hull,
+		"shield_capacity": durability.shield_capacity,
+		"armor_capacity": durability.armor_capacity,
+		"hull_capacity": durability.hull_capacity,
+		"devices_disabled": durability.devices_disabled(),
 	}
 
 

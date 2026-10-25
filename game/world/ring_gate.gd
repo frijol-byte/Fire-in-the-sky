@@ -106,6 +106,7 @@ func _build_frame_colliders() -> void:
 
 
 func _build_trigger() -> void:
+	_trigger.collision_mask = PhysicsLayers.SHIPS
 	var shape: CollisionShape3D = CollisionShape3D.new()
 	var cylinder: CylinderShape3D = CylinderShape3D.new()
 	cylinder.radius = TRIGGER_RADIUS

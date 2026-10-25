@@ -11,3 +11,4 @@ res://ui/hud/flight_hud.tscn
 res://ui/dev/dev_tools.tscn
 res://ui/dev/tuning_overlay.tscn
 res://ui/pause/pause_menu.tscn
+res://world/props/target_dummy.tscn

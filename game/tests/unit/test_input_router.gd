@@ -5,10 +5,9 @@ extends GdUnitTestSuite
 ## Pitch/yaw are steered by the mouse position (virtual joystick), which `InputRouter` reads
 ## directly (see `InputRouter.mouse_stick`), so they have no keyboard/mouse action event.
 const MOUSE_STEERED: PackedStringArray = ["pitch_up", "pitch_down", "yaw_left", "yaw_right"]
-## Actions with no gamepad button on purpose (M1-F1 moved RT/LT to throttle and brake):
+## Actions with no gamepad button on purpose:
 ## - flight_assist_off: the owner will give it a new button or trigger later (keyboard: Shift).
-## - fire_primary / fire_secondary: M2-T2 binds them to A / X and removes these two exemptions.
-const NO_GAMEPAD_YET: PackedStringArray = ["flight_assist_off", "fire_primary", "fire_secondary"]
+const NO_GAMEPAD_YET: PackedStringArray = ["flight_assist_off"]
 
 
 func test_actions_list_is_not_empty() -> void:
@@ -105,3 +104,27 @@ func test_paddles_and_b_are_unbound_on_the_gamepad() -> void:
 					. override_failure_message("'%s' is on a button M1-F1 freed" % action)
 					. is_false()
 				)
+
+
+func _pad_buttons_of(action: String) -> Array[int]:
+	var result: Array[int] = []
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventJoypadButton:
+			result.append((event as InputEventJoypadButton).button_index)
+	return result
+
+
+func test_fire_is_on_a_and_x_and_boost_moved_to_l3() -> void:
+	# M2-T2 (owner decision 2026-10-25): RT/LT are throttle, so A / X fire and boost moves to L3.
+	assert_array(_pad_buttons_of("fire_primary")).is_equal([JOY_BUTTON_A])
+	assert_array(_pad_buttons_of("fire_secondary")).is_equal([JOY_BUTTON_X])
+	assert_array(_pad_buttons_of("boost")).is_equal([JOY_BUTTON_LEFT_STICK])
+
+
+func test_nothing_else_shares_a_or_the_fire_buttons() -> void:
+	# A is fire only; boost and cruise drive may share L3 (cruise has no gameplay until M4); X is
+	# shared with target_nearest until M2-T3 moves it.
+	for action: String in InputRouter.ACTIONS:
+		if action in ["fire_primary"]:
+			continue
+		assert_array(_pad_buttons_of(action)).not_contains([JOY_BUTTON_A])

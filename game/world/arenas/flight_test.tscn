@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://world/arenas/flight_test.gd" id="1_arena"]
 [ext_resource type="Script" path="res://world/sky/sky_baker.gd" id="2_baker"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://ui/hud/flight_hud.tscn" id="7_hud"]
 [ext_resource type="PackedScene" path="res://ui/dev/dev_tools.tscn" id="8_tools"]
 [ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="9_pause"]
+[ext_resource type="Script" path="res://combat/projectile_manager.gd" id="10_projectiles"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_text"]
 font_size = 36
@@ -31,6 +32,11 @@ script = ExtResource("2_baker")
 script = ExtResource("3_field")
 
 [node name="Gates" type="Node3D" parent="."]
+
+[node name="Dummies" type="Node3D" parent="."]
+
+[node name="ProjectileManager" type="Node3D" parent="."]
+script = ExtResource("10_projectiles")
 
 [node name="CameraRig" parent="." instance=ExtResource("4_rig")]
 

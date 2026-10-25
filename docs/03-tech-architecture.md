@@ -165,7 +165,19 @@ Ship (RigidBody3D, custom_integrator = true)
 
 ### 5.2 Combat
 - **Projectiles** are pooled and moved with shape casts, not physics bodies. Hitscan is used
-  for railguns.
+  for railguns. (M2-T2) `ProjectileManager` (one per scene, group `projectile_manager`) owns a fixed
+  pool of `Projectile` records: each physics tick it sweeps a sphere along each shot's path
+  (`cast_motion`, then `get_rest_info` for the contact), hurts whatever has a `durability()` method
+  with `Durability.apply`, and retires the shot at its range. One `MultiMesh` draws every streak
+  (`shaders/projectile_streak.gdshader`, interpolated between physics ticks, so there is nothing to
+  `reset_physics_interpolation()`). `WeaponSystem` (a child of `Ship`, `ship.weapons()`) mounts the
+  ship's `primary_weapon` (`WeaponDef`, `data/weapons/`) on `SOCKET_primary_*`, fires the group while
+  `controls.fire_primary` is held, pays energy through `PowerSystem.request`, and `WeaponMount` holds
+  the per-gun rate, heat and overheat rules. `CombatFx` (pooled flashes, sparks and 3D sounds) and
+  `ShieldFx` (the ripple bubble on ships and dummies) show the result. `TargetDummy` is the practice
+  target (`DummyDef`, placed by `ArenaDef`).
+- **Physics layers** (`core/physics_layers.gd`): WORLD (rocks, gates, stations), SHIPS and TARGETS
+  (dummies). The chase camera's clearance ray sees WORLD only; projectiles see all three.
 - One `DamageInfo` struct (`amount`, `type`, `source`, `hit_point`, `subsystem`), and one
   function `Durability.apply(info)`, whose type multipliers are unit-tested. The multipliers are
   data (`DamageTable`, `data/combat/damage_table.tres`); `Durability` is a child node of `Ship`

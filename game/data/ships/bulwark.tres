@@ -44,6 +44,7 @@ boost_fov_kick = 8.0
 canopy_path = "res://assets/models/props/canopy_human_light.glb"
 paint_primary = Color(0.894, 0.906, 0.925, 1)
 paint_secondary = Color(0.106, 0.208, 0.408, 1)
+primary_weapon = &"autocannon"
 primary_slots = 2
 secondary_slots = 2
 device_slots = 2

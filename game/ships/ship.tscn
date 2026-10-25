@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://ships/ship.gd" id="1_ship"]
 [ext_resource type="Script" path="res://ships/flight_controller.gd" id="2_flight"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://ships/power_system.gd" id="4_power"]
 [ext_resource type="Script" path="res://vfx/engine_fx.gd" id="5_fx"]
 [ext_resource type="Script" path="res://combat/durability.gd" id="6_durability"]
+[ext_resource type="Script" path="res://combat/weapon_system.gd" id="7_weapons"]
+[ext_resource type="Script" path="res://vfx/shield_fx.gd" id="8_shield"]
 
 [node name="Ship" type="RigidBody3D"]
 custom_integrator = true
@@ -20,6 +22,12 @@ script = ExtResource("4_power")
 
 [node name="Durability" type="Node" parent="."]
 script = ExtResource("6_durability")
+
+[node name="WeaponSystem" type="Node" parent="."]
+script = ExtResource("7_weapons")
+
+[node name="ShieldFx" type="MeshInstance3D" parent="."]
+script = ExtResource("8_shield")
 
 [node name="EngineFx" type="Node" parent="."]
 script = ExtResource("5_fx")

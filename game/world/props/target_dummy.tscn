@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://world/target_dummy.gd" id="1_dummy"]
+[ext_resource type="Script" path="res://combat/durability.gd" id="2_durability"]
+[ext_resource type="Script" path="res://vfx/shield_fx.gd" id="3_shield"]
+
+[sub_resource type="SphereShape3D" id="Shape_dummy"]
+radius = 6.0
+
+[sub_resource type="SphereMesh" id="Mesh_dummy"]
+radius = 6.0
+height = 12.0
+radial_segments = 24
+rings = 12
+
+[node name="TargetDummy" type="AnimatableBody3D"]
+script = ExtResource("1_dummy")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+shape = SubResource("Shape_dummy")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_dummy")
+
+[node name="Durability" type="Node" parent="."]
+script = ExtResource("2_durability")
+
+[node name="ShieldFx" type="MeshInstance3D" parent="."]
+script = ExtResource("3_shield")
+
+[node name="Label" type="Label3D" parent="."]
+billboard = 1
+no_depth_test = true
+pixel_size = 0.03
+font_size = 32
+outline_size = 10

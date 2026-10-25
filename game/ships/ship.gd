@@ -18,11 +18,15 @@ var model: ShipModel = null
 @onready var _flight: FlightController = $FlightController
 @onready var _power: PowerSystem = $PowerSystem
 @onready var _durability: Durability = $Durability
+@onready var _weapons: WeaponSystem = $WeaponSystem
+@onready var _shield_fx: ShieldFx = $ShieldFx
 @onready var _engine_fx: EngineFx = $EngineFx
 
 
 func _ready() -> void:
 	custom_integrator = true
+	collision_layer = PhysicsLayers.SHIPS
+	collision_mask = PhysicsLayers.SHIP_MASK
 	gravity_scale = 0.0
 	linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
 	angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
@@ -43,6 +47,9 @@ func _ready() -> void:
 	_flight.boost_depleted.connect(_on_boost_depleted)
 	_build_model()
 	_engine_fx.setup(self)
+	_weapons.configure(self)
+	var bounds: AABB = ShieldFx.bounds_of(model, self)
+	_shield_fx.setup(self, bounds.get_center(), bounds.size * 0.5)
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
@@ -59,6 +66,11 @@ func power() -> PowerSystem:
 ## The ship's shield, armor and hull. `durability().apply(info)` is the only way to hurt it.
 func durability() -> Durability:
 	return _durability
+
+
+## The ship's guns. They fire while `controls.fire_primary` is held.
+func weapons() -> WeaponSystem:
+	return _weapons
 
 
 ## Re-reads the values of `def` that are copied at spawn (mass, the capacitor). The flight

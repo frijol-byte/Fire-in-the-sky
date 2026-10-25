@@ -122,13 +122,12 @@ virtual-stick layout. Everything is rebindable.
 | Left stick | Strafe left/right (X), thrust up/down (Y, stick up = ship up) |
 | Right stick | Pitch / yaw (aim) |
 | LB / RB | Roll left / right |
-| A | Boost (hold). Moves to L3 in M2-T2, when A becomes fire primary |
+| A | Fire primary weapons (hold) |
 | B | Unbound for now (flight assist off / drift keeps its action and the `Shift` key; the owner will give it a gamepad button or trigger later) |
-| X | Target: nearest hostile in reticle; double-tap = nearest overall |
-| Fire primary / secondary | Mouse buttons only until **M2-T2**, which puts them on **A / X** on the gamepad (secondary: hold to lock missiles) |
+| X | Fire secondary weapon (hold to lock missiles). Until M2-T3 it also still carries "target nearest", which then moves to another button |
 | Y | Interact / dock / pick up (context) |
 | D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target (from M2; in the flight test arena the D-pad / keys 1-2-3 switch ships, a temporary demo stand-in) |
-| L3 | Cruise drive (toward selected destination) |
+| L3 | Boost (hold). Cruise drive (toward the selected destination) shares it until M4, when it gets its own input |
 | R3 | Camera: chase ↔ cockpit |
 | Paddle 3 / `Z` (hold) | Free look: the right stick turns the camera while the ship keeps flying (settings flag, off by default) |
 | Start / Select | Pause menu / system map |
@@ -179,6 +178,22 @@ only repairs at stations or with repair devices. Hull at 0 means the ship is des
 | Homing Missile | Hold to lock (1.2 s), tracks the target; flares or EMP defeat it |
 | Rocket Pod | Dumb-fire salvo, great against slow targets |
 | Torpedo | Slow, huge damage against capital ships. It can be shot down (this sets up future EMP/point-defense bosses) |
+
+**Primary starting values (M2-T2, to tune in the M2 playtest; the numbers live in `data/weapons/*.tres`).**
+Per gun; a ship fires every mounted gun together (two on the Kestrel, Bulwark and Drayman, three at tier 3).
+
+| | Pulse Laser | Autocannon |
+|---|---|---|
+| Damage per shot (type) | 8 (Energy) | 4 (Kinetic) |
+| Rate | 4 / s (the two guns alternate) | 12 / s |
+| Shot speed, range | 520 m/s, 900 m | 380 m/s, 650 m |
+| Spread | none | 1.4° |
+| Cost | 2 energy per shot (8 / s per gun, 16 / s for a pair) | 3 heat per shot; overheats at 100, cools 14 / s, fires again at 40 |
+| Fitted to | Kestrel | Bulwark, Drayman |
+
+Against a Kestrel (100 shield / 60 armor / 80 hull) a perfectly aimed pair of lasers takes about 3.5 s, a pair of
+autocannons about 3 s but with spread and a roughly 4.5 s overheat limit. Both guns converge on a point 300-350 m
+ahead, so their shots cross on the reticle.
 
 **Devices** (active abilities with cooldowns): Shield Booster, Countermeasure Flares, EMP
 Pulse (short range), Repair Nanites. **Turrets** (on ships with a turret slot): auto-fire at

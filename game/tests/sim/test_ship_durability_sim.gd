@@ -2,8 +2,12 @@ extends GdUnitTestSuite
 ## A flying `Ship` owns a `Durability`, ticks it in the physics step and reports it in bug dumps.
 
 
+func ship_params() -> Array[Array]:
+	return FlightSim.ship_params()
+
+
 func test_every_ship_spawns_with_full_layers(
-	ship_id: StringName, _test_parameters := FlightSim.ship_params()
+	ship_id: StringName, _test_parameters := ship_params()
 ) -> void:
 	var ship: Ship = auto_free(FlightSim.spawn(self, ship_id))
 	var durability: Durability = ship.durability()

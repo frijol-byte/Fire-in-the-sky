@@ -14,6 +14,7 @@ const LINE_WIDTH: float = 2.0
 const BAR_WIDTH: float = 480.0
 const BAR_HEIGHT: float = 8.0
 const BAR_BOTTOM_OFFSET: float = 92.0
+const HEAT_BAR_BOTTOM_OFFSET: float = 40.0
 const MOUSE_DOT_RADIUS: float = 5.0
 ## How long "BOOST EMPTY" shows after the capacitor runs dry.
 const DEPLETED_SECONDS: float = 1.5
@@ -32,6 +33,7 @@ var _depleted_left: float = 0.0
 @onready var _speed: Label = $Speed
 @onready var _state: Label = $State
 @onready var _energy: Label = $Energy
+@onready var _weapon: Label = $Weapon
 
 
 func _ready() -> void:
@@ -73,6 +75,7 @@ func _draw() -> void:
 	if InputRouter.mouse_flight_active():
 		_draw_mouse_stick(InputRouter.mouse_offset(), InputRouter.mouse_deadzone_px())
 	_draw_energy_bar()
+	_draw_heat_bar()
 
 
 ## The mouse virtual stick: its deadzone ring in the center and a dot where it points.
@@ -116,6 +119,24 @@ func _draw_energy_bar() -> void:
 	draw_line(Vector2(tick_x, top - 4.0), Vector2(tick_x, top + BAR_HEIGHT + 4.0), COLOR_MAIN, 1.0)
 
 
+## The primary guns' heat, under the energy readout. Only guns that build heat have one.
+func _draw_heat_bar() -> void:
+	var weapons: WeaponSystem = ship.weapons()
+	var weapon: WeaponDef = weapons.weapon_for(WeaponSystem.GROUP_PRIMARY)
+	if weapon == null or weapon.heat_per_shot <= 0.0:
+		return
+	var fraction: float = clampf(weapons.heat_fraction(WeaponSystem.GROUP_PRIMARY), 0.0, 1.0)
+	var left: float = (size.x - BAR_WIDTH) * 0.5
+	var top: float = size.y - HEAT_BAR_BOTTOM_OFFSET
+	draw_rect(Rect2(left, top, BAR_WIDTH, BAR_HEIGHT), COLOR_BAR_BACK)
+	var hot: bool = weapons.is_overheated(WeaponSystem.GROUP_PRIMARY)
+	var color: Color = COLOR_WARN if hot else COLOR_MAIN.lerp(COLOR_WARN, fraction * fraction)
+	draw_rect(Rect2(left, top, BAR_WIDTH * fraction, BAR_HEIGHT), color)
+	# A tick where an overheated gun starts firing again.
+	var tick_x: float = left + BAR_WIDTH * weapon.overheat_resume_fraction
+	draw_line(Vector2(tick_x, top - 4.0), Vector2(tick_x, top + BAR_HEIGHT + 4.0), COLOR_MAIN, 1.0)
+
+
 func _refresh() -> void:
 	if ship == null:
 		return
@@ -129,6 +150,13 @@ func _refresh() -> void:
 	var warn: bool = fa_off or boost == HudMath.BoostState.EMPTY
 	_state.add_theme_color_override("font_color", COLOR_WARN if warn else COLOR_MAIN)
 	_energy.text = energy_text(power.energy, power.capacity)
+	var weapons: WeaponSystem = ship.weapons()
+	var overheated: bool = weapons.is_overheated(WeaponSystem.GROUP_PRIMARY)
+	var starved: bool = weapons.energy_starved and ship.controls.fire_primary
+	_weapon.text = weapon_text(weapons.weapon_for(WeaponSystem.GROUP_PRIMARY), overheated, starved)
+	_weapon.add_theme_color_override(
+		"font_color", COLOR_WARN if overheated or starved else COLOR_MAIN
+	)
 
 
 func _on_boost_depleted(depleted_ship: Node) -> void:
@@ -139,6 +167,19 @@ func _on_boost_depleted(depleted_ship: Node) -> void:
 ## "184 m/s".
 static func speed_text(speed: float) -> String:
 	return TranslationServer.translate("HUD_SPEED") % speed
+
+
+## "PULSE LASER", with "OVERHEATED" or "NO ENERGY" after it while the guns cannot fire. Empty
+## without a weapon.
+static func weapon_text(weapon: WeaponDef, overheated: bool, starved: bool) -> String:
+	if weapon == null:
+		return ""
+	var text: String = TranslationServer.translate(weapon.display_name_key)
+	if overheated:
+		text += "     " + TranslationServer.translate("HUD_OVERHEAT")
+	elif starved:
+		text += "     " + TranslationServer.translate("HUD_NO_ENERGY")
+	return text
 
 
 ## "FA ON   BOOST READY".

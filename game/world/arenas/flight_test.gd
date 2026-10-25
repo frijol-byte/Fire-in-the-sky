@@ -15,6 +15,7 @@ const ARENA_ID: StringName = &"flight_test"
 const SHIP_SCENE: PackedScene = preload("res://ships/ship.tscn")
 const GATE_SCENE: PackedScene = preload("res://world/props/ring_gate.tscn")
 const CAMERA_RIG_SCENE: PackedScene = preload("res://ships/camera_rig.tscn")
+const DUMMY_SCENE: PackedScene = preload("res://world/props/target_dummy.tscn")
 
 ## Until the sky is baked (and always in a headless run) the background is this plain colour.
 const FALLBACK_AMBIENT: Color = Color(0.35, 0.3, 0.28)
@@ -29,6 +30,7 @@ var gates_passed: int = 0
 @onready var _sky_baker: SkyBaker = $SkyBaker
 @onready var _field: AsteroidField = $AsteroidField
 @onready var _gates: Node3D = $Gates
+@onready var _dummies: Node3D = $Dummies
 @onready var _rig: CameraRig = $CameraRig
 @onready var _speed_fx: SpeedFx = $SpeedFx
 @onready var _audio: ShipAudio = $ShipAudio
@@ -46,6 +48,7 @@ func _ready() -> void:
 	_configure_light()
 	_environment.environment = make_environment(def, null)
 	_build_gates()
+	_build_dummies()
 	_field.build(def, course_line(def))
 	spawn_player(def.spawn_ship_id)
 	# Free look is off by default (the right stick aims); the arena turns it on to try it out.
@@ -160,6 +163,21 @@ func _build_gates() -> void:
 		gate.passed.connect(_on_gate_passed)
 
 
+func _build_dummies() -> void:
+	for index: int in def.dummy_ids.size():
+		var dummy_def: DummyDef = Content.dummy(def.dummy_ids[index])
+		if dummy_def == null:
+			Log.error(&"arena", "no DummyDef '%s'" % def.dummy_ids[index])
+			continue
+		var dummy: TargetDummy = DUMMY_SCENE.instantiate() as TargetDummy
+		dummy.name = "Dummy%d" % index
+		# Placed before it enters the tree: a body that starts at the origin would shove a ship
+		# spawned there (the start) until its first physics step moves it.
+		dummy.position = def.dummy_origins[index]
+		_dummies.add_child(dummy)
+		dummy.setup(dummy_def, def.dummy_origins[index], def.dummy_rails[index])
+
+
 ## The line of the course: the start, then every gate in order.
 static func course_line(arena: ArenaDef) -> PackedVector3Array:
 	var result: PackedVector3Array = [arena.spawn_position]
@@ -190,6 +208,7 @@ func _update_help() -> void:
 			InputRouter.glyph_for(&"thrust_forward"),
 			InputRouter.glyph_for(&"thrust_back"),
 			InputRouter.glyph_for(&"boost"),
+			InputRouter.glyph_for(&"fire_primary"),
 			InputRouter.glyph_for(&"camera_toggle"),
 			InputRouter.glyph_for(&"pause"),
 		]

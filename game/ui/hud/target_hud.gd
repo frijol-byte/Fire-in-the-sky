@@ -22,6 +22,10 @@ const SELECTED_ARROW_SIZE: float = 16.0
 ## Edge arrows for this many of the nearest hostile targets (the selected one always has one).
 const MAX_ARROWS: int = 6
 const LEAD_RADIUS: float = 10.0
+## The missile lock ring sits this many pixels outside the brackets.
+const LOCK_RING_GAP: float = 12.0
+const LOCK_RING_WIDTH: float = 4.0
+const LOCK_FONT_SIZE: int = 20
 ## The lead indicator turns to the aligned colour when the nose ring is this close (pixels) to it,
 ## or inside the brackets, whichever is larger.
 const ALIGNED_PIXELS: float = 14.0
@@ -129,8 +133,39 @@ func _draw_selected(
 		HudMath.projected_radius(chosen.radius, chosen.distance, camera.fov, size.y)
 	)
 	_draw_strokes(HudMath.bracket_strokes(chosen.stance, half), marker.position, color, 2.5)
+	_draw_missile_lock(marker.position, half)
 	if targeting.has_lock() and targeting.has_lead:
 		_draw_lead(camera, chosen, drawn, marker.position, half)
+
+
+## The homing missile's lock: a ring around the brackets that fills as the lock builds, and the
+## word LOCK once it is done (release the button to launch).
+func _draw_missile_lock(center: Vector2, half: float) -> void:
+	var lock: MissileLock = ship.secondaries().lock
+	if lock.progress <= 0.0:
+		return
+	var radius: float = half + LOCK_RING_GAP
+	var locked: bool = lock.is_locked()
+	var color: Color = COLOR_ALIGNED if locked else COLOR_LEAD
+	draw_arc(center, radius, 0.0, TAU, 64, Color(color, 0.25), LOCK_RING_WIDTH, true)
+	draw_arc(
+		center, radius, -PI * 0.5, -PI * 0.5 + TAU * lock.progress, 64, color, LOCK_RING_WIDTH, true
+	)
+	if locked:
+		var font: Font = get_theme_default_font()
+		var text: String = TranslationServer.translate("HUD_LOCK_TAG")
+		var width: float = (
+			font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, LOCK_FONT_SIZE).x
+		)
+		draw_string(
+			font,
+			center + Vector2(-width * 0.5, radius + float(LOCK_FONT_SIZE) + 4.0),
+			text,
+			HORIZONTAL_ALIGNMENT_LEFT,
+			-1,
+			LOCK_FONT_SIZE,
+			color
+		)
 
 
 ## The lead indicator: a small reticle where a shot fired now would meet the moving target.

@@ -102,6 +102,8 @@ great and reads clearly.
     perpendicular at the right moment, and flares decoy at the defined rate (statistical
     test, seeded).
 - **Acceptance:** sims pass.
+- **Done (2026-10-25, see `docs/STATUS.md`):** the arena's ship switcher moved to F2-F4, so the device buttons
+  belong to the ship's devices.
 - **Notes from the M1 gate:** device slots 1-3 (`ShipControls.device`, keys 1/2/3, D-pad) are
   used by the flight arena's **ship switcher** (`FlightTest._physics_process`). Flares are a
   device, so either keep devices out of `flight_test.tscn` or move the switcher off those buttons

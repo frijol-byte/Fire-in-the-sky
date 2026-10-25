@@ -94,6 +94,13 @@ extends ContentDef
 @export_group("Weapons")
 ## `WeaponDef` id fitted to every primary hardpoint (`SOCKET_primary_*`). Loadouts come in M5.
 @export var primary_weapon: StringName = &"pulse_laser"
+## `SecondaryDef` id the ship launches with the secondary fire button, or empty for none.
+@export var secondary_weapon: StringName = &""
+## Where missiles and rockets leave the ship (ship axes, -Z is forward), used when the model has no
+## `SOCKET_secondary_*`. A little below and ahead of the nose, clear of the hull.
+@export var secondary_launch_offset: Vector3 = Vector3(0.0, -1.2, -5.0)
+## `DeviceDef` ids in device slots 1, 2, 3 (device buttons and the D-pad).
+@export var device_ids: Array[StringName] = []
 
 @export_group("Look")
 ## Faction paint, set on the model's `PAINT_PRIMARY` / `PAINT_SECONDARY` parts at spawn
@@ -202,6 +209,13 @@ func problems() -> PackedStringArray:
 		result.append("shield_regen and shield_regen_delay must not be negative")
 	if primary_weapon == &"":
 		result.append("primary_weapon is empty")
+	if device_ids.size() > device_slots:
+		result.append("device_ids has more entries than device_slots")
+	if device_ids.size() > 3:
+		result.append("device_ids has more than 3 entries (there are 3 device buttons)")
+	for device_id: StringName in device_ids:
+		if device_ids.count(device_id) > 1:
+			result.append("device_ids lists %s twice" % device_id)
 	if model_path.is_empty() or not ResourceLoader.exists(model_path):
 		result.append("model_path does not exist: %s" % model_path)
 	return result

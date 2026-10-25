@@ -5,9 +5,9 @@ extends Node3D
 ## builds it from that data and wires the player's ship to the camera, the speed effects and the
 ## flight sounds.
 ##
-## The ship is spawned by `spawn_player()`. The ship switcher (device slots 1-3: keys 1/2/3 or the
-## D-pad) calls it again with the arena's `selectable_ship_ids`. It is a demo-only stand-in: the
-## D-pad belongs to devices from M2.
+## The ship is spawned by `spawn_player()`. The ship switcher (keyboard keys F2-F4, `SWITCH_KEYS`)
+## calls it again with the arena's `selectable_ship_ids`. It is a demo-only stand-in; the device
+## buttons (keys 1-3, the D-pad) belong to the ship's devices, e.g. the flares.
 ## It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
 ## menu (Esc / Start), like every flight scene (M1-T6).
 
@@ -16,6 +16,8 @@ const SHIP_SCENE: PackedScene = preload("res://ships/ship.tscn")
 const GATE_SCENE: PackedScene = preload("res://world/props/ring_gate.tscn")
 const CAMERA_RIG_SCENE: PackedScene = preload("res://ships/camera_rig.tscn")
 const DUMMY_SCENE: PackedScene = preload("res://world/props/target_dummy.tscn")
+## The keys that pick the arena's selectable ships, in order (slot 1 is the first).
+const SWITCH_KEYS: Array[Key] = [KEY_F2, KEY_F3, KEY_F4]
 
 ## Until the sky is baked (and always in a headless run) the background is this plain colour.
 const FALLBACK_AMBIENT: Color = Color(0.35, 0.3, 0.28)
@@ -64,8 +66,11 @@ func _exit_tree() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
-func _physics_process(_delta: float) -> void:
-	var wanted: StringName = ship_for_slot(def, InputRouter.controls.device)
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key: InputEventKey = event as InputEventKey
+	if key == null or not key.pressed or key.echo:
+		return
+	var wanted: StringName = ship_for_slot(def, slot_for_key(key.physical_keycode))
 	if wanted != &"" and ship != null and wanted != ship.def.id:
 		spawn_player(wanted)
 
@@ -109,7 +114,12 @@ func spawn_player(ship_id: StringName) -> Ship:
 	return ship
 
 
-## The ship the device slot (1-3, 0 = none pressed) selects in `arena`, or `&""` if the slot is
+## The ship slot (1-3) a key selects, or 0 when it is not one of `SWITCH_KEYS`.
+static func slot_for_key(keycode: Key) -> int:
+	return SWITCH_KEYS.find(keycode) + 1
+
+
+## The ship the slot (1-3, 0 = none pressed) selects in `arena`, or `&""` if the slot is
 ## empty or the arena has no such ship.
 static func ship_for_slot(arena: ArenaDef, slot: int) -> StringName:
 	if arena == null or slot < 1 or slot > arena.selectable_ship_ids.size():
@@ -193,7 +203,7 @@ func _on_gate_passed(_ship: Ship) -> void:
 func _switch_glyphs() -> String:
 	var glyphs: PackedStringArray = []
 	for slot: int in def.selectable_ship_ids.size():
-		glyphs.append(InputRouter.glyph_for(StringName("device_%d" % (slot + 1))))
+		glyphs.append(OS.get_keycode_string(SWITCH_KEYS[slot]))
 	return " ".join(glyphs)
 
 
@@ -218,6 +228,13 @@ func _update_help() -> void:
 		+ (
 			tr("ARENA_HELP_TARGET")
 			% [InputRouter.glyph_for(&"target_nearest"), InputRouter.glyph_for(&"look_at_target")]
+		)
+	)
+	_help.text += (
+		"\n"
+		+ (
+			tr("ARENA_HELP_SECONDARY")
+			% [InputRouter.glyph_for(&"fire_secondary"), InputRouter.glyph_for(&"device_1")]
 		)
 	)
 	# The drift button is optional: the gamepad has none for now (see GDD 5).

@@ -14,6 +14,26 @@ static func spawn_manager(parent: Node) -> ProjectileManager:
 	return manager
 
 
+## Adds a `MissileManager` to `parent`, with room for `capacity` rounds in flight.
+static func spawn_missile_manager(
+	parent: Node, capacity: int = MissileManager.DEFAULT_CAPACITY
+) -> MissileManager:
+	var manager: MissileManager = MissileManager.new()
+	manager.capacity = capacity
+	parent.add_child(manager)
+	return manager
+
+
+## Adds a ship of `ship_id` to `parent` at `position`, its nose towards `look_at` (default: -Z).
+static func spawn_ship(
+	parent: Node, ship_id: StringName, position: Vector3, look_at: Vector3 = Vector3.INF
+) -> Ship:
+	var ship: Ship = FlightSim.spawn(parent, ship_id)
+	var facing: Vector3 = Vector3.FORWARD if look_at == Vector3.INF else look_at - position
+	ship.global_transform = Transform3D(Basis.looking_at(facing, Vector3.UP), position)
+	return ship
+
+
 ## Adds a dummy of `def_id` to `parent`, standing at `origin` (sliding along `rail` if not zero).
 static func spawn_dummy(
 	parent: Node, def_id: StringName, origin: Vector3, rail: Vector3 = Vector3.ZERO
@@ -37,6 +57,26 @@ static func spawn_wall(parent: Node, position: Vector3, size: Vector3) -> Static
 	parent.add_child(wall)
 	wall.global_position = position
 	return wall
+
+
+## Records every explosion a `MissileManager` reports, as {tick, point, harmless, missile}.
+class BlastLog:
+	extends RefCounted
+	var blasts: Array[Dictionary] = []
+	var ticks: int = 0
+
+	func attach(manager: MissileManager) -> void:
+		manager.exploded.connect(_on_exploded)
+
+	func _on_exploded(missile: Missile, point: Vector3, harmless: bool) -> void:
+		blasts.append({"tick": ticks, "point": point, "harmless": harmless, "missile": missile})
+
+	func damaging() -> Array[Dictionary]:
+		var result: Array[Dictionary] = []
+		for blast: Dictionary in blasts:
+			if not (blast["harmless"] as bool):
+				result.append(blast)
+		return result
 
 
 ## Lets the physics server register freshly added bodies.

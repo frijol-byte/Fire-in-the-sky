@@ -103,8 +103,9 @@ Ship (RigidBody3D, custom_integrator = true)
 ├─ FlightController   # ShipControls + ShipDef → forces/torques (FA, drift, boost)
 ├─ PowerSystem        # energy capacitor, regen, consumers
 ├─ Durability         # shield/armor/hull, damage intake, regen
-├─ WeaponSystem       # hardpoints from sockets, groups (primary/secondary/turret)
-├─ DeviceSystem       # active abilities and cooldowns
+├─ WeaponSystem       # hardpoints from sockets, the primary group
+├─ SecondarySystem    # homing missile (lock-on) or rocket pod, ammo
+├─ DeviceSystem       # active abilities and cooldowns (flares)
 ├─ Targeting          # lock, lead calculation, subsystem cycling
 ├─ CargoHold
 ├─ Subsystems (optional, for capitals/bosses)
@@ -176,6 +177,18 @@ Ship (RigidBody3D, custom_integrator = true)
   the per-gun rate, heat and overheat rules. `CombatFx` (pooled flashes, sparks and 3D sounds) and
   `ShieldFx` (the ripple bubble on ships and dummies) show the result. `TargetDummy` is the practice
   target (`DummyDef`, placed by `ArenaDef`).
+- **Missiles, rockets and flares** (M2-T4). `MissileManager` (one per scene, group `missile_manager`)
+  pools `Missile` and `Flare` records like `ProjectileManager` does shots, sweeping each round with the
+  shared `SweepCaster`. A homing missile steers with `MissileGuidance.steer` (proportional navigation,
+  turn-rate limited, a seeker cone; all pure and unit-tested), explodes on contact or at its proximity
+  fuse, and `_splash` hurts everything in the `Targeting.GROUP` group with `Durability.apply` (full at
+  the centre, `splash_amount` falloff, never the shooter). `SecondarySystem` (`ship.secondaries()`)
+  reads `controls.fire_secondary`: a homing missile needs the lock of `MissileLock` (hold, release to
+  launch), a rocket pod fires salvos. `DeviceSystem` (`ship.devices()`) runs `controls.device`; flares
+  call `MissileManager.deploy_flares`, which rolls once per hunting missile with a seeded generator.
+  `SecondaryDef` and `DeviceDef` hold the numbers (`data/secondaries/`, `data/devices/`). The AI asks
+  `MissileManager.incoming_for(ship)` whether to throw flares. `MissileWarning` (in `FlightHud`) is the
+  incoming-missile alarm.
 - **Physics layers** (`core/physics_layers.gd`): WORLD (rocks, gates, stations), SHIPS and TARGETS
   (dummies). The chase camera's clearance ray sees WORLD only; projectiles see all three.
 - One `DamageInfo` struct (`amount`, `type`, `source`, `hit_point`, `subsystem`), and one

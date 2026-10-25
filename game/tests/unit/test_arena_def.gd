@@ -72,6 +72,18 @@ func test_a_slot_without_a_ship_selects_nothing() -> void:
 	assert_str(FlightTest.ship_for_slot(arena, 2)).is_equal("")
 
 
+func test_the_switcher_keys_are_f2_to_f4_and_leave_the_device_buttons_alone() -> void:
+	assert_int(FlightTest.slot_for_key(KEY_F2)).is_equal(1)
+	assert_int(FlightTest.slot_for_key(KEY_F3)).is_equal(2)
+	assert_int(FlightTest.slot_for_key(KEY_F4)).is_equal(3)
+	assert_int(FlightTest.slot_for_key(KEY_F1)).is_equal(0)
+	assert_int(FlightTest.slot_for_key(KEY_1)).is_equal(0)
+	assert_int(FlightTest.slot_for_key(KEY_2)).is_equal(0)
+	assert_int(FlightTest.slot_for_key(KEY_3)).is_equal(0)
+	# F1 and F12 belong to the dev tools.
+	assert_array(FlightTest.SWITCH_KEYS).not_contains([KEY_F1, KEY_F12])
+
+
 func test_problems_flags_a_bad_ship_list() -> void:
 	var arena: ArenaDef = _copy()
 	arena.selectable_ship_ids = [&"kestrel", &"kestrel"]

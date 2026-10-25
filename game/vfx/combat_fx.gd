@@ -13,6 +13,10 @@ extends Node3D
 enum ImpactKind { WORLD, SHIELD, ARMOR, HULL }
 
 const FLASH_POOL: int = 24
+## Big flashes (explosions, launches, flares) have a pool of their own: their billboards keep the
+## scale they are given, so they really are as big as asked. (The small muzzle and impact flashes
+## are drawn at the billboard's unit size.)
+const BLAST_POOL: int = 12
 ## Spark bursts kept per kind of hit (each kind has bursts of its own size, see `SPARK_COUNT`).
 const SPARK_POOL: int = 8
 const SOUND_POOL: int = 12
@@ -29,8 +33,15 @@ const SOUND_HIT_ARMOR: AudioStreamWAV = preload("res://assets/audio/sfx/hit_armo
 const SOUND_HIT_HULL: AudioStreamWAV = preload("res://assets/audio/sfx/hit_hull.wav")
 const SOUND_HIT_ROCK: AudioStreamWAV = preload("res://assets/audio/sfx/hit_rock.wav")
 const SOUND_OVERHEAT: AudioStreamWAV = preload("res://assets/audio/sfx/weapon_overheat.wav")
+const SOUND_EXPLOSION: AudioStreamWAV = preload("res://assets/audio/sfx/explosion.wav")
 const HIT_SOUND_DB: float = -6.0
 const OVERHEAT_SOUND_DB: float = -8.0
+const EXPLOSION_SOUND_DB: float = -2.0
+## An explosion is a hot flash a little bigger than its blast radius over a white core, and sparks.
+const EXPLOSION_FLASH_FACTOR: float = 1.5
+const EXPLOSION_CORE_FACTOR: float = 0.55
+const EXPLOSION_FLASH_TIME: float = 0.4
+const EXPLOSION_CORE_TIME: float = 0.2
 
 
 class Flash:
@@ -43,6 +54,8 @@ class Flash:
 
 
 var _flashes: Array[Flash] = []
+var _blasts: Array[Flash] = []
+var _next_blast: int = 0
 ## Spark bursts per `ImpactKind`; a burst's particle count is fixed when it is made, because
 ## changing it while the particles are alive reallocates their buffers.
 var _sparks: Dictionary[int, Array] = {}
@@ -58,7 +71,9 @@ func _ready() -> void:
 	top_level = true
 	_glow = _radial_texture()
 	for index: int in FLASH_POOL:
-		_flashes.append(_make_flash())
+		_flashes.append(_make_flash(false))
+	for index: int in BLAST_POOL:
+		_blasts.append(_make_flash(true))
 	for kind: int in ImpactKind.values():
 		var bursts: Array[CPUParticles3D] = []
 		if SPARK_COUNT[kind] > 0:
@@ -78,7 +93,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	for flash: Flash in _flashes:
+	for flash: Flash in _flashes + _blasts:
 		if flash.left <= 0.0:
 			continue
 		flash.left = maxf(flash.left - delta, 0.0)
@@ -108,14 +123,37 @@ func impact(point: Vector3, normal: Vector3, weapon: WeaponDef, result: DamageRe
 	play(hit_stream(kind), point, HIT_SOUND_DB)
 
 
-## Plays `stream` at `position` on the next sound slot (the oldest sound is cut off when all are busy).
-func play(stream: AudioStream, position: Vector3, volume_db: float) -> void:
+## An explosion of blast radius `radius` metres at `position`: a flash over a white core, a burst
+## of sparks and a boom. Missiles and rockets use it (`harmless` ones just a small one).
+func explosion(position: Vector3, radius: float, color: Color) -> void:
+	flash(position, color, radius * EXPLOSION_FLASH_FACTOR, EXPLOSION_FLASH_TIME)
+	flash(position, Color.WHITE, radius * EXPLOSION_CORE_FACTOR, EXPLOSION_CORE_TIME)
+	_emit_sparks(ImpactKind.HULL, position, Vector3.UP, color)
+	play(SOUND_EXPLOSION, position, EXPLOSION_SOUND_DB)
+
+
+## A big flash of `size` metres at `position` that fades away over `time` seconds.
+func flash(position: Vector3, color: Color, size: float, time: float = FLASH_TIME) -> void:
+	var blast: Flash = _blasts[_next_blast]
+	_next_blast = (_next_blast + 1) % _blasts.size()
+	_light(blast, position, color, size, time)
+
+
+## The sound at `path` (loaded once).
+func load_sound(path: String) -> AudioStream:
+	return _stream(path)
+
+
+## Plays `stream` at `position` on the next sound slot (the oldest sound is cut off when all are
+## busy). `pitch` is a pitch multiplier.
+func play(stream: AudioStream, position: Vector3, volume_db: float, pitch: float = 1.0) -> void:
 	if stream == null or _players.is_empty():
 		return
 	var player: AudioStreamPlayer3D = _players[_next_player]
 	_next_player = (_next_player + 1) % _players.size()
 	player.stream = stream
 	player.volume_db = volume_db
+	player.pitch_scale = pitch
 	player.global_position = position
 	player.play()
 
@@ -123,7 +161,7 @@ func play(stream: AudioStream, position: Vector3, volume_db: float) -> void:
 ## Flashes showing right now.
 func active_flashes() -> int:
 	var count: int = 0
-	for flash: Flash in _flashes:
+	for flash: Flash in _flashes + _blasts:
 		if flash.left > 0.0:
 			count += 1
 	return count
@@ -204,6 +242,10 @@ func _stream(path: String) -> AudioStream:
 func _start_flash(position: Vector3, color: Color, size: float, time: float) -> void:
 	var flash: Flash = _flashes[_next_flash]
 	_next_flash = (_next_flash + 1) % _flashes.size()
+	_light(flash, position, color, size, time)
+
+
+func _light(flash: Flash, position: Vector3, color: Color, size: float, time: float) -> void:
 	flash.left = time
 	flash.total = time
 	flash.size = size
@@ -230,7 +272,7 @@ func _emit_sparks(kind: int, point: Vector3, normal: Vector3, color: Color) -> v
 	sparks.emitting = true
 
 
-func _make_flash() -> Flash:
+func _make_flash(keep_scale: bool) -> Flash:
 	var flash: Flash = Flash.new()
 	var node: MeshInstance3D = MeshInstance3D.new()
 	var quad: QuadMesh = QuadMesh.new()
@@ -240,6 +282,7 @@ func _make_flash() -> Flash:
 	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	material.billboard_keep_scale = keep_scale
 	material.albedo_texture = _glow
 	material.disable_receive_shadows = true
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED

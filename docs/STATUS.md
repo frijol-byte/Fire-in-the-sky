@@ -8,8 +8,11 @@
   waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
 - **What to start next:** M1-F1 (new pad layout, sharper thrusters) is merged; the build to playtest
   now also has **guns** (M2-T2: fire on **A** / **X**, boost on **L3**; shoot the target dummies in
-  the arena). **M2-T3** (targeting, lead indicator, aim assist; PR open) adds the target button
-  (**Y**: tap / double-tap), brackets, the lead ring and aim assist. **M2-T4** (secondaries) is next.
+  the arena). **M2-T3** (targeting, lead indicator, aim assist) is merged: target button (**Y**: tap /
+  double-tap), brackets, the lead ring and aim assist. **M2-T4** (secondaries: Homing Missile, Rocket Pod,
+  Flares, incoming-missile warning; PR open) adds **X** = secondary (hold on a locked target, release to
+  launch the missile; press for a rocket salvo) and flares on device slot 1 (key **1** / D-pad up). The
+  arena's ship switcher moved to the **F2 / F3 / F4** keys. **M2-T5** (basic AI pilot) is next.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -70,7 +73,8 @@
 |---|---|---|---|---|
 | M2-T1 | Damage model & Durability | M1 | ✅ | #20 |
 | M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
-| M2-T3 | Targeting, lead indicator & aim assist | T2 | 👀 | #22 |
+| M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
+| M2-T4 | Secondaries & countermeasures | T3 | 👀 | #23 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -520,6 +524,53 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
 
+- M2-T4 (2026-10-25): homing missile, rocket pod, flares and the incoming-missile warning. Things the next
+  session must know:
+  - **Controls the AI writes:** `controls.fire_secondary` held, then released. A **homing missile** launches on the
+    release tick only if the lock is complete (hold >= `lock_time` 1.2 s on the selected, locked target inside the
+    lock cone and range; `SecondarySystem.can_lock_on(target)`); release early and nothing happens. A **rocket pod**
+    fires a salvo as soon as the button is down. `controls.device = 1` (one tick, consumed by `DeviceSystem`) throws
+    the flares. `MissileManager.incoming_for(ship)` lists the homing missiles steering at a ship (flare-fooled ones
+    do not count): that is what an AI's "UseDevice" behavior should read. The AI must not get aim assist or a
+    lock-on shortcut; it needs `Targeting` like the player.
+  - **Nodes:** `Ship` has two new children, `SecondarySystem` (`ship.secondaries()`: `def`, `ammo`, `lock`,
+    `add_ammo`, `cooldown_left`, `is_ready`) and `DeviceSystem` (`ship.devices()`: `device_in(slot)`,
+    `cooldown_left(slot)`, `use(slot)`). Scenes that fire missiles or use flares need one **`MissileManager`**
+    (`combat/missile_manager.gd`; `flight_test.tscn` has it); without one the weapon/device logs a warning once and
+    does nothing. `CombatSim.spawn_missile_manager` / `spawn_ship` / `BlastLog` are the sim helpers.
+  - **Data:** `SecondaryDef` (`data/secondaries/{homing_missile,rocket_pod}.tres`, `Content.secondary(id)`),
+    `DeviceDef` (`data/devices/flares.tres`, `Content.device(id)`), and new `ShipDef` fields `secondary_weapon`,
+    `secondary_launch_offset` (used when the model has no `SOCKET_secondary_*`; none of the three models does yet)
+    and `device_ids` (slot 1..3). Kestrel and Drayman carry the homing missile, Bulwark the rocket pod; all three
+    carry flares in slot 1. Numbers are in GDD 7.2 ("Secondary starting values"), all to tune in the M2 playtest.
+  - **Missile behavior** (pure maths in `MissileGuidance`, unit tested): proportional navigation, 55 deg/s turn
+    limit, top speed 290 m/s (the Kestrel's boost is 320, so boosting straight away outruns it, the Bulwark and
+    Drayman cannot), a 110 degree seeker cone (a target that gets behind the missile is lost for good, so a dodged
+    missile does not circle back), proximity fuse 12 m after 40 m of flight, blast 16 m with a linear falloff
+    (`splash_amount`) through `Durability.apply`. The shooter is never hurt by its own blast; allies, neutrals and
+    dummies are. A missile with no target or a destroyed target flies on straight and self-destructs (harmlessly)
+    after 8 s. The dodge sim (`test_missile_sim.gd`) boost-drifts a Kestrel across the missile's path 200 m out and
+    asserts a miss; the same chase without the dodge, and a dodge 30 m out, are hits.
+  - **Flares:** one roll per tracking missile within 700 m per use (65%), seeded (`MissileManager.seed_rolls`); a
+    fooled missile chases a flare until it burns out (4 s) or goes off at it, harmlessly. Missiles launched after the
+    flares are out are not helped. The statistical test (`test_flare_sim.gd`) rolls 2000 missiles and checks the rate
+    against `decoy_chance`, plus seeded repeatability.
+  - **Shared code:** `SweepCaster` (the sphere sweep) now serves both `ProjectileManager` and `MissileManager`;
+    `ProjectileManager.make_streaks` / `streak_at` build and place streaks for both. `WeaponSystem` no longer has a
+    secondary group (the old empty `GROUP_SECONDARY` is gone).
+  - **VFX gotcha:** in `CombatFx` a billboard ignores its node scale unless `billboard_keep_scale` is set, so the old
+    muzzle and impact flashes are always drawn at the quad's unit size (left as they were). Big flashes
+    (`CombatFx.flash`, `explosion`) use their own pool (`BLAST_POOL`) whose material keeps the scale. If the owner
+    wants the muzzle/impact flashes bigger, set `billboard_keep_scale` on the small pool too and retune the sizes.
+  - **HUD:** `FlightHud` has the secondary line (name, ammo, LOCKING n% / LOCKED / RELOADING / NO AMMO / DISABLED, bottom
+    left) and the device line (FLARES READY / n s, bottom right); `TargetHud` draws the lock ring and LOCK; `MissileWarning`
+    (child of `FlightHud`) is the banner, the missile marker or edge arrow and the alarm (`missile_warning.wav`).
+  - **Arena:** the ship switcher moved from the device buttons to **F2 / F3 / F4** (`FlightTest.SWITCH_KEYS`,
+    `_unhandled_key_input`), so a flares press does not also switch ship.
+  - **Audio:** seven new placeholder sounds from `tools/audio/make_placeholder_audio.py` (missile and rocket launch,
+    explosion, lock beep, lock acquired, missile warning, flare launch), listed in `licenses.csv`.
+  - Shot scenes `missiles_shot` (lock ring, LOCK, launch, flight, blast, aftermath) and `flares_shot` (warning, arrow, flares,
+    fooled missile). Frame N is physics tick 2N; the missile shot's blast is at frame 91.
 - M2-T3 (2026-10-25): targeting, lead indicator and aim assist. Things the next session must know:
   - **Buttons (owner may change):** `target_nearest` moved from X to **Y** (shared with `interact`, which has no
     gameplay until M4); B stays free for drift. New hold action `look_at_target` = **B** key / **Paddle 4** (the

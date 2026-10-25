@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DamageTable" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/damage_table.gd" id="1_table"]
+
+[resource]
+script = ExtResource("1_table")
+id = &"default"
+energy = Vector3(1.5, 0.75, 1)
+kinetic = Vector3(0.75, 1.5, 1)
+explosive = Vector3(1, 1, 1.25)
+ion = Vector3(2, 0.25, 0)
+ion_disable_seconds = 3.0

@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://ships/ship.gd" id="1_ship"]
 [ext_resource type="Script" path="res://ships/flight_controller.gd" id="2_flight"]
 [ext_resource type="Resource" path="res://data/ships/kestrel.tres" id="3_def"]
 [ext_resource type="Script" path="res://ships/power_system.gd" id="4_power"]
 [ext_resource type="Script" path="res://vfx/engine_fx.gd" id="5_fx"]
+[ext_resource type="Script" path="res://combat/durability.gd" id="6_durability"]
 
 [node name="Ship" type="RigidBody3D"]
 custom_integrator = true
@@ -16,6 +17,9 @@ script = ExtResource("2_flight")
 
 [node name="PowerSystem" type="Node" parent="."]
 script = ExtResource("4_power")
+
+[node name="Durability" type="Node" parent="."]
+script = ExtResource("6_durability")
 
 [node name="EngineFx" type="Node" parent="."]
 script = ExtResource("5_fx")

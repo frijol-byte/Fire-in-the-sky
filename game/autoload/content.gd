@@ -44,6 +44,11 @@ func ship(id: StringName) -> ShipDef:
 	return get_def(&"ship", id) as ShipDef
 
 
+## Returns the damage table with `id` (`&"default"` is the GDD 7.1 table), or `null`.
+func damage_table(id: StringName = &"default") -> DamageTable:
+	return get_def(&"damage_table", id) as DamageTable
+
+
 ## Returns the ids of every def of `kind`, sorted.
 func ids(kind: StringName) -> Array[StringName]:
 	var by_id: Dictionary = _defs.get(kind, {})

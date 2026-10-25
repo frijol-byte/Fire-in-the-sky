@@ -81,6 +81,16 @@ extends ContentDef
 ## Canopy frame shown in the cockpit view (a prop `.glb`).
 @export_file("*.glb") var canopy_path: String = ""
 
+@export_group("Durability")
+## Health layers (GDD 7.1): shield, then armor, then hull. Hull at 0 destroys the ship.
+@export var shield_capacity: float = 100.0
+@export var armor_capacity: float = 80.0
+@export var hull_capacity: float = 100.0
+## Shield regained per second once the regen delay has passed.
+@export var shield_regen: float = 10.0
+## Seconds without damage before the shield regenerates (GDD 7.1: 4 s).
+@export var shield_regen_delay: float = 4.0
+
 @export_group("Look")
 ## Faction paint, set on the model's `PAINT_PRIMARY` / `PAINT_SECONDARY` parts at spawn
 ## (the defaults are the paint shader's own).
@@ -178,6 +188,14 @@ func problems() -> PackedStringArray:
 		result.append("energy_regen and energy_regen_delay must not be negative")
 	if boost_min_energy < 0.0 or boost_min_energy > energy_capacity:
 		result.append("boost_min_energy must be between 0 and energy_capacity")
+	for layer: float in [shield_capacity, armor_capacity]:
+		if layer < 0.0:
+			result.append("shield_capacity and armor_capacity must not be negative")
+			break
+	if hull_capacity <= 0.0:
+		result.append("hull_capacity must be above 0")
+	if shield_regen < 0.0 or shield_regen_delay < 0.0:
+		result.append("shield_regen and shield_regen_delay must not be negative")
 	if model_path.is_empty() or not ResourceLoader.exists(model_path):
 		result.append("model_path does not exist: %s" % model_path)
 	return result

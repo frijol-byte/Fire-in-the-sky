@@ -17,6 +17,7 @@ var model: ShipModel = null
 
 @onready var _flight: FlightController = $FlightController
 @onready var _power: PowerSystem = $PowerSystem
+@onready var _durability: Durability = $Durability
 @onready var _engine_fx: EngineFx = $EngineFx
 
 
@@ -36,6 +37,7 @@ func _ready() -> void:
 		return
 	mass = def.mass
 	_power.configure(def)
+	_durability.configure(def, self)
 	_flight.def = def
 	_flight.power = _power
 	_flight.boost_depleted.connect(_on_boost_depleted)
@@ -46,11 +48,17 @@ func _ready() -> void:
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	_flight.integrate(state, controls)
 	_power.tick(state.step)
+	_durability.tick(state.step)
 
 
 ## The ship's energy capacitor (boost, and later weapons and devices, spend from it).
 func power() -> PowerSystem:
 	return _power
+
+
+## The ship's shield, armor and hull. `durability().apply(info)` is the only way to hurt it.
+func durability() -> Durability:
+	return _durability
 
 
 ## Re-reads the values of `def` that are copied at spawn (mass, the capacitor). The flight

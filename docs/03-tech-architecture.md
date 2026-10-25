@@ -167,7 +167,9 @@ Ship (RigidBody3D, custom_integrator = true)
 - **Projectiles** are pooled and moved with shape casts, not physics bodies. Hitscan is used
   for railguns.
 - One `DamageInfo` struct (`amount`, `type`, `source`, `hit_point`, `subsystem`), and one
-  function `Durability.apply(info)`, whose type multipliers are unit-tested.
+  function `Durability.apply(info)`, whose type multipliers are unit-tested. The multipliers are
+  data (`DamageTable`, `data/combat/damage_table.tres`); `Durability` is a child node of `Ship`
+  (`ship.durability()`), and emits `Events.ship_damaged` / `Events.ship_destroyed`.
 - **Lead calculation** is a pure function (unit-tested with moving targets).
 - **Aim assist** lives in `InputRouter` → `ShipControls` (magnetism and friction), never in the
   weapons.

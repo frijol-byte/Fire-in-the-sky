@@ -122,9 +122,27 @@ func test_fire_is_on_a_and_x_and_boost_moved_to_l3() -> void:
 
 
 func test_nothing_else_shares_a_or_the_fire_buttons() -> void:
-	# A is fire only; boost and cruise drive may share L3 (cruise has no gameplay until M4); X is
-	# shared with target_nearest until M2-T3 moves it.
+	# A is fire only; boost and cruise drive may share L3 (cruise has no gameplay until M4).
 	for action: String in InputRouter.ACTIONS:
 		if action in ["fire_primary"]:
 			continue
 		assert_array(_pad_buttons_of(action)).not_contains([JOY_BUTTON_A])
+
+
+func test_target_nearest_is_on_y_and_x_is_only_secondary_fire() -> void:
+	# M2-T3: target_nearest left X for Y (shared with interact, which has no gameplay until M4).
+	assert_array(_pad_buttons_of("target_nearest")).is_equal([JOY_BUTTON_Y])
+	assert_array(_pad_buttons_of("interact")).is_equal([JOY_BUTTON_Y])
+	for action: String in InputRouter.ACTIONS:
+		if action != "fire_secondary":
+			assert_array(_pad_buttons_of(action)).not_contains([JOY_BUTTON_X])
+
+
+func test_look_at_target_is_a_hold_on_paddle_4_and_b() -> void:
+	assert_bool(InputRouter.ACTIONS.has("look_at_target")).is_true()
+	assert_array(_pad_buttons_of("look_at_target")).is_equal([JOY_BUTTON_PADDLE4])
+	var keys: Array[int] = []
+	for event: InputEvent in InputMap.action_get_events("look_at_target"):
+		if event is InputEventKey:
+			keys.append((event as InputEventKey).physical_keycode)
+	assert_array(keys).is_equal([KEY_B])

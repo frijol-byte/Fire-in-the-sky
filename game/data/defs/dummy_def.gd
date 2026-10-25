@@ -5,6 +5,9 @@ extends ContentDef
 
 ## `strings.csv` key of the dummy's name.
 @export var display_name_key: String = ""
+## Whose side the dummy is on. Hostile dummies are what "target nearest hostile" picks; the others
+## let targeting and the HUD brackets be tried on neutral and friendly shapes too.
+@export var stance: Targeting.Stance = Targeting.Stance.HOSTILE
 
 @export_group("Durability")
 @export var shield_capacity: float = 120.0

@@ -81,3 +81,112 @@ func test_every_hud_key_has_a_string() -> void:
 	keys.append(HudMath.assist_key(false))
 	for key: StringName in keys:
 		assert_str(TranslationServer.translate(key)).is_not_equal(str(key))
+
+
+func test_marker_at_projects_a_real_point() -> void:
+	var camera: Camera3D = _camera()
+	var size: Vector2 = get_viewport().get_visible_rect().size
+	var ahead: HudMath.Marker = HudMath.marker_at(camera, Vector3(0, 0, -250), size, MARGIN)
+	assert_bool(ahead.on_screen).is_true()
+	assert_vector(ahead.position).is_equal_approx(size * 0.5, Vector2.ONE * 1.0)
+	var right: HudMath.Marker = HudMath.marker_at(camera, Vector3(40, 0, -250), size, MARGIN)
+	assert_float(right.position.x).is_greater(size.x * 0.5)
+	var behind: HudMath.Marker = HudMath.marker_at(camera, Vector3(0, 0, 100), size, MARGIN)
+	assert_bool(behind.behind).is_true()
+	assert_bool(behind.on_screen).is_false()
+
+
+func test_marker_at_matches_marker_for_a_far_point() -> void:
+	var camera: Camera3D = _camera()
+	var size: Vector2 = get_viewport().get_visible_rect().size
+	var by_direction: HudMath.Marker = HudMath.marker_for(
+		camera, Vector3.ZERO, Vector3(0.2, 0.1, -1), size, MARGIN
+	)
+	var by_point: HudMath.Marker = HudMath.marker_at(
+		camera, Vector3(0.2, 0.1, -1).normalized() * HudMath.MARKER_DISTANCE, size, MARGIN
+	)
+	assert_vector(by_point.position).is_equal_approx(by_direction.position, Vector2.ONE * 0.01)
+
+
+func test_projected_radius_shrinks_with_distance_and_grows_with_size() -> void:
+	var near: float = HudMath.projected_radius(6.0, 100.0, 75.0, 1080.0)
+	var far: float = HudMath.projected_radius(6.0, 400.0, 75.0, 1080.0)
+	assert_float(near).is_greater(far)
+	assert_float(near / far).is_equal_approx(4.0, 0.001)
+	assert_float(HudMath.projected_radius(12.0, 100.0, 75.0, 1080.0)).is_equal_approx(
+		near * 2.0, 0.001
+	)
+	# A target at the camera fills the view; a target of no size takes no room.
+	assert_float(HudMath.projected_radius(6.0, 0.0, 75.0, 1080.0)).is_equal(1080.0)
+	assert_float(HudMath.projected_radius(0.0, 100.0, 75.0, 1080.0)).is_equal(0.0)
+
+
+func test_projected_radius_is_what_the_camera_draws() -> void:
+	var camera: Camera3D = _camera()
+	var size: Vector2 = get_viewport().get_visible_rect().size
+	var centre: Vector2 = camera.unproject_position(Vector3(0, 0, -200))
+	var edge: Vector2 = camera.unproject_position(Vector3(0, 10, -200))
+	var predicted: float = HudMath.projected_radius(10.0, 200.0, camera.fov, size.y)
+	assert_float(centre.distance_to(edge)).is_equal_approx(predicted, 0.5)
+
+
+func test_distance_text_switches_to_kilometres() -> void:
+	assert_str(HudMath.distance_text(320.4)).is_equal("320 m")
+	assert_str(HudMath.distance_text(999.0)).is_equal("999 m")
+	assert_str(HudMath.distance_text(1200.0)).is_equal("1.2 km")
+
+
+func test_bracket_shapes_differ_by_stance() -> void:
+	var hostile: Array[PackedVector2Array] = HudMath.bracket_strokes(Targeting.Stance.HOSTILE, 30.0)
+	var neutral: Array[PackedVector2Array] = HudMath.bracket_strokes(Targeting.Stance.NEUTRAL, 30.0)
+	var friendly: Array[PackedVector2Array] = HudMath.bracket_strokes(
+		Targeting.Stance.FRIENDLY, 30.0
+	)
+	for strokes: Array[PackedVector2Array] in [hostile, neutral, friendly]:
+		assert_int(strokes.size()).is_equal(4)
+	# Square corners are three points, arcs have many, so the shapes cannot be mistaken.
+	assert_int(hostile[0].size()).is_equal(3)
+	assert_int(friendly[0].size()).is_equal(3)
+	assert_int(neutral[0].size()).is_greater(3)
+	assert_bool(hostile[0] == friendly[0]).is_false()
+
+
+func test_hostile_brackets_sit_on_the_square_and_neutral_arcs_on_the_circle() -> void:
+	for stroke: PackedVector2Array in HudMath.bracket_strokes(Targeting.Stance.HOSTILE, 30.0):
+		# The corner is the middle point.
+		assert_float(absf(stroke[1].x)).is_equal_approx(30.0, 0.001)
+		assert_float(absf(stroke[1].y)).is_equal_approx(30.0, 0.001)
+	for stroke: PackedVector2Array in HudMath.bracket_strokes(Targeting.Stance.NEUTRAL, 30.0):
+		for point: Vector2 in stroke:
+			assert_float(point.length()).is_equal_approx(30.0, 0.001)
+
+
+func test_friendly_brackets_form_a_diamond() -> void:
+	for stroke: PackedVector2Array in HudMath.bracket_strokes(Targeting.Stance.FRIENDLY, 30.0):
+		var vertex: Vector2 = stroke[1]
+		# A diamond's corners are on the axes.
+		var on_axis: bool = absf(vertex.x) < 0.001 or absf(vertex.y) < 0.001
+		assert_bool(on_axis).is_true()
+
+
+func test_arrow_points_point_along_the_direction() -> void:
+	var tip_right: PackedVector2Array = HudMath.arrow_points(Vector2(100, 100), Vector2.RIGHT, 10.0)
+	assert_vector(tip_right[0]).is_equal_approx(Vector2(110, 100), Vector2.ONE * 0.001)
+	assert_float(tip_right[1].x).is_less(100.0)
+	assert_float(tip_right[2].x).is_less(100.0)
+	var tip_up: PackedVector2Array = HudMath.arrow_points(Vector2(100, 100), Vector2.UP, 10.0)
+	assert_vector(tip_up[0]).is_equal_approx(Vector2(100, 90), Vector2.ONE * 0.001)
+	# Zero direction still gives a drawable arrow.
+	assert_int(HudMath.arrow_points(Vector2.ZERO, Vector2.ZERO, 10.0).size()).is_equal(3)
+
+
+func test_stance_and_lock_keys_have_strings() -> void:
+	var keys: Array[StringName] = []
+	for stance: int in Targeting.Stance.values():
+		keys.append(HudMath.stance_key(stance as Targeting.Stance))
+	keys.append(HudMath.lock_key(Targeting.Lock.OUT_OF_RANGE))
+	keys.append(HudMath.lock_key(Targeting.Lock.OCCLUDED))
+	keys.append_array([&"HUD_SHIELD", &"HUD_ARMOR", &"HUD_HULL"])
+	for key: StringName in keys:
+		assert_str(TranslationServer.translate(key)).is_not_equal(str(key))
+	assert_str(String(HudMath.lock_key(Targeting.Lock.LOCKED))).is_empty()

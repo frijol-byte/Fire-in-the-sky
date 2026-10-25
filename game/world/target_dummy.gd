@@ -3,7 +3,7 @@ extends AnimatableBody3D
 ## A practice target: a sphere with the same shield, armor and hull layers as a ship, so every
 ## weapon is tested against the real damage code. It stands still, or slides back and forth along
 ## a rail (`rail_position`), and comes back repaired a few seconds after it is destroyed. It joins
-## the `GROUP` group so targeting can find it later.
+## the `GROUP` group, and the `Targeting.GROUP` group so ships can target it.
 ##
 ## The numbers come from a `DummyDef`; where it stands and how far its rail runs comes from the
 ## `ArenaDef` that places it. Projectiles hurt it through `durability()`, like a ship.
@@ -13,8 +13,8 @@ const GROUP: StringName = &"targets"
 ## The shield bubble is this much bigger than the dummy's ball.
 const BUBBLE_MARGIN: float = 1.12
 
-## Where the dummy is now, in metres per second (zero for a static dummy). The lead calculation of
-## M2-T3 reads it.
+## How fast the dummy is moving, in metres per second (zero for a static dummy). The lead
+## calculation reads it.
 var velocity: Vector3 = Vector3.ZERO
 var def: DummyDef = null
 
@@ -37,6 +37,7 @@ var _shown_health: Vector3i = Vector3i(-1, -1, -1)
 
 func _ready() -> void:
 	add_to_group(GROUP)
+	add_to_group(Targeting.GROUP)
 	collision_layer = PhysicsLayers.TARGETS
 	collision_mask = 0
 	sync_to_physics = true
@@ -98,6 +99,23 @@ func durability() -> Durability:
 
 func is_destroyed() -> bool:
 	return _destroyed
+
+
+## The methods below make the dummy a valid target for `Targeting` (see its header).
+func target_name() -> String:
+	return tr(def.display_name_key)
+
+
+func target_stance() -> Targeting.Stance:
+	return def.stance
+
+
+func target_velocity() -> Vector3:
+	return velocity
+
+
+func target_radius() -> float:
+	return def.radius
 
 
 ## Brings a destroyed dummy back, fully repaired.

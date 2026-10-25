@@ -209,6 +209,8 @@ func _update_help() -> void:
 			InputRouter.glyph_for(&"thrust_back"),
 			InputRouter.glyph_for(&"boost"),
 			InputRouter.glyph_for(&"fire_primary"),
+			InputRouter.glyph_for(&"target_nearest"),
+			InputRouter.glyph_for(&"look_at_target"),
 			InputRouter.glyph_for(&"camera_toggle"),
 			InputRouter.glyph_for(&"pause"),
 		]

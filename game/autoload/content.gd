@@ -59,6 +59,16 @@ func dummy(id: StringName) -> DummyDef:
 	return get_def(&"dummy", id) as DummyDef
 
 
+## Returns the targeting def with `id` (`&"default"` unless a test asks for another), or `null`.
+func targeting(id: StringName = &"default") -> TargetingDef:
+	return get_def(&"targeting", id) as TargetingDef
+
+
+## Returns the difficulty def with `id` (`&"easy"`, `&"normal"`, `&"hard"`), or `null`.
+func difficulty(id: StringName) -> DifficultyDef:
+	return get_def(&"difficulty", id) as DifficultyDef
+
+
 ## Returns the ids of every def of `kind`, sorted.
 func ids(kind: StringName) -> Array[StringName]:
 	var by_id: Dictionary = _defs.get(kind, {})

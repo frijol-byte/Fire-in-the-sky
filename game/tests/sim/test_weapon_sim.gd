@@ -231,6 +231,13 @@ func test_a_locked_target_swings_the_guns_by_at_most_the_gimbal() -> void:
 	weapons.set_aim_point(near)
 	var to_near: Vector3 = (near - mount.socket.global_position).normalized()
 	assert_float(weapons.aim_direction(mount).angle_to(to_near)).is_less(0.0001)
+	# The assist strength scales the limit: half strength, half the swing.
+	weapons.set_aim_point(far)
+	weapons.gimbal_scale = 0.5
+	assert_float(weapons.aim_direction(mount).angle_to(Vector3(0, 0, -1))).is_equal_approx(
+		max_angle * 0.5, 0.001
+	)
+	weapons.gimbal_scale = 1.0
 	# The mouse gets no gimbal.
 	weapons.gimbal_enabled = false
 	assert_float(weapons.aim_direction(mount).angle_to(Vector3(0, 0, -1))).is_less(0.01)

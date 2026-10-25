@@ -5,7 +5,7 @@ const STANDARD: DummyDef = preload("res://data/combat/dummy_standard.tres")
 
 
 func test_the_dummies_are_registered_and_valid() -> void:
-	for id: StringName in [&"standard", &"sturdy"]:
+	for id: StringName in [&"standard", &"sturdy", &"neutral", &"ally"]:
 		var def: DummyDef = Content.dummy(id)
 		assert_object(def).is_not_null()
 		assert_array(def.problems()).is_empty()
@@ -51,3 +51,16 @@ func test_mismatched_dummy_arrays_are_flagged() -> void:
 	var no_rails: Array[Vector3] = []
 	arena.dummy_rails = no_rails
 	assert_array(arena.problems()).is_not_empty()
+
+
+func test_the_arena_has_one_dummy_of_each_stance() -> void:
+	var arena: ArenaDef = Content.get_def(&"arena", &"flight_test") as ArenaDef
+	var stances: Array[int] = []
+	for id: StringName in arena.dummy_ids:
+		var stance: int = Content.dummy(id).stance
+		if not stances.has(stance):
+			stances.append(stance)
+	stances.sort()
+	assert_array(stances).is_equal(
+		[Targeting.Stance.HOSTILE, Targeting.Stance.NEUTRAL, Targeting.Stance.FRIENDLY]
+	)

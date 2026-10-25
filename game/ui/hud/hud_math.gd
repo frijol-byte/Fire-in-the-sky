@@ -20,8 +20,15 @@ const MIN_MARKER_SPEED: float = 1.5
 static func marker_for(
 	camera: Camera3D, origin: Vector3, direction: Vector3, view_size: Vector2, margin: float
 ) -> Marker:
+	return marker_at(camera, origin + direction.normalized() * MARKER_DISTANCE, view_size, margin)
+
+
+## Same as `marker_for` for a real point in the world (a target, a lead point) instead of a
+## direction: where `world` lands on screen, pinned to the edge when off-screen or behind.
+static func marker_at(
+	camera: Camera3D, world: Vector3, view_size: Vector2, margin: float
+) -> Marker:
 	var marker: Marker = Marker.new()
-	var world: Vector3 = origin + direction.normalized() * MARKER_DISTANCE
 	var point: Vector2 = camera.unproject_position(world)
 	var behind: bool = camera.is_position_behind(world)
 	if behind:
@@ -34,6 +41,104 @@ static func marker_for(
 	marker.position = point if marker.on_screen else clamp_to_edge(point, view_size, margin)
 	marker.behind = behind
 	return marker
+
+
+## How many pixels a sphere of `radius` metres, `distance` metres from the camera, spans as a
+## radius on a view `view_height` pixels tall with a vertical field of view of `fov_deg`.
+static func projected_radius(
+	radius: float, distance: float, fov_deg: float, view_height: float
+) -> float:
+	if distance <= 0.0:
+		return view_height
+	var half_height_at_distance: float = distance * tan(deg_to_rad(fov_deg) * 0.5)
+	return radius / half_height_at_distance * view_height * 0.5
+
+
+## "320 m", or "1.2 km" from a kilometre up.
+static func distance_text(meters: float) -> String:
+	if meters >= 1000.0:
+		return TranslationServer.translate("HUD_DISTANCE_KM") % (meters / 1000.0)
+	return TranslationServer.translate("HUD_DISTANCE_M") % meters
+
+
+## `strings.csv` key of a stance's name.
+static func stance_key(stance: Targeting.Stance) -> StringName:
+	match stance:
+		Targeting.Stance.NEUTRAL:
+			return &"HUD_STANCE_NEUTRAL"
+		Targeting.Stance.FRIENDLY:
+			return &"HUD_STANCE_FRIENDLY"
+	return &"HUD_STANCE_HOSTILE"
+
+
+## `strings.csv` key of why a lock is missing (`Targeting.Lock`), or `&""` while locked.
+static func lock_key(lock: Targeting.Lock) -> StringName:
+	match lock:
+		Targeting.Lock.OUT_OF_RANGE:
+			return &"HUD_LOCK_OUT_OF_RANGE"
+		Targeting.Lock.OCCLUDED:
+			return &"HUD_LOCK_OCCLUDED"
+	return &""
+
+
+## The strokes of a target bracket of half-size `half` pixels around the origin, one polyline
+## each. The shape says whose side the target is on: square corners for hostile, round arcs for
+## neutral, diamond corners for friendly, so it reads without relying on colour.
+static func bracket_strokes(stance: Targeting.Stance, half: float) -> Array[PackedVector2Array]:
+	var strokes: Array[PackedVector2Array] = []
+	var leg: float = half * 0.45
+	match stance:
+		Targeting.Stance.NEUTRAL:
+			# Four arcs of 50 degrees, centred on the diagonals.
+			for corner: int in 4:
+				var centre: float = PI * 0.25 + PI * 0.5 * corner
+				var arc: PackedVector2Array = []
+				for step: int in 6:
+					var angle: float = centre - deg_to_rad(25.0) + deg_to_rad(10.0) * step
+					arc.append(Vector2(cos(angle), sin(angle)) * half)
+				strokes.append(arc)
+		Targeting.Stance.FRIENDLY:
+			# The four corners of a diamond, a short leg each way.
+			for corner: int in 4:
+				var vertex: Vector2 = Vector2.RIGHT.rotated(PI * 0.5 * corner) * half * 1.15
+				var previous: Vector2 = Vector2.RIGHT.rotated(PI * 0.5 * (corner - 1)) * half * 1.15
+				var following: Vector2 = (
+					Vector2.RIGHT.rotated(PI * 0.5 * (corner + 1)) * half * 1.15
+				)
+				var toward_previous: Vector2 = vertex + (previous - vertex).normalized() * leg
+				var toward_following: Vector2 = vertex + (following - vertex).normalized() * leg
+				strokes.append(PackedVector2Array([toward_previous, vertex, toward_following]))
+		_:
+			# Hostile: the four corners of a square.
+			for sign_x: float in [-1.0, 1.0]:
+				for sign_y: float in [-1.0, 1.0]:
+					var corner_point: Vector2 = Vector2(sign_x, sign_y) * half
+					strokes.append(
+						PackedVector2Array(
+							[
+								corner_point + Vector2(-sign_x * leg, 0.0),
+								corner_point,
+								corner_point + Vector2(0.0, -sign_y * leg)
+							]
+						)
+					)
+	return strokes
+
+
+## The three corners of an edge arrow of `size` pixels at `position`, pointing along `direction`
+## (away from the screen centre, towards the target).
+static func arrow_points(position: Vector2, direction: Vector2, size: float) -> PackedVector2Array:
+	var forward: Vector2 = (
+		direction.normalized() if direction.length_squared() > 0.0 else Vector2.UP
+	)
+	var side: Vector2 = forward.orthogonal()
+	return PackedVector2Array(
+		[
+			position + forward * size,
+			position - forward * size * 0.6 + side * size * 0.8,
+			position - forward * size * 0.6 - side * size * 0.8
+		]
+	)
 
 
 ## Pins `point` to the border of the screen rectangle inset by `margin`, along the line from the

@@ -35,7 +35,7 @@ const CLEARANCE_RECOVER_TAU: float = 0.4
 const FOV_KICK_IN_TAU: float = 0.15
 const FOV_KICK_OUT_TAU: float = 0.35
 
-## Free look: the most the camera turns, and how fast it follows the stick.
+## Free look (and the look-at-target hold): the most the camera turns, and how fast it follows.
 const FREE_LOOK_MAX_YAW: float = deg_to_rad(150.0)
 const FREE_LOOK_MAX_PITCH: float = deg_to_rad(60.0)
 const FREE_LOOK_TAU: float = 0.08
@@ -231,6 +231,21 @@ static func clearance_step(
 	return lerpf(current, hit_fraction, smooth_weight(dt, recover_tau))
 
 
+## The free look (yaw, pitch in radians, right and up positive) that points the camera along
+## `to_target` (a world-space offset from the ship) for a ship with basis `ship_basis`: the camera
+## swings round behind the ship on the far side from the target. Limited like free look is.
+static func look_at_target_angles(ship_basis: Basis, to_target: Vector3) -> Vector2:
+	if to_target.length_squared() < 0.000001:
+		return Vector2.ZERO
+	var local: Vector3 = ship_basis.orthonormalized().inverse() * to_target.normalized()
+	var yaw: float = atan2(local.x, -local.z)
+	var pitch: float = asin(clampf(local.y, -1.0, 1.0))
+	return Vector2(
+		clampf(yaw, -FREE_LOOK_MAX_YAW, FREE_LOOK_MAX_YAW),
+		clampf(pitch, -FREE_LOOK_MAX_PITCH, FREE_LOOK_MAX_PITCH)
+	)
+
+
 ## The rotation for a free-look of `look` radians (yaw, pitch; right and up positive).
 static func free_look_basis(look: Vector2) -> Basis:
 	return Basis.from_euler(Vector3(look.y, -look.x, 0.0))
@@ -298,7 +313,19 @@ func _cockpit_base() -> Transform3D:
 func _update_free_look(delta: float) -> void:
 	var stick: Vector2 = InputRouter.free_look_vector()
 	var wanted: Vector2 = Vector2(stick.x * FREE_LOOK_MAX_YAW, stick.y * FREE_LOOK_MAX_PITCH)
+	if InputRouter.look_at_target_active():
+		wanted = _look_at_target_wanted(wanted)
 	_look = _look.lerp(wanted, smooth_weight(delta, FREE_LOOK_TAU))
+
+
+## The look that keeps the selected target in view, or `fallback` when there is none.
+func _look_at_target_wanted(fallback: Vector2) -> Vector2:
+	var target: Node3D = ship.targeting().target
+	if target == null or not is_instance_valid(target) or not target.is_inside_tree():
+		return fallback
+	var ship_pose: Transform3D = _ship_transform()
+	var to_target: Vector3 = target.get_global_transform_interpolated().origin - ship_pose.origin
+	return look_at_target_angles(ship_pose.basis, to_target)
 
 
 func _update_boost(delta: float, def: ShipDef) -> void:

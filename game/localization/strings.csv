@@ -30,6 +30,7 @@ GLYPH_PAD_DPAD_RIGHT,D-pad Right
 GLYPH_PAD_PADDLE_1,Paddle 1
 GLYPH_PAD_PADDLE_2,Paddle 2
 GLYPH_PAD_PADDLE_3,Paddle 3
+GLYPH_PAD_PADDLE_4,Paddle 4
 GLYPH_PAD_LS_UP,Left stick up
 GLYPH_PAD_LS_DOWN,Left stick down
 GLYPH_PAD_LS_LEFT,Left stick left
@@ -60,7 +61,7 @@ SHIP_DRAYMAN_NAME,Drayman
 ARENA_FLIGHT_TEST_NAME,Flight test arena
 ARENA_GATES,Gates passed: %d
 ARENA_SHIP,%s    (demo only) switch ship: %s
-ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s camera    %s pause
+ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s target (tap / double-tap)    %s look at target    %s camera    %s pause
 ARENA_HELP_DRIFT,    %s drift
 BOOT_FLY_HINT,%s: fly the flight test arena
 HUD_SPEED,%.0f m/s
@@ -128,3 +129,18 @@ DUMMY_HEALTH,S %d  A %d  H %d
 HUD_WEAPON,%s
 HUD_OVERHEAT,OVERHEATED
 HUD_NO_ENERGY,NO ENERGY
+HUD_DISTANCE_M,%.0f m
+HUD_DISTANCE_KM,%.1f km
+HUD_STANCE_HOSTILE,HOSTILE
+HUD_STANCE_NEUTRAL,NEUTRAL
+HUD_STANCE_FRIENDLY,FRIENDLY
+HUD_LOCK_OUT_OF_RANGE,LOCK LOST: OUT OF RANGE
+HUD_LOCK_OCCLUDED,LOCK LOST: NO LINE OF SIGHT
+HUD_SHIELD,SHIELD
+HUD_ARMOR,ARMOR
+HUD_HULL,HULL
+DUMMY_NEUTRAL_NAME,Neutral drone
+DUMMY_ALLY_NAME,Friendly drone
+DIFFICULTY_EASY_NAME,Easy
+DIFFICULTY_NORMAL_NAME,Normal
+DIFFICULTY_HARD_NAME,Hard

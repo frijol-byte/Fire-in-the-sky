@@ -36,6 +36,7 @@ const ACTIONS: PackedStringArray = [
 	"cruise_drive",
 	"camera_toggle",
 	"free_look",
+	"look_at_target",
 	"pause",
 	"system_map",
 ]
@@ -84,6 +85,7 @@ const _PAD_BUTTON_GLYPHS: Dictionary[int, StringName] = {
 	JOY_BUTTON_PADDLE1: &"GLYPH_PAD_PADDLE_1",
 	JOY_BUTTON_PADDLE2: &"GLYPH_PAD_PADDLE_2",
 	JOY_BUTTON_PADDLE3: &"GLYPH_PAD_PADDLE_3",
+	JOY_BUTTON_PADDLE4: &"GLYPH_PAD_PADDLE_4",
 }
 
 ## Keys are "<axis index><sign of the axis value>".
@@ -112,6 +114,10 @@ var last_device: Device = Device.KEYBOARD_MOUSE
 ## The player's controls for the current physics tick. Replaced every tick, so a reference
 ## you keep is a snapshot.
 var controls: ShipControls = ShipControls.new()
+
+## Multiplies the aim stick (reticle friction, GDD 7.3). `Targeting` sets it every tick while the
+## player's nose is near the locked target, and puts it back to 1 (no friction) otherwise.
+var aim_friction: float = 1.0
 
 var _mouse_seen: bool = false
 ## The mouse's motion added up, in pixels from the screen center (y down), held inside the
@@ -160,14 +166,17 @@ func build_controls() -> ShipControls:
 
 
 ## The aim input as (yaw, pitch) in -1..1, pitch up positive: the right stick plus the mouse
-## virtual stick, shaped like every other stick. Before the invert-Y setting.
-func look_input() -> Vector2:
+## virtual stick, shaped like every other stick. Before the invert-Y setting. With `assisted` it is
+## slowed by `aim_friction` (the ship's aim); the free-look camera asks for it unassisted.
+func look_input(assisted: bool = true) -> Vector2:
 	var deadzone: float = float(Settings.get_value(SETTING_STICK_DEADZONE, DEFAULT_STICK_DEADZONE))
 	var exponent: float = float(Settings.get_value(SETTING_CURVE_EXPONENT, DEFAULT_CURVE_EXPONENT))
 	var look: Vector2 = shape_stick(
 		Vector2(_axis("yaw_left", "yaw_right"), _axis("pitch_down", "pitch_up")), deadzone, exponent
 	)
 	look += _mouse_look(exponent)
+	if assisted:
+		look *= aim_friction
 	return look.clamp(-Vector2.ONE, Vector2.ONE)
 
 
@@ -180,12 +189,18 @@ func free_look_active() -> bool:
 	)
 
 
+## True while the player holds `look_at_target` (and is not free-looking): the camera then turns
+## to keep the locked target in view while the ship keeps flying.
+func look_at_target_active() -> bool:
+	return Input.is_action_pressed("look_at_target") and not free_look_active()
+
+
 ## The camera look for this frame as (yaw, pitch) in -1..1 (right and up positive, invert-Y
 ## applied), or zero when free look is not active.
 func free_look_vector() -> Vector2:
 	if not free_look_active():
 		return Vector2.ZERO
-	var look: Vector2 = look_input()
+	var look: Vector2 = look_input(false)
 	if bool(Settings.get_value(SETTING_INVERT_Y, DEFAULT_INVERT_Y)):
 		look.y = -look.y
 	return look

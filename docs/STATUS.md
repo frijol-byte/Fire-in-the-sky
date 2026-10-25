@@ -67,7 +67,7 @@
 
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
-| M2-T1 | Damage model & Durability | M1 | 👀 | — |
+| M2-T1 | Damage model & Durability | M1 | 👀 | #20 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

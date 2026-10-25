@@ -43,14 +43,14 @@ script = ExtResource("6_audio")
 [node name="Readout" type="Label" parent="."]
 offset_left = 48.0
 offset_top = 40.0
-offset_right = 1100.0
+offset_right = 1850.0
 offset_bottom = 126.0
 label_settings = SubResource("LabelSettings_text")
 
 [node name="Help" type="Label" parent="."]
 offset_left = 48.0
 offset_top = 132.0
-offset_right = 1100.0
+offset_right = 1850.0
 offset_bottom = 182.0
 label_settings = SubResource("LabelSettings_text")
 

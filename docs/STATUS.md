@@ -6,9 +6,9 @@
 ## Now
 - **Phase:** M1 — Flight: review gate ✅ clean (`docs/reviews/M1.md`); **owner playtest
   waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
-- **What to start next:** **M1-F1** (`docs/tasks/M1-flight.md`): your new pad layout and sharper
-  thrusters. M2-T1 (`docs/tasks/M2-combat-core.md`) can run at the same time; M2-T2 waits for M1-F1
-  (it moves the fire buttons).
+- **What to start next:** M1-F1 (new pad layout, sharper thrusters) is 👀 in PR; it is the build to
+  playtest. **M2-T1** (`docs/tasks/M2-combat-core.md`) can start now. **M2-T2** can start once M1-F1
+  is merged (it moves the fire buttons onto A / X).
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -61,7 +61,7 @@
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
-| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | ⬜ | |
+| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | 👀 | |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -267,8 +267,7 @@ and keep all notes bullets from both sides.
     (keyboard key names come from Godot). Rebinding UI later should reuse it.
   - Debug scene `core/debug/input_debug.tscn` (in the smoke list); shot `input_debug_shot` renders a
     fixed sample.
-  - Vertical thrust on the gamepad is bound to paddle buttons (see the PR's Design questions);
-    the NO_GAMEPAD_YET exemption in `test_input_router.gd` is gone.
+  - Vertical thrust used to sit on paddle buttons; M1-F1 moved it to the left stick (see its note).
   - Static functions can't call `tr()`; use `TranslationServer.translate()` there.
 
 - M1-T2 (2026-10-18): ship physics core with flight assist on. Things the next session must know:
@@ -455,6 +454,26 @@ and keep all notes bullets from both sides.
     projectiles, the device-slot clash with the ship switcher, where pilots/durability plug in); read them with the card.
   - No long sims exist yet (`game/tests/sim/long/` is empty); the first should arrive with M2-T5 (AI duels).
 
+- M1-F1 (2026-10-25): gamepad flight layout and sharper side/vertical thrusters. Things the next session must know:
+  - **Pad layout:** RT = `thrust_forward`, LT = `thrust_back` (analog axes 5 / 4), left stick Y = `thrust_up` /
+    `thrust_down` (stick up = up), left stick X = strafe. B, the paddles and the RT/LT fire bindings are gone from
+    `project.godot`. `fire_primary`, `fire_secondary` and `flight_assist_off` have **no gamepad event** on purpose:
+    `NO_GAMEPAD_YET` in `test_input_router.gd` (and a copy in `test_input_router_runtime.gd`) exempts them. **M2-T2
+    removes the two fire exemptions** when it binds A / X (and moves boost off A); the owner will pick a button
+    for drift later and then drops that one too. `glyph_for` gives `--` for an unbound pad action.
+  - `InputRouter.build_controls`: throttle is `shape_axis(thrust_forward - thrust_back)`; the left stick is one
+    `shape_stick(strafe, vertical)`. `ShipControls.thrust` and `FlightController` are unchanged.
+  - **Thrusters:** `thrust_lateral` / `thrust_vertical` are about 3x (kestrel 110 m/s², bulwark 78, drayman 54);
+    forward, turning and `fa_linear_gain` are untouched, so no new FA gain was needed (the ramp is
+    thrust-limited, which is what makes start and stop crisp). New `ShipDef.strafe_response_time` (0.85 / 0.95 /
+    1.05 s) is the checked target, not something the flight model reads; `tests/sim/test_flight_lateral.gd` flies
+    every ship and axis against it. GDD 4.4/5 updated (owner consent in the card).
+  - The arena help line is now `RT throttle  LT brake  A boost  R3 camera  Start pause` (+ `Shift drift` only when
+    the drift action has a button on the current device). Shot: `tests/shots/arena_pad_shot.tscn`
+    (`docs/previews/m1-f1-arena-gamepad-help.png`).
+  - The tuning overlay still has the thrust sliders; if the owner re-tunes thrust, update `strafe_response_time`
+    to match or `test_flight_lateral` will tell you.
+
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_
 
@@ -474,17 +493,19 @@ works, from script-generated ship to a Windows build.
 The first build you can fly. Press **Y** on the gamepad (G on the keyboard) on the title screen to
 enter the flight test arena: an amber nebula, an asteroid belt and a course of ring gates.
 
-- **Fly:** left stick moves, right stick turns, bumpers roll. **A** boosts (it drains the energy
-  bar), hold **B** to drift with flight assist off (the green marker shows where you are really
-  going), **R3** switches between the chase and cockpit views.
-- **Three ships:** D-pad up / right / down (keys 1 / 2 / 3) puts you in the Kestrel (light
+- **Fly:** **RT** is throttle, **LT** brakes and reverses, the left stick strafes (left/right) and
+  moves up/down, the right stick turns, bumpers roll. **A** boosts (it drains the energy bar),
+  **R3** switches between the chase and cockpit views. Drift (flight assist off) has no gamepad
+  button for now; hold **Shift** on a keyboard (the green marker shows where you are really going).
+  The side and up/down thrusters respond about three times faster than the first M1 build.
+- **Three ships (demo only; the D-pad belongs to devices from M2):** D-pad up / right / down (keys 1 / 2 / 3) puts you in the Kestrel (light
   fighter), the Bulwark (heavy fighter) or the Drayman (armed freighter).
 - **Tuning:** Select (F1) opens the tuning overlay and pauses. Move the sliders, fly, and press
   "Copy values" when something feels right; paste the text into your playtest report.
 - **Bug capture:** Back + Start (F12) saves a screenshot and the game state. The pause menu
   (Start / Esc) opens the folder.
 - **Free look:** hold Z (or back paddle 3, if your pad has paddles) and look around with the right
-  stick or mouse. Up/down thrust is R / F (paddles 1 / 2).
+  stick or mouse. Up/down thrust is R / F (left stick up / down on the gamepad).
 - **Mouse and keyboard** work too: the mouse steers (a small dot shows how far), WASD moves.
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**.

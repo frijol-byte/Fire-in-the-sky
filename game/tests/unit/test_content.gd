@@ -15,7 +15,7 @@ func test_the_kestrel_is_loaded_with_gdd_values() -> void:
 	assert_float(kestrel.max_speed).is_equal(180.0)
 	assert_float(kestrel.boost_max_speed).is_equal(320.0)
 	assert_float(kestrel.accel_forward()).is_equal_approx(60.0, 0.001)
-	assert_float(kestrel.accel_lateral()).is_equal_approx(35.0, 0.001)
+	assert_float(kestrel.accel_lateral()).is_equal_approx(110.0, 0.001)
 	assert_vector(kestrel.max_angular_rate_deg).is_equal(Vector3(90, 90, 150))
 
 
@@ -72,6 +72,9 @@ func test_problems_reports_bad_values() -> void:
 	assert_str(found).contains("max_speed must be above 0")
 	assert_str(found).contains("model_path")
 	assert_str(found).contains("id is empty")
+	var no_response: ShipDef = _kestrel_copy()
+	no_response.strafe_response_time = 0.0
+	assert_str(", ".join(no_response.problems())).contains("strafe_response_time")
 	var slow_boost: ShipDef = _kestrel_copy()
 	slow_boost.boost_max_speed = slow_boost.max_speed - 1.0
 	assert_str(", ".join(slow_boost.problems())).contains("boost_max_speed")

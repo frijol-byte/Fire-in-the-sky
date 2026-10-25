@@ -169,7 +169,10 @@ publish the release. Do it **after** merging the review PR:
    **Open bug report folder** button that opens it. On Windows the folder is
    `%APPDATA%\Godot\app_userdata\Fire in the Sky\bug_reports\`. Until a build has the feature,
    take a normal screenshot with **Win + Shift + S** and note what happened.
-   **Switching ships (M1):** in the flight arena press **1 / 2 / 3** (gamepad: d-pad up / right /
+   **Gamepad flying (M1):** **RT** is throttle, **LT** brakes / reverses, the **left stick** strafes
+   (left/right) and moves up/down, the **right stick** turns, **LB / RB** roll, **A** boosts, **R3**
+   switches camera. **B** does nothing for now (drift is on **Shift** on a keyboard).
+   **Switching ships (M1, demo only):** in the flight arena press **1 / 2 / 3** (gamepad: d-pad up / right /
    down) to jump into the Kestrel (light fighter), Bulwark (heavy fighter) or Drayman (armed
    freighter). You restart at the beginning of the course in the ship you picked.
    **Tuning flight feel (M1):** press **F1** (gamepad: **Select**) to open the tuning

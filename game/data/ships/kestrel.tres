@@ -44,6 +44,7 @@ boost_fov_kick = 8.0
 canopy_path = "res://assets/models/props/canopy_human_light.glb"
 paint_primary = Color(0.839, 0.863, 0.902, 1)
 paint_secondary = Color(0.133, 0.251, 0.486, 1)
+primary_weapon = &"pulse_laser"
 primary_slots = 2
 secondary_slots = 1
 device_slots = 1

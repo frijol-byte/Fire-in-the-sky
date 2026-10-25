@@ -170,8 +170,11 @@ publish the release. Do it **after** merging the review PR:
    `%APPDATA%\Godot\app_userdata\Fire in the Sky\bug_reports\`. Until a build has the feature,
    take a normal screenshot with **Win + Shift + S** and note what happened.
    **Gamepad flying (M1):** **RT** is throttle, **LT** brakes / reverses, the **left stick** strafes
-   (left/right) and moves up/down, the **right stick** turns, **LB / RB** roll, **A** boosts, **R3**
-   switches camera. **B** does nothing for now (drift is on **Shift** on a keyboard).
+   (left/right) and moves up/down, the **right stick** turns, **LB / RB** roll, **L3** (click the
+   left stick) boosts, **A** fires the main guns (hold), **X** is the second weapon (nothing to fire yet),
+   **R3** switches camera. **B** does nothing for now (drift is on **Shift** on a keyboard). In the flight
+   arena the round targets ahead of you are practice dummies: their shield / armor / hull numbers are shown
+   above them, and a destroyed one comes back after a few seconds.
    **Switching ships (M1, demo only):** in the flight arena press **1 / 2 / 3** (gamepad: d-pad up / right /
    down) to jump into the Kestrel (light fighter), Bulwark (heavy fighter) or Drayman (armed
    freighter). You restart at the beginning of the course in the ship you picked.

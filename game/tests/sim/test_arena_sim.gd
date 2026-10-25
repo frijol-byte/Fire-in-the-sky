@@ -200,6 +200,39 @@ func test_the_arena_scene_runs_with_the_player_flying_and_boosting() -> void:
 	assert_float(top_speed).is_greater(100.0)
 
 
+func test_the_arena_has_its_target_dummies_and_a_projectile_manager() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	var dummies: Node = arena.get_node("Dummies")
+	assert_int(dummies.get_child_count()).is_equal(FLIGHT_TEST.dummy_ids.size())
+	for dummy: Node in dummies.get_children():
+		assert_object(dummy).is_instanceof(TargetDummy)
+	assert_object(ProjectileManager.for_node(arena)).is_same(arena.get_node("ProjectileManager"))
+
+
+func test_the_player_shoots_the_dummy_ahead_in_the_arena() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	for child: Node in arena.ship.get_children():
+		if child is PlayerPilot:
+			child.free()
+	var first: TargetDummy = arena.get_node("Dummies").get_child(0) as TargetDummy
+	var held: ShipControls = ShipControls.new()
+	held.fire_primary = true
+	for _tick: int in 150:
+		arena.ship.controls = held
+		await get_tree().physics_frame
+	var durability: Durability = first.durability()
+	# The first dummy stands dead ahead of the start: some of its shield is gone.
+	assert_float(durability.shield + durability.armor + durability.hull).is_less(
+		first.def.shield_capacity + first.def.armor_capacity + first.def.hull_capacity
+	)
+
+
 func test_respawning_moves_the_hud_to_the_new_ship() -> void:
 	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
 	_track(arena)

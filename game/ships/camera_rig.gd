@@ -50,7 +50,7 @@ const SHAKE_SEED: int = 17
 const FALLBACK_EYE: Vector3 = Vector3(0.0, 1.0, -2.0)
 
 ## Physics layers the chase camera avoids. Layer 1 is where world geometry lives for now.
-@export_flags_3d_physics var clearance_mask: int = 1
+@export_flags_3d_physics var clearance_mask: int = PhysicsLayers.CAMERA_MASK
 
 var ship: Ship = null
 var view: View = View.CHASE

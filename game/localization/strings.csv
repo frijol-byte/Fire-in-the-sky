@@ -60,7 +60,7 @@ SHIP_DRAYMAN_NAME,Drayman
 ARENA_FLIGHT_TEST_NAME,Flight test arena
 ARENA_GATES,Gates passed: %d
 ARENA_SHIP,%s    (demo only) switch ship: %s
-ARENA_HELP,%s throttle    %s brake    %s boost    %s camera    %s pause
+ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s camera    %s pause
 ARENA_HELP_DRIFT,    %s drift
 BOOT_FLY_HINT,%s: fly the flight test arena
 HUD_SPEED,%.0f m/s
@@ -121,3 +121,10 @@ PAUSE_TITLE,Paused
 PAUSE_RESUME,Resume
 PAUSE_BUG_FOLDER,Open bug report folder
 PAUSE_QUIT,Quit
+WEAPON_PULSE_LASER_NAME,Pulse Laser
+WEAPON_AUTOCANNON_NAME,Autocannon
+DUMMY_NAME,Target dummy
+DUMMY_HEALTH,S %d  A %d  H %d
+HUD_WEAPON,%s
+HUD_OVERHEAT,OVERHEATED
+HUD_NO_ENERGY,NO ENERGY

@@ -83,6 +83,13 @@ extends ContentDef
 @export_range(0.0, 1.0) var rock_bounce: float = 0.35
 @export_range(0.0, 1.0) var rock_friction: float = 0.3
 
+@export_group("Target dummies")
+## One entry per dummy, in parallel arrays: its `DummyDef` id, where it stands and how far its
+## rail runs from there (zero: it stands still).
+@export var dummy_ids: Array[StringName] = []
+@export var dummy_origins: PackedVector3Array = []
+@export var dummy_rails: PackedVector3Array = []
+
 @export_group("Gates")
 ## One transform per ring gate: the ring lies in the local XY plane and is flown through
 ## along local Z.
@@ -126,6 +133,8 @@ func problems() -> PackedStringArray:
 		result.append("field scale range is empty")
 	if collider_pool_size < 1 or collider_radius <= 0.0:
 		result.append("collider pool needs at least one collider and a positive radius")
+	if dummy_origins.size() != dummy_ids.size() or dummy_rails.size() != dummy_ids.size():
+		result.append("dummy_ids, dummy_origins and dummy_rails must have the same length")
 	if gate_scale <= 0.0:
 		result.append("gate_scale must be positive")
 	return result

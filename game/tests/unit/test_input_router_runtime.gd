@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 ## switching and its signal; glyph text.
 
 ## Keep in step with `NO_GAMEPAD_YET` in test_input_router.gd.
-const NO_GAMEPAD_YET: PackedStringArray = ["flight_assist_off", "fire_primary", "fire_secondary"]
+const NO_GAMEPAD_YET: PackedStringArray = ["flight_assist_off"]
 
 var _saved_device: InputRouter.Device
 
@@ -111,12 +111,13 @@ func test_switching_device_emits_signal_once() -> void:
 func test_glyphs_for_gamepad() -> void:
 	assert_str(InputRouter.glyph_for(&"thrust_forward", InputRouter.Device.GAMEPAD)).is_equal("RT")
 	assert_str(InputRouter.glyph_for(&"thrust_back", InputRouter.Device.GAMEPAD)).is_equal("LT")
-	assert_str(InputRouter.glyph_for(&"boost", InputRouter.Device.GAMEPAD)).is_equal("A")
+	assert_str(InputRouter.glyph_for(&"boost", InputRouter.Device.GAMEPAD)).is_equal("L3")
 	assert_str(InputRouter.glyph_for(&"thrust_up", InputRouter.Device.GAMEPAD)).is_equal(
 		"Left stick up"
 	)
-	# No gamepad button until M2-T2 (fire) or the owner's next layout call (drift).
-	assert_str(InputRouter.glyph_for(&"fire_primary", InputRouter.Device.GAMEPAD)).is_equal("--")
+	assert_str(InputRouter.glyph_for(&"fire_primary", InputRouter.Device.GAMEPAD)).is_equal("A")
+	assert_str(InputRouter.glyph_for(&"fire_secondary", InputRouter.Device.GAMEPAD)).is_equal("X")
+	# No gamepad button until the owner's next layout call (drift).
 	assert_str(InputRouter.glyph_for(&"flight_assist_off", InputRouter.Device.GAMEPAD)).is_equal(
 		"--"
 	)

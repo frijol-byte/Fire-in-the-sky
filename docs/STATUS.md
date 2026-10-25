@@ -6,9 +6,9 @@
 ## Now
 - **Phase:** M1 — Flight: review gate ✅ clean (`docs/reviews/M1.md`); **owner playtest
   waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
-- **What to start next:** M1-F1 (new pad layout, sharper thrusters) is 👀 in PR; it is the build to
-  playtest. **M2-T1** (`docs/tasks/M2-combat-core.md`) can start now. **M2-T2** can start once M1-F1
-  is merged (it moves the fire buttons onto A / X).
+- **What to start next:** M1-F1 (new pad layout, sharper thrusters) is merged; the build to playtest
+  now also has **guns** (M2-T2: fire on **A** / **X**, boost on **L3**; shoot the target dummies in
+  the arena). **M2-T3** (targeting, lead indicator, aim assist) can start once M2-T2 is merged.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -68,6 +68,7 @@
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
 | M2-T1 | Damage model & Durability | M1 | 👀 | #20 |
+| M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | 👀 | — |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -517,6 +518,40 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
 
+- M2-T2 (2026-10-25): weapons framework, Pulse Laser, Autocannon, projectiles, hit VFX, target dummies.
+  Things the next session must know:
+  - **Layers** are in `core/physics_layers.gd` (`PhysicsLayers`: WORLD 1, SHIPS 2, TARGETS 4; masks for ship,
+    camera, projectile). Ships are on SHIPS, the dummy on TARGETS, rocks and gate frames stay on WORLD (the
+    default). The chase camera's clearance ray now sees WORLD only. Ring gate triggers listen for SHIPS.
+    New collision geometry must pick its layer from there.
+  - **Weapons are data:** `data/weapons/*.tres` (`WeaponDef`), fitted by `ShipDef.primary_weapon` (one id for
+    every `SOCKET_primary_*`; loadouts come in M5). `WeaponSystem` (child of `Ship`, `ship.weapons()`) fires while
+    `controls.fire_primary` is held; the pure per-gun rules (rate, heat, overheat) are in `WeaponMount`.
+    `fire_secondary` is read too but there are no secondary weapons yet (the group is empty): M2-T4 adds
+    them. An ion hit blocks the secondary group only.
+  - **Shots** are pooled `Projectile` records inside a `ProjectileManager` (one per scene, found through the
+    `projectile_manager` group; `flight_test.tscn` has one). Shape-cast movement, no nodes per shot, drawn by one
+    `MultiMesh` with `shaders/projectile_streak.gdshader` (turns its face to the camera) and interpolated between
+    physics ticks, so nothing needs `reset_physics_interpolation()`. Anything with a `durability()` method can
+    be shot (ships, `TargetDummy`); other bodies just stop the shot. **A new scene that fires guns needs a
+    `ProjectileManager`** (without one the guns log a warning and do nothing).
+  - **Aim:** guns converge on a point `convergence_m` ahead. `WeaponSystem.set_aim_point(lead_point)` swings them
+    towards a locked target by at most 3 degrees (`WeaponDef.gimbal_deg`); `gimbal_enabled = false` for the mouse.
+    M2-T3 should call both (nothing does yet).
+  - **Fire buttons:** A = primary, X = secondary; **boost moved to L3** (shares it with cruise drive, which has no
+    gameplay until M4). `target_nearest` is still on X: M2-T3 must give it another button (ask the owner; B is
+    reserved for drift).
+  - **Dummies:** `DummyDef` (`data/combat/dummy_*.tres`) + `ArenaDef.dummy_ids / dummy_origins / dummy_rails`
+    (rail = offset the dummy slides to and back). Set a dummy's `position` **before** adding it to the tree (a body
+    that starts at the origin shoves a ship spawned there). `TargetDummy.velocity` is there for the lead solver.
+  - **VFX/SFX:** `CombatFx` (muzzle flash, impact flash, sparks, 3D sounds, all pooled), `ShieldFx` (the shield
+    ripple, a child of every `Ship` and `TargetDummy`, driven by `Events.ship_damaged`). New WAVs are made by
+    `tools/audio/make_placeholder_audio.py`. CPUParticles amount must not change after creation (separate pools per hit kind).
+  - **Tests:** `tests/sim/combat_sim.gd` (`CombatSim`) spawns managers, dummies and walls for sims. Parameterised
+    tests need a local `ship_params()` method in the suite (`_test_parameters := FlightSim.ship_params()` is
+    silently not run; the T1 durability sim had that bug and is fixed here).
+  - Shot scenes `weapons_laser_shot`, `weapons_cannon_shot` (the arena) and `hit_effects_shot` (close-up).
+    A shot driver must not touch nodes after `ShotDirector` frees the scene (it crashed lavapipe once).
 - M2-T1 (2026-10-25): damage model and `Durability`. Things the next session must know:
   - **One entry point:** `ship.durability().apply(DamageInfo)` (`combat/durability.gd`). It returns a `DamageResult`
     (health lost per layer, `destroyed`, `ion_disabled`) for hit markers and impact VFX. Build hits with

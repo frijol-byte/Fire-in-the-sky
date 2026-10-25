@@ -24,6 +24,15 @@ func test_energy_text_is_a_percentage() -> void:
 	assert_str(FlightHud.energy_text(1.0, 0.0)).is_equal("ENERGY 0")
 
 
+func test_weapon_text_names_the_gun_and_shows_why_it_is_silent() -> void:
+	var weapon: WeaponDef = Content.weapon(&"autocannon")
+	assert_str(FlightHud.weapon_text(weapon, false, false)).is_equal("Autocannon")
+	assert_str(FlightHud.weapon_text(weapon, true, false)).is_equal("Autocannon     OVERHEATED")
+	assert_str(FlightHud.weapon_text(weapon, false, true)).is_equal("Autocannon     NO ENERGY")
+	assert_str(FlightHud.weapon_text(weapon, true, true)).contains("OVERHEATED")
+	assert_str(FlightHud.weapon_text(null, true, true)).is_empty()
+
+
 func test_hud_shows_the_bound_ships_speed_and_state() -> void:
 	var ship: Ship = auto_free(SHIP_SCENE.instantiate()) as Ship
 	ship.def = Content.ship(&"kestrel")
@@ -50,3 +59,4 @@ func test_depleted_boost_flashes_boost_empty() -> void:
 	assert_str((hud.get_node("State") as Label).text).contains("EMPTY")
 	hud._process(FlightHud.DEPLETED_SECONDS + 0.1)
 	assert_str((hud.get_node("State") as Label).text).not_contains("EMPTY")
+	assert_str((hud.get_node("Weapon") as Label).text).is_equal("Pulse Laser")

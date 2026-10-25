@@ -91,6 +91,10 @@ extends ContentDef
 ## Seconds without damage before the shield regenerates (GDD 7.1: 4 s).
 @export var shield_regen_delay: float = 4.0
 
+@export_group("Weapons")
+## `WeaponDef` id fitted to every primary hardpoint (`SOCKET_primary_*`). Loadouts come in M5.
+@export var primary_weapon: StringName = &"pulse_laser"
+
 @export_group("Look")
 ## Faction paint, set on the model's `PAINT_PRIMARY` / `PAINT_SECONDARY` parts at spawn
 ## (the defaults are the paint shader's own).
@@ -196,6 +200,8 @@ func problems() -> PackedStringArray:
 		result.append("hull_capacity must be above 0")
 	if shield_regen < 0.0 or shield_regen_delay < 0.0:
 		result.append("shield_regen and shield_regen_delay must not be negative")
+	if primary_weapon == &"":
+		result.append("primary_weapon is empty")
 	if model_path.is_empty() or not ResourceLoader.exists(model_path):
 		result.append("model_path does not exist: %s" % model_path)
 	return result

@@ -33,13 +33,31 @@ var _statuses: Dictionary[StringName, float] = {}
 ## Takes the layer sizes and shield regeneration from `def`, fills every layer and uses `table`
 ## (the default `DamageTable` from `Content` when `null`). `ship` is reported in the events.
 func configure(def: ShipDef, ship: Node = null, table: DamageTable = null) -> void:
+	configure_layers(
+		Vector3(def.shield_capacity, def.armor_capacity, def.hull_capacity),
+		def.shield_regen,
+		def.shield_regen_delay,
+		ship,
+		table
+	)
+
+
+## Same as `configure` for things that are not ships (target dummies): `capacities` is
+## (shield, armor, hull).
+func configure_layers(
+	capacities: Vector3,
+	regen: float,
+	regen_delay: float,
+	ship: Node = null,
+	table: DamageTable = null
+) -> void:
 	_ship = ship
 	_table = table if table != null else Content.get_def(&"damage_table", &"default") as DamageTable
-	shield_capacity = def.shield_capacity
-	armor_capacity = def.armor_capacity
-	hull_capacity = def.hull_capacity
-	shield_regen_per_second = def.shield_regen
-	shield_regen_delay = def.shield_regen_delay
+	shield_capacity = capacities.x
+	armor_capacity = capacities.y
+	hull_capacity = capacities.z
+	shield_regen_per_second = regen
+	shield_regen_delay = regen_delay
 	restore()
 
 

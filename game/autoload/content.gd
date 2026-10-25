@@ -49,6 +49,16 @@ func damage_table(id: StringName = &"default") -> DamageTable:
 	return get_def(&"damage_table", id) as DamageTable
 
 
+## Returns the weapon def with `id`, or `null`.
+func weapon(id: StringName) -> WeaponDef:
+	return get_def(&"weapon", id) as WeaponDef
+
+
+## Returns the target dummy def with `id`, or `null`.
+func dummy(id: StringName) -> DummyDef:
+	return get_def(&"dummy", id) as DummyDef
+
+
 ## Returns the ids of every def of `kind`, sorted.
 func ids(kind: StringName) -> Array[StringName]:
 	var by_id: Dictionary = _defs.get(kind, {})

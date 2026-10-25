@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="WeaponDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/weapon_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"pulse_laser"
+display_name_key = "WEAPON_PULSE_LASER_NAME"
+slot = &"primary"
+damage_type = 0
+damage = 8.0
+fire_rate = 4.0
+projectile_speed = 520.0
+range_m = 900.0
+spread_deg = 0.0
+projectile_radius = 0.35
+convergence_m = 350.0
+gimbal_deg = 3.0
+stagger = true
+energy_cost = 2.0
+heat_per_shot = 0.0
+heat_capacity = 100.0
+cool_rate = 20.0
+overheat_resume_fraction = 0.4
+tracer_color = Color(1.0, 0.25, 0.18, 1)
+tracer_length = 12.0
+tracer_width = 0.45
+muzzle_flash_size = 1.8
+impact_color = Color(1.0, 0.55, 0.35, 1)
+fire_sfx = "res://assets/audio/sfx/laser_fire.wav"
+fire_sfx_db = -8.0

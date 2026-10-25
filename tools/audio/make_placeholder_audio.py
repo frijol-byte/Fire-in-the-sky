@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Generates the placeholder flight sounds (engine hum, boost whoosh, dust hiss) as WAV files.
+"""Generates the placeholder flight and combat sounds as WAV files: engine hum, boost whoosh,
+dust hiss, the two weapons' shots, hit sounds for shield, armor, hull and rock, and the overheat vent.
 
 Everything is synthesised from maths and a seeded random generator, so the files are original
 work released as CC0 and a rebuild is byte-identical. Python standard library only.
@@ -7,8 +8,8 @@ work released as CC0 and a rebuild is byte-identical. Python standard library on
   python3 tools/audio/make_placeholder_audio.py            # writes game/assets/audio/sfx/*.wav
   python3 tools/audio/make_placeholder_audio.py --check    # fails if the committed files differ
 
-The hum and the hiss are seamless loops (the game switches looping on in code); the whoosh is a
-one-shot. Replace them with real recordings in the audio pass (M8).
+The hum and the hiss are seamless loops (the game switches looping on in code); everything else
+is a one-shot. Replace them with real recordings in the audio pass (M8).
 """
 
 from __future__ import annotations
@@ -111,10 +112,119 @@ def boost_whoosh() -> list[float]:
     return _normalise(out, 0.9)
 
 
+def _decay(i: int, seconds: float, rate: float) -> float:
+    """Exponential decay envelope at sample `i`, falling by `rate` e-folds per second."""
+    return math.exp(-rate * i / RATE) if i / RATE <= seconds else 0.0
+
+
+def laser_fire() -> list[float]:
+    """A zapping pulse: a tone that falls from 2.4 kHz to 260 Hz in a tenth of a second, with a
+    bright second harmonic and a tiny noise click at the start."""
+    count = int(RATE * 0.22)
+    rng = random.Random(4004)
+    out, phase = [], 0.0
+    for i in range(count):
+        t = i / RATE
+        freq = 260.0 + 2140.0 * math.exp(-t * 26.0)
+        phase += 2.0 * math.pi * freq / RATE
+        tone = math.sin(phase) + 0.45 * math.sin(2.0 * phase + 0.6)
+        attack = min(i / 60.0, 1.0)
+        click = rng.uniform(-1.0, 1.0) * math.exp(-t * 400.0) * 0.5
+        out.append((tone * attack * math.exp(-t * 15.0)) + click)
+    return _normalise(out, 0.85)
+
+
+def autocannon_fire() -> list[float]:
+    """A short percussive bang: a burst of mid noise, a thump at 85 Hz and a ringing crack."""
+    count = int(RATE * 0.14)
+    rng = random.Random(5005)
+    noise = _lowpass(_noise(rng, count), 3200.0)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        thump = math.sin(2.0 * math.pi * (85.0 - 30.0 * t * 6.0) * t) * math.exp(-t * 38.0)
+        crack = noise[i] * math.exp(-t * 55.0) * 1.6
+        out.append(thump * 0.9 + crack)
+    return _normalise(out, 0.9)
+
+
+def hit_shield() -> list[float]:
+    """A bright energy shimmer: three high partials with a fast tremolo, falling away."""
+    count = int(RATE * 0.38)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        value = 0.0
+        for freq, amp in ((820.0, 1.0), (1230.0, 0.7), (1970.0, 0.5), (3100.0, 0.25)):
+            value += amp * math.sin(2.0 * math.pi * freq * t * (1.0 + 0.04 * math.sin(30.0 * t)))
+        tremolo = 0.65 + 0.35 * math.sin(2.0 * math.pi * 38.0 * t)
+        out.append(value * tremolo * min(i / 40.0, 1.0) * math.exp(-t * 9.0))
+    return _normalise(out, 0.8)
+
+
+def hit_armor() -> list[float]:
+    """A metal clank: inharmonic partials that die quickly, over a noise click."""
+    count = int(RATE * 0.26)
+    rng = random.Random(6006)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        value = 0.0
+        for freq, amp, rate in ((520.0, 1.0, 22.0), (1130.0, 0.8, 30.0), (1790.0, 0.6, 38.0), (2430.0, 0.4, 50.0)):
+            value += amp * math.sin(2.0 * math.pi * freq * t) * math.exp(-t * rate)
+        value += rng.uniform(-1.0, 1.0) * math.exp(-t * 220.0) * 1.2
+        out.append(value)
+    return _normalise(out, 0.85)
+
+
+def hit_hull() -> list[float]:
+    """A heavy thud: a sine that drops from 140 to 50 Hz and a crunch of low-passed noise."""
+    count = int(RATE * 0.3)
+    rng = random.Random(7007)
+    noise = _lowpass(_noise(rng, count), 1400.0)
+    out, phase = [], 0.0
+    for i in range(count):
+        t = i / RATE
+        phase += 2.0 * math.pi * (50.0 + 90.0 * math.exp(-t * 28.0)) / RATE
+        out.append(math.sin(phase) * math.exp(-t * 14.0) + noise[i] * math.exp(-t * 30.0) * 1.3)
+    return _normalise(out, 0.9)
+
+
+def hit_rock() -> list[float]:
+    """A dull crumbling tap: noise through a low band, and a short low tone."""
+    count = int(RATE * 0.2)
+    rng = random.Random(8008)
+    noise = _lowpass(_lowpass(_noise(rng, count), 900.0), 900.0)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        out.append(noise[i] * math.exp(-t * 26.0) * 3.0 + math.sin(2.0 * math.pi * 150.0 * t) * math.exp(-t * 40.0))
+    return _normalise(out, 0.8)
+
+
+def weapon_overheat() -> list[float]:
+    """Steam venting: a hissing noise that swells and fades over about 0.6 s."""
+    count = int(RATE * 0.6)
+    rng = random.Random(9009)
+    hiss = _highpass(_lowpass(_noise(rng, count), 6000.0), 1500.0)
+    out = []
+    for i in range(count):
+        t = i / count
+        out.append(hiss[i] * math.sin(math.pi * min(t / 0.25, 1.0) * 0.5) ** 2 * math.exp(-3.0 * t))
+    return _normalise(out, 0.7)
+
+
 FILES = {
     "engine_hum.wav": engine_hum,
     "dust_hiss.wav": dust_hiss,
     "boost_whoosh.wav": boost_whoosh,
+    "laser_fire.wav": laser_fire,
+    "autocannon_fire.wav": autocannon_fire,
+    "hit_shield.wav": hit_shield,
+    "hit_armor.wav": hit_armor,
+    "hit_hull.wav": hit_hull,
+    "hit_rock.wav": hit_rock,
+    "weapon_overheat.wav": weapon_overheat,
 }
 
 

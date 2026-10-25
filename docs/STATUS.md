@@ -68,7 +68,7 @@
 | Card | Title | Depends on | State | PR |
 |---|---|---|---|---|
 | M2-T1 | Damage model & Durability | M1 | 👀 | #20 |
-| M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | 👀 | — |
+| M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | 👀 | #21 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

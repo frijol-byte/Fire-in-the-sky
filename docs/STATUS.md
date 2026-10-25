@@ -70,7 +70,7 @@
 |---|---|---|---|---|
 | M2-T1 | Damage model & Durability | M1 | ✅ | #20 |
 | M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
-| M2-T3 | Targeting, lead indicator & aim assist | T2 | 👀 | _PR_ |
+| M2-T3 | Targeting, lead indicator & aim assist | T2 | 👀 | #22 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

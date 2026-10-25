@@ -126,7 +126,7 @@ virtual-stick layout. Everything is rebindable.
 | B | Unbound for now (flight assist off / drift keeps its action and the `Shift` key; the owner will give it a gamepad button or trigger later) |
 | X | Fire secondary weapon (hold to lock missiles) |
 | Y | Target: tap = nearest hostile (cycles to the next one on a repeat tap), double-tap = nearest of any side. Also interact / dock / pick up (context; no gameplay before M4, so the two share the button for now) |
-| D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target (from M2; in the flight test arena the D-pad / keys 1-2-3 switch ships, a temporary demo stand-in) |
+| D-pad ↑/→/↓/← | Devices 1–3 (↑ = Countermeasure Flares), cycle subsystem target (M7). The flight test arena's ship switcher is on the keys F2 / F3 / F4 (a temporary demo stand-in) |
 | L3 | Boost (hold). Cruise drive (toward the selected destination) shares it until M4, when it gets its own input |
 | R3 | Camera: chase ↔ cockpit |
 | Paddle 4 / `B` (hold) | Look at target: the camera keeps the selected target in view while the ship keeps flying |
@@ -224,7 +224,7 @@ ahead, so their shots cross on the reticle.
 - **Incoming-missile warning:** while a homing missile is steering at the player, the HUD shows a flashing
   MISSILE INCOMING banner with the distance, a marker on the missile (an arrow on the screen edge if it is out
   of view) and an alarm that beeps faster the closer it is. A missile fooled by a flare stops counting.
-- **Countermeasure Flares** (device slot 1; keys 1-3 / D-pad pick the slot): throws 4 flares, 8 s cooldown, no
+- **Countermeasure Flares** (device slot 1: key **1** or D-pad up; slots 2 and 3 are key 2 / D-pad right and key 3 / D-pad down): throws 4 flares, 8 s cooldown, no
   energy. Every missile that is hunting the ship and within 700 m is rolled **once** per use: 65% of them
   chase a flare instead (a flare burns for 4 s; when it goes out, or the target is destroyed, the missile
   flies on unguided). Missiles launched after the flares are out are not helped by them. An ion hit disables

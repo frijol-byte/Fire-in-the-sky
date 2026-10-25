@@ -185,3 +185,22 @@ func test_splash_is_full_at_the_centre_less_at_the_edge_and_nothing_beyond() -> 
 	assert_float(MissileGuidance.splash_amount(60.0, 16.0, 0.35, 8.0)).is_equal_approx(40.5, 0.0001)
 	assert_float(MissileGuidance.splash_amount(60.0, 16.0, 0.35, 16.01)).is_equal(0.0)
 	assert_float(MissileGuidance.splash_amount(60.0, 0.0, 0.35, 0.0)).is_equal(0.0)
+
+
+func test_the_seeker_sees_a_cone_around_the_nose() -> void:
+	var cone: float = deg_to_rad(110.0)
+	(
+		assert_bool(MissileGuidance.in_seeker_view(Vector3.FORWARD, Vector3(0, 0, -100), cone))
+		. is_true()
+	)
+	# 90 degrees off to the side is still in view; straight behind is not.
+	assert_bool(MissileGuidance.in_seeker_view(Vector3.FORWARD, Vector3(100, 0, 0), cone)).is_true()
+	(
+		assert_bool(MissileGuidance.in_seeker_view(Vector3.FORWARD, Vector3(0, 0, 100), cone))
+		. is_false()
+	)
+	# 120 degrees round: just out of view.
+	var behind: Vector3 = Vector3.FORWARD.rotated(Vector3.UP, deg_to_rad(120.0)) * 100.0
+	assert_bool(MissileGuidance.in_seeker_view(Vector3.FORWARD, behind, cone)).is_false()
+	# Something on top of the missile is always seen.
+	assert_bool(MissileGuidance.in_seeker_view(Vector3.FORWARD, Vector3.ZERO, cone)).is_true()

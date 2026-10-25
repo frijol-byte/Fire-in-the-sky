@@ -64,7 +64,7 @@ ARENA_SHIP,%s    (demo only) switch ship: %s
 ARENA_HELP,%s throttle    %s brake    %s boost    %s fire    %s camera    %s pause
 ARENA_HELP_TARGET,%s target (tap / double-tap)    %s look at target
 ARENA_HELP_DRIFT,    %s drift
-ARENA_HELP_SECONDARY,"%s secondary (hold to lock, release to launch)    %s flares"
+ARENA_HELP_SECONDARY,"%s secondary (hold to lock, release to launch)    flares: %s"
 BOOT_FLY_HINT,%s: fly the flight test arena
 HUD_SPEED,%.0f m/s
 HUD_FA_ON,FA ON

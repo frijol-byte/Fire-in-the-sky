@@ -34,8 +34,8 @@ enum Effect {
 ## Colour of a flare (values above 1 glow).
 @export var color: Color = Color(1.0, 0.85, 0.5)
 ## Length and width of a flare's streak, in metres.
-@export var streak_length: float = 5.0
-@export var streak_width: float = 1.6
+@export var streak_length: float = 1.6
+@export var streak_width: float = 0.45
 ## Diameter of the flash where the flares leave, in metres.
 @export var flash_size: float = 5.0
 ## Sound of a use (a path under `assets/audio/sfx/`).

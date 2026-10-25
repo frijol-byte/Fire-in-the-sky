@@ -32,25 +32,25 @@ move_camera = false
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("4_def")
 label = "5_flight"
-frame = 70
+frame = 72
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_5"]
 script = ExtResource("4_def")
 label = "6_closing"
-frame = 80
+frame = 84
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_6"]
 script = ExtResource("4_def")
 label = "7_blast"
-frame = 91
+frame = 92
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_7"]
 script = ExtResource("4_def")
 label = "8_aftermath"
-frame = 110
+frame = 115
 move_camera = false
 
 [node name="MissilesShot" type="Node3D"]

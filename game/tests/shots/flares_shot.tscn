@@ -8,43 +8,43 @@
 [sub_resource type="Resource" id="Resource_0"]
 script = ExtResource("4_def")
 label = "1_launched"
-frame = 30
+frame = 14
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_1"]
 script = ExtResource("4_def")
 label = "2_warning"
-frame = 60
+frame = 44
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("4_def")
 label = "3_closing"
-frame = 90
+frame = 60
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_3"]
 script = ExtResource("4_def")
 label = "4_flares"
-frame = 104
+frame = 71
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("4_def")
 label = "5_decoyed"
-frame = 112
+frame = 84
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_5"]
 script = ExtResource("4_def")
 label = "6_blast"
-frame = 122
+frame = 98
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_6"]
 script = ExtResource("4_def")
 label = "7_clear"
-frame = 150
+frame = 118
 move_camera = false
 
 [node name="FlaresShot" type="Node3D"]

@@ -55,6 +55,22 @@ func test_the_alarm_speeds_up_as_the_missile_closes() -> void:
 		previous = interval
 
 
+func test_the_arrow_of_a_missile_out_of_view_sits_on_the_screen_edge() -> void:
+	var view: Vector2 = Vector2(1920.0, 1080.0)
+	var margin: float = MissileWarning.EDGE_MARGIN
+	# To the right of the centre: pinned to the right edge at the same height.
+	var right: Vector2 = MissileWarning.pinned_position(Vector2(1200.0, 540.0), view, margin)
+	assert_float(right.x).is_equal_approx(view.x - margin, 0.01)
+	assert_float(right.y).is_equal_approx(540.0, 0.01)
+	# A missile right behind the ship projects onto the centre: the arrow points down.
+	var behind: Vector2 = MissileWarning.pinned_position(view * 0.5, view, margin)
+	assert_float(behind.x).is_equal_approx(view.x * 0.5, 0.01)
+	assert_float(behind.y).is_equal_approx(view.y - margin, 0.01)
+	# Up and to the left: on the top edge or the left edge, never inside the screen.
+	var corner: Vector2 = MissileWarning.pinned_position(Vector2(300.0, 100.0), view, margin)
+	assert_bool(is_equal_approx(corner.x, margin) or is_equal_approx(corner.y, margin)).is_true()
+
+
 func test_the_banner_flashes() -> void:
 	var lit: int = 0
 	var samples: int = 300

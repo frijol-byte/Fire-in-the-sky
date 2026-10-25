@@ -8,7 +8,7 @@ extends Control
 
 const EDGE_MARGIN: float = 56.0
 const LINE_WIDTH: float = 3.0
-const BANNER_TOP: float = 150.0
+const BANNER_TOP: float = 345.0
 const BANNER_FONT_SIZE: int = 40
 const DISTANCE_FONT_SIZE: int = 24
 const MARKER_SIZE: float = 16.0
@@ -123,8 +123,9 @@ func _draw() -> void:
 	if marker.on_screen:
 		_draw_marker(marker.position, color)
 	else:
+		var pinned: Vector2 = pinned_position(marker.position, size, EDGE_MARGIN)
 		var points: PackedVector2Array = HudMath.arrow_points(
-			marker.position, marker.position - size * 0.5, ARROW_SIZE
+			pinned, pinned - size * 0.5, ARROW_SIZE
 		)
 		draw_colored_polygon(points, color)
 
@@ -162,6 +163,19 @@ func _scan() -> void:
 			_time_to_impact = arrival
 	if _nearest != null:
 		_distance = _nearest.position.distance_to(ship.global_position)
+
+
+## Where the arrow for a missile that is out of view sits: on the screen edge (inset by `margin`),
+## in the direction of `position` from the centre. A missile right behind the ship, which projects
+## onto the centre, points straight down.
+static func pinned_position(position: Vector2, view_size: Vector2, margin: float) -> Vector2:
+	var center: Vector2 = view_size * 0.5
+	var offset: Vector2 = position - center
+	if offset.length() < 8.0:
+		offset = Vector2.DOWN
+	return HudMath.clamp_to_edge(
+		center + offset.normalized() * view_size.length(), view_size, margin
+	)
 
 
 ## Seconds until a missile at `missile_pos` moving at `missile_vel` reaches a ship at `ship_pos`

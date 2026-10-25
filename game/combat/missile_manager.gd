@@ -40,6 +40,8 @@ const STREAKS_PER_MISSILE: int = 2
 const EXHAUST_LENGTH_FACTOR: float = 2.6
 const EXHAUST_WIDTH_FACTOR: float = 0.5
 const EXHAUST_COLOR_FACTOR: float = 0.45
+## Flares leave sideways and a little backwards: this fraction of the eject speed along the ship's tail.
+const FLARE_BACKWARD_FRACTION: float = 0.15
 ## A round that self-destructs or goes off at a flare makes a blast this much of its radius.
 const HARMLESS_BLAST_FACTOR: float = 0.3
 
@@ -171,7 +173,7 @@ func deploy_flares(source: Node3D, def: DeviceDef) -> int:
 	for index: int in def.flare_count:
 		var angle: float = TAU * (float(index) + _rng.randf()) / float(def.flare_count)
 		var out: Vector3 = (basis.x * cos(angle) + basis.y * sin(angle)) * def.eject_speed
-		var velocity: Vector3 = drift + out + basis.z * def.eject_speed * 0.5
+		var velocity: Vector3 = drift + out + basis.z * def.eject_speed * FLARE_BACKWARD_FRACTION
 		var flare: Flare = _take_flare()
 		_flare_serial += 1
 		flare.start(def, source, source.global_position + basis.z * 4.0, velocity, _flare_serial)

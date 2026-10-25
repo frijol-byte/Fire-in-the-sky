@@ -39,6 +39,11 @@ extends ContentDef
 @export var fa_linear_gain: float = 6.0
 ## Same for the turn rate error.
 @export var fa_angular_gain: float = 12.0
+## Design target (M1-F1): with flight assist on, full strafe or full vertical thrust reaches 90% of
+## its speed limit within this many seconds, and letting go stops again (down to 10%) within the
+## same time, with no overshoot. It is not read by the flight model: the thrust values above make
+## it true and `tests/sim/test_flight_lateral.gd` checks it.
+@export var strafe_response_time: float = 1.0
 
 @export_group("Energy and boost")
 @export var energy_capacity: float = 100.0
@@ -144,6 +149,7 @@ func problems() -> PackedStringArray:
 		"max_vertical_speed": max_vertical_speed,
 		"fa_linear_gain": fa_linear_gain,
 		"fa_angular_gain": fa_angular_gain,
+		"strafe_response_time": strafe_response_time,
 		"energy_capacity": energy_capacity,
 		"boost_max_speed": boost_max_speed,
 		"boost_thrust_multiplier": boost_thrust_multiplier,

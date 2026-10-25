@@ -93,9 +93,15 @@ Everspace-style Newtonian-lite. **The player and AI use exactly the same flight 
 
 | Ship class | Max speed (FA) | Boost max | Fwd accel | Strafe accel | Pitch/yaw | Roll |
 |---|---|---|---|---|---|---|
-| Light fighter | 180 m/s | 320 m/s | 60 m/s² | 35 m/s² | 90°/s | 150°/s |
-| Heavy fighter | 140 m/s | 260 m/s | 45 m/s² | 28 m/s² | 65°/s | 110°/s |
-| Armed freighter | 110 m/s | 200 m/s | 30 m/s² | 18 m/s² | 40°/s | 70°/s |
+| Light fighter | 180 m/s | 320 m/s | 60 m/s² | 110 m/s² | 90°/s | 150°/s |
+| Heavy fighter | 140 m/s | 260 m/s | 45 m/s² | 78 m/s² | 65°/s | 110°/s |
+| Armed freighter | 110 m/s | 200 m/s | 30 m/s² | 54 m/s² | 40°/s | 70°/s |
+
+Strafe accel covers the side and up/down thrusters (M1-F1: about 3x the first values, so they
+respond quickly and stop crisply instead of floating). Each ship's `strafe_response_time` is the
+checked target: full strafe or vertical thrust reaches 90% of its speed limit, and stops again,
+within 0.85 s (light), 0.95 s (heavy) or 1.05 s (freighter). Turning, not thrusters, stays the main
+way to change direction.
 
 Scale: 1 unit = 1 metre. Fighters are 12–20 m long, freighters ~35 m, carriers ~400 m,
 stations 600–1500 m.
@@ -111,16 +117,17 @@ virtual-stick layout. Everything is rebindable.
 
 | Input (Xbox naming) | Action |
 |---|---|
-| Left stick | Thrust forward/back (Y), strafe left/right (X) |
+| RT (analog) | Throttle forward |
+| LT (analog) | Brake / reverse (RT and LT held together cancel) |
+| Left stick | Strafe left/right (X), thrust up/down (Y, stick up = ship up) |
 | Right stick | Pitch / yaw (aim) |
 | LB / RB | Roll left / right |
-| RT | Fire primary weapons |
-| LT | Fire secondary (hold to lock missiles) |
-| A | Boost (hold) |
-| B | Flight assist off (hold to drift) |
+| A | Boost (hold). Moves to L3 in M2-T2, when A becomes fire primary |
+| B | Unbound for now (flight assist off / drift keeps its action and the `Shift` key; the owner will give it a gamepad button or trigger later) |
 | X | Target: nearest hostile in reticle; double-tap = nearest overall |
+| Fire primary / secondary | Mouse buttons only until **M2-T2**, which puts them on **A / X** on the gamepad (secondary: hold to lock missiles) |
 | Y | Interact / dock / pick up (context) |
-| D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target |
+| D-pad ↑/→/↓/← | Devices 1–3, cycle subsystem target (from M2; in the flight test arena the D-pad / keys 1-2-3 switch ships, a temporary demo stand-in) |
 | L3 | Cruise drive (toward selected destination) |
 | R3 | Camera: chase ↔ cockpit |
 | Paddle 3 / `Z` (hold) | Free look: the right stick turns the camera while the ship keeps flying (settings flag, off by default) |

@@ -4,9 +4,9 @@ extends GdUnitTestSuite
 
 ## GDD 4.4 starting values: max speed, boost max, forward accel, strafe accel, pitch/yaw, roll.
 const GDD: Dictionary[StringName, Array] = {
-	&"kestrel": [180.0, 320.0, 60.0, 35.0, 90.0, 150.0],
-	&"bulwark": [140.0, 260.0, 45.0, 28.0, 65.0, 110.0],
-	&"drayman": [110.0, 200.0, 30.0, 18.0, 40.0, 70.0],
+	&"kestrel": [180.0, 320.0, 60.0, 110.0, 90.0, 150.0],
+	&"bulwark": [140.0, 260.0, 45.0, 78.0, 65.0, 110.0],
+	&"drayman": [110.0, 200.0, 30.0, 54.0, 40.0, 70.0],
 }
 ## Length range in metres per ship (GDD 4.4: fighters 12-20 m, freighters ~35 m).
 const LENGTH: Dictionary[StringName, Vector2] = {

@@ -13,14 +13,25 @@ const COCKPIT_START: int = 420
 const CHASE_AGAIN: int = 520
 const TURN_START: int = 560
 
+## Pretend the player last used a gamepad, so the help line shows the pad's glyphs.
+@export var gamepad_glyphs: bool = false
+
 var _tick: int = 0
+var _saved_device: InputRouter.Device = InputRouter.last_device
 var _pilot_removed: bool = false
 
 @onready var arena: FlightTest = $"../Arena"
 
 
+func _ready() -> void:
+	if gamepad_glyphs:
+		InputRouter.last_device = InputRouter.Device.GAMEPAD
+		Events.input_device_changed.emit(InputRouter.Device.GAMEPAD)
+
+
 func _exit_tree() -> void:
 	Settings.values.clear()
+	InputRouter.last_device = _saved_device
 
 
 func _physics_process(_delta: float) -> void:

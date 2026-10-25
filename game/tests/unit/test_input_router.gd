@@ -5,6 +5,10 @@ extends GdUnitTestSuite
 ## Pitch/yaw are steered by the mouse position (virtual joystick), which `InputRouter` reads
 ## directly (see `InputRouter.mouse_stick`), so they have no keyboard/mouse action event.
 const MOUSE_STEERED: PackedStringArray = ["pitch_up", "pitch_down", "yaw_left", "yaw_right"]
+## Actions with no gamepad button on purpose (M1-F1 moved RT/LT to throttle and brake):
+## - flight_assist_off: the owner will give it a new button or trigger later (keyboard: Shift).
+## - fire_primary / fire_secondary: M2-T2 binds them to A / X and removes these two exemptions.
+const NO_GAMEPAD_YET: PackedStringArray = ["flight_assist_off", "fire_primary", "fire_secondary"]
 
 
 func test_actions_list_is_not_empty() -> void:
@@ -22,6 +26,8 @@ func test_every_action_exists_in_input_map() -> void:
 
 func test_every_action_has_a_gamepad_event() -> void:
 	for action: String in InputRouter.ACTIONS:
+		if action in NO_GAMEPAD_YET:
+			continue
 		var has_pad: bool = false
 		for event: InputEvent in InputMap.action_get_events(action):
 			if event is InputEventJoypadButton or event is InputEventJoypadMotion:
@@ -57,3 +63,45 @@ func test_actions_have_no_duplicates() -> void:
 			. is_false()
 		)
 		seen[action] = true
+
+
+func test_exempt_actions_really_have_no_gamepad_event() -> void:
+	# Keeps the exemption list honest: remove an action from it once it gets a button.
+	for action: String in NO_GAMEPAD_YET:
+		for event: InputEvent in InputMap.action_get_events(action):
+			(
+				assert_bool(event is InputEventJoypadButton or event is InputEventJoypadMotion)
+				. override_failure_message("'%s' has a gamepad event; drop its exemption" % action)
+				. is_false()
+			)
+
+
+func _pad_axis_of(action: String) -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventJoypadMotion:
+			var motion: InputEventJoypadMotion = event
+			result.append(Vector2(motion.axis, motion.axis_value))
+	return result
+
+
+func test_gamepad_flight_layout() -> void:
+	# (axis index, direction): RT = 5, LT = 4, left stick X = 0, left stick Y = 1.
+	assert_array(_pad_axis_of("thrust_forward")).is_equal([Vector2(JOY_AXIS_TRIGGER_RIGHT, 1.0)])
+	assert_array(_pad_axis_of("thrust_back")).is_equal([Vector2(JOY_AXIS_TRIGGER_LEFT, 1.0)])
+	assert_array(_pad_axis_of("thrust_up")).is_equal([Vector2(JOY_AXIS_LEFT_Y, -1.0)])
+	assert_array(_pad_axis_of("thrust_down")).is_equal([Vector2(JOY_AXIS_LEFT_Y, 1.0)])
+	assert_array(_pad_axis_of("strafe_left")).is_equal([Vector2(JOY_AXIS_LEFT_X, -1.0)])
+	assert_array(_pad_axis_of("strafe_right")).is_equal([Vector2(JOY_AXIS_LEFT_X, 1.0)])
+
+
+func test_paddles_and_b_are_unbound_on_the_gamepad() -> void:
+	for action: String in InputRouter.ACTIONS:
+		for event: InputEvent in InputMap.action_get_events(action):
+			if event is InputEventJoypadButton:
+				var index: int = (event as InputEventJoypadButton).button_index
+				(
+					assert_bool(index in [JOY_BUTTON_B, JOY_BUTTON_PADDLE1, JOY_BUTTON_PADDLE2])
+					. override_failure_message("'%s' is on a button M1-F1 freed" % action)
+					. is_false()
+				)

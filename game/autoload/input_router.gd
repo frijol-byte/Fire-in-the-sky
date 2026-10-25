@@ -135,13 +135,15 @@ func build_controls() -> ShipControls:
 	var exponent: float = float(Settings.get_value(SETTING_CURVE_EXPONENT, DEFAULT_CURVE_EXPONENT))
 	var invert_y: bool = bool(Settings.get_value(SETTING_INVERT_Y, DEFAULT_INVERT_Y))
 
+	# Throttle is one axis (gamepad: RT minus LT, so both held cancel). The left stick is strafe
+	# (X) and up/down (Y), one radial stick.
+	var throttle: float = shape_axis(_axis("thrust_back", "thrust_forward"), deadzone, exponent)
 	var move: Vector2 = shape_stick(
-		Vector2(_axis("strafe_left", "strafe_right"), _axis("thrust_back", "thrust_forward")),
+		Vector2(_axis("strafe_left", "strafe_right"), _axis("thrust_down", "thrust_up")),
 		deadzone,
 		exponent
 	)
-	var vertical: float = shape_axis(_axis("thrust_down", "thrust_up"), deadzone, exponent)
-	c.thrust = Vector3(move.x, vertical, move.y)
+	c.thrust = Vector3(move.x, move.y, throttle)
 
 	var look: Vector2 = Vector2.ZERO if free_look_active() else look_input()
 	var roll: float = shape_axis(_axis("roll_left", "roll_right"), deadzone, exponent)
@@ -252,7 +254,7 @@ static func shape_stick(stick: Vector2, deadzone: float, exponent: float) -> Vec
 	return shaped.clamp(-Vector2.ONE, Vector2.ONE)
 
 
-## Deadzone and response curve for a single axis (vertical thrust, roll), clamped to -1..1.
+## Deadzone and response curve for a single axis (throttle, roll), clamped to -1..1.
 static func shape_axis(value: float, deadzone: float, exponent: float) -> float:
 	return shape_stick(Vector2(value, 0.0), deadzone, exponent).x
 

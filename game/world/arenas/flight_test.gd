@@ -6,7 +6,8 @@ extends Node3D
 ## flight sounds.
 ##
 ## The ship is spawned by `spawn_player()`. The ship switcher (device slots 1-3: keys 1/2/3 or the
-## D-pad) calls it again with the arena's `selectable_ship_ids`.
+## D-pad) calls it again with the arena's `selectable_ship_ids`. It is a demo-only stand-in: the
+## D-pad belongs to devices from M2.
 ## It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
 ## menu (Esc / Start), like every flight scene (M1-T6).
 
@@ -186,9 +187,14 @@ func _update_help() -> void:
 	_help.text = (
 		tr("ARENA_HELP")
 		% [
+			InputRouter.glyph_for(&"thrust_forward"),
+			InputRouter.glyph_for(&"thrust_back"),
 			InputRouter.glyph_for(&"boost"),
-			InputRouter.glyph_for(&"flight_assist_off"),
 			InputRouter.glyph_for(&"camera_toggle"),
 			InputRouter.glyph_for(&"pause"),
 		]
 	)
+	# The drift button is optional: the gamepad has none for now (see GDD 5).
+	var drift: String = InputRouter.glyph_for(&"flight_assist_off")
+	if drift != tr("GLYPH_UNBOUND"):
+		_help.text += tr("ARENA_HELP_DRIFT") % drift

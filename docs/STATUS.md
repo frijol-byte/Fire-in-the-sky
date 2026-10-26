@@ -85,7 +85,7 @@
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
 | M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
 | M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | #25 |
-| M2-T7 | Combat HUD, feedback & encounter test | T2–T6 | 👀 | (this PR) |
+| M2-T7 | Combat HUD, feedback & encounter test | T2–T6 | 👀 | #26 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

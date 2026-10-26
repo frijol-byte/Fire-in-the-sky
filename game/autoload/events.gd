@@ -33,3 +33,7 @@ signal loot_collected(ship: Node, drop: LootDrop)
 
 ## Emitted by `GameState` whenever the wallet changes (credits or materials).
 signal wallet_changed
+
+## Emitted by `AIPilot` when it changes behavior. `behavior` is an `AIUtility.Behavior` value. Radio
+## barks hook in here.
+signal ai_behavior_changed(ship: Node, behavior: int)

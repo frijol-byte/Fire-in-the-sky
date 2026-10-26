@@ -170,3 +170,54 @@ DEATH_RESPAWN,Respawn at the start
 MATERIAL_SCRAP_METAL,Scrap %d
 MATERIAL_COOLANT,Coolant %d
 MATERIAL_CIRCUITRY,Circuitry %d
+SHIP_PIRATE_FIGHTER_NAME,Cinder Raider
+SHIP_PIRATE_INTERCEPTOR_NAME,Cinder Dagger
+ARENA_COMBAT_TEST_NAME,Combat test arena
+HUD_LOW_SHIELD,LOW SHIELD
+HUD_KILL,DESTROYED: %s
+COMBAT_WAVE,Wave %d of %d    Pirates: %d
+COMBAT_WAVE_COUNTDOWN,next in %d s
+COMBAT_WAVE_IDLE,No wave running (F7 to pick one)
+COMBAT_GET_READY,GET READY
+COMBAT_BANNER_WAVE,WAVE %d of %d: %d pirate(s)
+COMBAT_BANNER_CLEARED,WAVE %d CLEARED
+COMBAT_BANNER_COMPLETE,ALL WAVES CLEARED
+COMBAT_HELP,"%s wave menu (pick a wave, restart, skip)"
+WAVEMENU_TITLE,Wave test
+WAVEMENU_WAVE,Wave %d (%d pirate(s))
+WAVEMENU_RESTART,Restart this wave
+WAVEMENU_NEXT,Skip to the next wave
+WAVEMENU_CLEAR,Send the pirates away
+WAVEMENU_SLOWMO,Slow-motion on the last kill
+WAVEMENU_CLOSE,Close
+CALLSIGN_1,Ashjaw
+CALLSIGN_2,Two-Knives
+CALLSIGN_3,Rattle
+CALLSIGN_4,Slag
+CALLSIGN_5,Mother Hen
+CALLSIGN_6,Cutter
+BARK_PURSUE_1,Got you on my scope.
+BARK_PURSUE_2,Coming in hot.
+BARK_PURSUE_3,"There he is, closing in."
+BARK_PURSUE_4,"Don't run, pretty ship."
+BARK_PURSUE_5,Lining him up.
+BARK_ATTACK_RUN_1,"Guns hot, going in!"
+BARK_ATTACK_RUN_2,Making my run!
+BARK_ATTACK_RUN_3,You're mine!
+BARK_ATTACK_RUN_4,"Firing, firing!"
+BARK_ATTACK_RUN_5,Light him up!
+BARK_BREAK_OFF_1,Breaking left!
+BARK_BREAK_OFF_2,Breaking right!
+BARK_BREAK_OFF_3,"Too close, pulling off!"
+BARK_BREAK_OFF_4,Coming around for another pass.
+BARK_BREAK_OFF_5,"Peeling away, cover me!"
+BARK_EVADE_1,He's on me!
+BARK_EVADE_2,"I'm hit, I'm hit!"
+BARK_EVADE_3,Can't shake him!
+BARK_EVADE_4,Somebody get him off me!
+BARK_EVADE_5,"Jinking, jinking!"
+BARK_USE_DEVICE_1,Popping flares!
+BARK_USE_DEVICE_2,Flares out!
+BARK_USE_DEVICE_3,Missile! Throwing decoys!
+BARK_USE_DEVICE_4,"Countermeasures, now!"
+BARK_USE_DEVICE_5,"Burning my flares, hold on!"

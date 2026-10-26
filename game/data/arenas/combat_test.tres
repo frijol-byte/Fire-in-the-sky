@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ArenaDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/arena_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"combat_test"
+display_name_key = "ARENA_COMBAT_TEST_NAME"
+spawn_ship_id = &"kestrel"
+selectable_ship_ids = Array[StringName]([&"kestrel", &"bulwark", &"drayman"])
+spawn_position = Vector3(0, 0, 0)
+spawn_look_at = Vector3(0, 0, -1000)
+sky_seed = 11.0
+sky_cubemap_size = 1024
+sky_space_color = Color(0.012, 0.01, 0.02, 1)
+sky_nebula_deep = Color(0.1, 0.05, 0.28, 1)
+sky_nebula_main = Color(0.45, 0.3, 1, 1)
+sky_nebula_hot = Color(0.85, 0.75, 1, 1)
+sky_dust_lane_color = Color(0.02, 0.012, 0.01, 1)
+sky_nebula_scale = 1.6
+sky_nebula_strength = 1.0
+sky_star_density = 0.85
+sky_star_brightness = 1.5
+sky_sun_direction = Vector3(0.55, 0.28, -0.78)
+sky_sun_color = Color(0.85, 0.92, 1, 1)
+sky_sun_radius_deg = 1.4
+sun_light_energy = 1.5
+sun_light_color = Color(1, 0.9, 0.85, 1)
+fill_light_energy = 0.8
+fill_light_color = Color(0.45, 0.4, 0.9, 1)
+ambient_energy = 2.5
+glow_intensity = 0.9
+glow_bloom = 0.15
+glow_threshold = 0.9
+field_seed = 4242
+field_rock_count = 900
+field_inner_radius = 650.0
+field_outer_radius = 3200.0
+field_density_bias = 1.2
+field_vertical_scale = 0.5
+field_min_scale = 0.5
+field_max_scale = 6.5
+field_scale_bias = 3.5
+field_lane_radius = 60.0
+collider_pool_size = 32
+collider_radius = 420.0
+rock_bounce = 0.35
+rock_friction = 0.3
+dummy_ids = Array[StringName]([])
+dummy_origins = Array[Vector3]([])
+dummy_rails = Array[Vector3]([])
+gate_transforms = Array[Transform3D]([])
+gate_scale = 1.0

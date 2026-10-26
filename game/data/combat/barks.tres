@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BarkDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/bark_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"default"
+behaviors = Array[StringName]([&"pursue", &"attack_run", &"break_off", &"evade", &"use_device"])
+chances = PackedFloat32Array(0.35, 0.6, 0.8, 0.8, 1.0)
+line_count = 5
+key_prefix = "BARK_"
+min_gap_seconds = 1.6
+min_pilot_gap_seconds = 5.0
+strip_lines = 3
+line_seconds = 5.0
+callsign_keys = Array[StringName]([&"CALLSIGN_1", &"CALLSIGN_2", &"CALLSIGN_3", &"CALLSIGN_4", &"CALLSIGN_5", &"CALLSIGN_6"])

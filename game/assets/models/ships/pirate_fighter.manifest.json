@@ -1,0 +1,249 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        5.6,
+        8.95,
+        4.2233
+      ],
+      "min": [
+        -3.7,
+        -7.21,
+        -1.05
+      ],
+      "size": [
+        9.3,
+        16.16,
+        5.2733
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        5.6,
+        8.95,
+        4.2233
+      ],
+      "min": [
+        -3.7,
+        -7.21,
+        -1.05
+      ],
+      "size": [
+        9.3,
+        16.16,
+        5.2733
+      ]
+    }
+  },
+  "category": "ships",
+  "collision": [
+    "hull-colonly"
+  ],
+  "id": "pirate_fighter",
+  "parts": {
+    "antennae": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 84
+    },
+    "canopy_frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 156
+    },
+    "canopy_glass": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "engine": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 508
+    },
+    "engine_glow": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 72
+    },
+    "frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 308
+    },
+    "gun_pod_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 160
+    },
+    "gun_pod_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 160
+    },
+    "hazard_stripes": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 36
+    },
+    "hull": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 164
+    },
+    "missile_rail": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "scrap_plates": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 220
+    },
+    "spikes": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 48
+    },
+    "tail_fin_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "tail_fin_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wing_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wing_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wingtip_light": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 12
+    }
+  },
+  "sockets": [
+    {
+      "index": 0,
+      "kind": "cockpit_cam",
+      "location": [
+        0.0,
+        1.5,
+        1.1786
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_cockpit_cam_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "engine",
+      "location": [
+        0.55,
+        -7.25,
+        -0.05
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "engine",
+      "location": [
+        -1.9,
+        -5.9,
+        -0.45
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "primary",
+      "location": [
+        3.3,
+        1.6,
+        -0.1369
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "primary",
+      "location": [
+        -2.5,
+        0.6,
+        -0.1783
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "secondary",
+      "location": [
+        -0.35,
+        2.7,
+        -0.62
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_secondary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "tier_parts": {
+    "T0ONLY": [],
+    "T1": [],
+    "T2": [],
+    "T3": []
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 2192,
+      "T1": 2192,
+      "T2": 2192,
+      "T3": 2192
+    },
+    "total": 2192
+  }
+}

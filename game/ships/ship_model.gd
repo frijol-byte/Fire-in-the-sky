@@ -6,6 +6,8 @@ extends Node3D
 
 ## Highest upgrade tier a model can show (T0 is the stock ship).
 const MAX_TIER: int = 3
+## The shared material of the engine glow discs; `set_engine_color` swaps it for a tinted copy.
+const ENGINE_GLOW_MATERIAL: String = "res://shaders/materials/emissive_engine.tres"
 
 ## Tier shown. Setting it updates the parts, so it also works before the node is in the tree.
 @export_range(0, 3) var tier: int = 0:
@@ -14,6 +16,7 @@ const MAX_TIER: int = 3
 var _tier_parts: Array[Node3D] = []
 var _sockets: Array[Marker3D] = []
 var _paint_meshes: Array[MeshInstance3D] = []
+var _glow_meshes: Array[MeshInstance3D] = []
 
 
 func _ready() -> void:
@@ -45,6 +48,20 @@ func set_paint(primary: Color, secondary: Color) -> void:
 	for mesh_node: MeshInstance3D in _paint_meshes:
 		mesh_node.set_instance_shader_parameter(&"primary_color", primary)
 		mesh_node.set_instance_shader_parameter(&"secondary_color", secondary)
+
+
+## Tints the glowing engine discs of this ship only (art bible 2: Concord blue-white, Cinder Clans
+## dirty orange). The ship's other engine effects take their colour from `ShipDef` directly.
+func set_engine_color(color: Color) -> void:
+	if _glow_meshes.is_empty():
+		return
+	var material: StandardMaterial3D = (
+		(load(ENGINE_GLOW_MATERIAL) as StandardMaterial3D).duplicate() as StandardMaterial3D
+	)
+	material.albedo_color = color
+	material.emission = color
+	for mesh_node: MeshInstance3D in _glow_meshes:
+		mesh_node.material_override = material
 
 
 ## True when `node` (a tier part or socket) exists at `at_tier`.
@@ -79,6 +96,15 @@ func _scan(node: Node) -> void:
 		_tier_parts.append(node as Node3D)
 	if node is MeshInstance3D and node.has_meta(ModelImportRules.META_PAINT):
 		_paint_meshes.append(node as MeshInstance3D)
+	if node is MeshInstance3D and _has_engine_glow_material(node as MeshInstance3D):
+		_glow_meshes.append(node as MeshInstance3D)
+
+
+static func _has_engine_glow_material(mesh_node: MeshInstance3D) -> bool:
+	if mesh_node.mesh == null or mesh_node.mesh.get_surface_count() == 0:
+		return false
+	var material: Material = mesh_node.mesh.surface_get_material(0)
+	return material != null and material.resource_path == ENGINE_GLOW_MATERIAL
 
 
 func _apply_tier() -> void:

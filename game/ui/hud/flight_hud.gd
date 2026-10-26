@@ -6,7 +6,8 @@ extends Control
 ## pulls them apart, which is how you read your momentum. With mouse flight, a faint ring in the
 ## center and a dot show where the mouse virtual stick points. The same HUD is later drawn on the
 ## cockpit's holo plane, so it only needs a camera, not a particular view. The target brackets, edge
-## arrows, lead indicator and target panel are drawn by the `TargetHud` child.
+## arrows, lead indicator and target panel are drawn by the `TargetHud` child; hit markers, damage
+## indicators and the ship's shield / armor / hull bars by `FeedbackHud`; radio lines by `CommsStrip`.
 
 const NOSE_RADIUS: float = 11.0
 const VELOCITY_RADIUS: float = 18.0
@@ -39,6 +40,8 @@ var _depleted_left: float = 0.0
 @onready var _device: Label = $Device
 @onready var _targets: TargetHud = $TargetHud
 @onready var _warning: MissileWarning = $MissileWarning
+@onready var _feedback: FeedbackHud = $FeedbackHud
+@onready var _comms: CommsStrip = $CommsStrip
 
 
 func _ready() -> void:
@@ -51,7 +54,18 @@ func bind(new_ship: Ship) -> void:
 	ship = new_ship
 	_targets.bind(new_ship)
 	_warning.bind(new_ship)
+	_feedback.bind(new_ship)
 	_refresh()
+
+
+## The combat feedback layer (hit markers, damage indicators, status bars, banners).
+func feedback() -> FeedbackHud:
+	return _feedback
+
+
+## The radio strip.
+func comms() -> CommsStrip:
+	return _comms
 
 
 func _process(delta: float) -> void:

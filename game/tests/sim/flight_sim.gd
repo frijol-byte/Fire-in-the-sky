@@ -5,8 +5,14 @@ extends RefCounted
 ## same `Ship` scene the game does.
 
 const SHIP_SCENE: PackedScene = preload("res://ships/ship.tscn")
-## The ships every flight sim is run for.
-const SHIP_IDS: Array[StringName] = [&"kestrel", &"bulwark", &"drayman"]
+## The three ships the player can fly (GDD 4.4).
+const PLAYER_SHIP_IDS: Array[StringName] = [&"kestrel", &"bulwark", &"drayman"]
+## The Cinder Clans' fighters (M2-T7).
+const PIRATE_SHIP_IDS: Array[StringName] = [&"pirate_fighter", &"pirate_interceptor"]
+## The ships every flight sim is run for: every `ShipDef`.
+const SHIP_IDS: Array[StringName] = [
+	&"kestrel", &"bulwark", &"drayman", &"pirate_fighter", &"pirate_interceptor"
+]
 
 
 ## One recorded tick.

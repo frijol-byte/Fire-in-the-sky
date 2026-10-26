@@ -176,6 +176,10 @@ great and reads clearly.
   - Engine glow colour is a constant in `vfx/engine_fx.gd` (blue-white for every ship). Pirates
     should look different: move the colour into `ShipDef` (group "Look") here.
 
+- **Done (2026-10-26, see `docs/STATUS.md`):** `FeedbackHud` / `HitFeedback` / `FeedbackMath`, pirate fighter and
+  interceptor (`tools/blender/recipes/ships/pirate_*.py`, engine colour in `ShipDef`), the combat test arena
+  (`CombatTest`, `EncounterDirector`, `WaveMenu` on F7) and radio barks (`BarkDirector`, `CommsStrip`).
+
 ---
 
 ## M2 review gate & playtest checklist

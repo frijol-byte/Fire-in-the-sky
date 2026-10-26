@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EncounterDef" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://data/defs/encounter_def.gd" id="1_def"]
+[ext_resource type="Script" path="res://data/defs/wave_def.gd" id="2_wave"]
+
+[sub_resource type="Resource" id="Wave_1"]
+script = ExtResource("2_wave")
+ship_ids = Array[StringName]([&"pirate_interceptor"])
+profile_ids = Array[StringName]([&"rookie"])
+
+[sub_resource type="Resource" id="Wave_2"]
+script = ExtResource("2_wave")
+ship_ids = Array[StringName]([&"pirate_fighter", &"pirate_interceptor"])
+profile_ids = Array[StringName]([&"rookie", &"rookie"])
+
+[sub_resource type="Resource" id="Wave_3"]
+script = ExtResource("2_wave")
+ship_ids = Array[StringName]([&"pirate_fighter", &"pirate_interceptor", &"pirate_interceptor"])
+profile_ids = Array[StringName]([&"rookie", &"rookie", &"rookie"])
+
+[resource]
+script = ExtResource("1_def")
+id = &"combat_test"
+waves = Array[ExtResource("2_wave")]([SubResource("Wave_1"), SubResource("Wave_2"), SubResource("Wave_3")])
+spawn_distance_m = 800.0
+spawn_spread_deg = 50.0
+stagger_seconds = 5.0
+first_wave_delay = 3.0
+intermission_seconds = 6.0
+loop = true
+seed_base = 700

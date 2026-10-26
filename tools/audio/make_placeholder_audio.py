@@ -2,7 +2,7 @@
 """Generates the placeholder flight and combat sounds as WAV files: engine hum, boost whoosh,
 dust hiss, the two weapons' shots, hit sounds for shield, armor, hull and rock, the overheat vent,
 the missile sounds (launches, explosion, lock beeps, incoming-missile warning, flare launch) and the
-loot pickup chime.
+loot pickup chime, the low-shield alarm and the kill confirmation.
 
 Everything is synthesised from maths and a seeded random generator, so the files are original
 work released as CC0 and a rebuild is byte-identical. Python standard library only.
@@ -336,6 +336,33 @@ def loot_pickup() -> list[float]:
     return _normalise(out, 0.6)
 
 
+def low_shield_alarm() -> list[float]:
+    """The low-shield alarm: one falling two-tone beep, softer and slower than the missile warning."""
+    count = int(RATE * 0.36)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        freq = 740.0 if t < 0.18 else 520.0
+        local = t % 0.18
+        envelope = min(local / 0.01, 1.0) * min((0.18 - local) / 0.03, 1.0)
+        out.append(math.sin(2.0 * math.pi * freq * t) * envelope * (0.9 + 0.1 * math.sin(2.0 * math.pi * 30.0 * t)))
+    return _normalise(out, 0.6)
+
+
+def kill_confirm() -> list[float]:
+    """The kill confirmation: a low thud under a sharp rising two-note ping."""
+    count = int(RATE * 0.5)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        thud = math.sin(2.0 * math.pi * 70.0 * t) * math.exp(-t * 16.0)
+        freq = 1568.0 if t < 0.07 else 2093.0
+        local = t if t < 0.07 else t - 0.07
+        ping = math.sin(2.0 * math.pi * freq * t) * min(local / 0.003, 1.0) * math.exp(-local * 11.0)
+        out.append(thud * 0.9 + ping * 0.7)
+    return _normalise(out, 0.7)
+
+
 FILES = {
     "engine_hum.wav": engine_hum,
     "dust_hiss.wav": dust_hiss,
@@ -355,6 +382,8 @@ FILES = {
     "missile_warning.wav": missile_warning,
     "flare_launch.wav": flare_launch,
     "loot_pickup.wav": loot_pickup,
+    "low_shield_alarm.wav": low_shield_alarm,
+    "kill_confirm.wav": kill_confirm,
 }
 
 

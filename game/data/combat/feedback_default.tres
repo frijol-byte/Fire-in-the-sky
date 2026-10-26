@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="FeedbackDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/feedback_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"default"
+hit_marker_seconds = 0.35
+kill_marker_seconds = 0.9
+indicator_seconds = 1.2
+max_indicators = 6
+kill_banner_seconds = 1.6
+low_shield_fraction = 0.25
+low_shield_clear_fraction = 0.4
+alarm_interval = 1.1
+shake_per_shield_point = 0.002
+shake_per_armor_point = 0.006
+shake_per_hull_point = 0.012
+shake_hit_max = 0.45
+shake_hit_seconds = 0.25
+shake_death = 1.0
+shake_death_seconds = 1.4
+shake_explosion_max = 0.55
+shake_explosion_range_m = 450.0
+shake_explosion_seconds = 0.7
+slowmo_scale = 0.3
+slowmo_seconds = 0.45

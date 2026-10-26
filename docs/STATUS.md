@@ -17,7 +17,10 @@
   **F6** to send them away. **M2-T6** (destruction, loot & respawn stub; PR open) makes ships blow up: the
   wreck tumbles and fades, the fighter drops loot containers that your tractor pulls in (credits and scrap show on
   the arena readout), and when *you* die a "Ship destroyed" screen lets you respawn at the start.
-  **M2-T7** (combat HUD, feedback & encounter test) is next.
+  **M2-T7** (combat HUD, feedback & encounter test; PR open) adds the **combat test arena** (scene
+  `world/arenas/combat_test.tscn`; waves of 1, 2 then 3 Cinder Clans pirates, **F7** wave menu), pirate ships,
+  hit markers, damage indicators, shield/armor/hull bars, a low-shield alarm, kill confirmation, camera shake and
+  radio barks on a comms strip. That completes M2's cards; the **M2 review gate** is next.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -82,6 +85,7 @@
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
 | M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
 | M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | #25 |
+| M2-T7 | Combat HUD, feedback & encounter test | T2–T6 | 👀 | (this PR) |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -530,6 +534,44 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
+
+- M2-T7 (2026-10-26): combat HUD, feedback, pirates and the encounter test. Things the next session must know:
+  - **Combat test arena:** `CombatTest` (`world/arenas/combat_test.gd`) *extends* `FlightTest` (same ship, camera, HUD, tools,
+    respawn); the scene sets `arena_id = &"combat_test"` (`data/arenas/combat_test.tres`: no gates or dummies, a sparse belt).
+    `FlightTest` gained hooks: `readout_text()`, `_on_player_spawned()`, `_shows_pirate_help()`, and both arenas carry a
+    `HitFeedback` and a `BarkDirector`. **Waves** are data: `data/encounters/combat_test.tres` (`EncounterDef` + `WaveDef`:
+    1 rookie interceptor; rookie fighter + rookie interceptor; rookie fighter + 2 rookie interceptors; pirates arrive
+    `stagger_seconds` = 5 apart; the encounter loops). `EncounterDirector` (`combat/`) spawns them around the player
+    (`EncounterMath`), clears on the last kill, runs the intermission and `restart_wave` on respawn (the respawn loop).
+    **F7** opens `WaveMenu` (`ui/dev/`): pick a wave, restart, skip, send away, slow-mo toggle. It pauses the game; a
+    gamepad-only playtest never needs it (waves auto-advance).
+  - **Pirates:** `pirate_fighter` ("Cinder Raider": autocannon, flares, no missiles) and `pirate_interceptor` ("Cinder
+    Dagger": pulse laser). Blender recipes `tools/blender/recipes/ships/pirate_*.py` (asymmetric kit-bash: one long wing
+    and a stub, scrap plates, hazard stripes, spikes); previews in `docs/previews/m2-t7-pirates-lineup.png`.
+    `ShipDef` gained `engine_color` / `engine_boost_color` (group Look; `EngineFx` and `ShipModel.set_engine_color`, which
+    tints the engine discs per ship, read them). `FlightSim.SHIP_IDS` now lists all five ships (`PLAYER_SHIP_IDS` and
+    `PIRATE_SHIP_IDS` split them), so every flight sim runs on the pirates too. Pirate `strafe_response_time` is 1.0 / 0.9
+    because the lateral sim checks it.
+  - **Feedback:** `FeedbackHud` (child of `FlightHud`, via `hud.feedback()`) draws hit markers (shield: thin cyan ticks;
+    armor: amber; hull: thick white with a dot; kill: big red burst plus a "DESTROYED" line), damage-direction arcs
+    (colour = layer hit, angle from the shooter's position via `FeedbackMath.direction_angle`), the ship's shield/armor/hull
+    bars, a low-shield alarm (edge flash and text) and banners (`show_banner`). `HitFeedback` (node in the arena,
+    `bind(ship, rig)`) shakes the camera (`CameraRig.shake`) on hits to the player, the player's death and nearby
+    explosions, beeps the alarm, plays the kill sound and does the optional slow-motion tick on the last hostile *ship*
+    (setting `feedback/kill_slowmo`, off by default, toggled in the F7 menu). All numbers: `data/combat/feedback_default.tres`.
+  - **Barks:** `AIPilot` emits `Events.ai_behavior_changed`; `BarkDirector` (`ai/`) rolls a per-behavior chance, picks one of
+    5 lines (`BARK_<BEHAVIOR>_<n>`, never the same twice running for a pilot) with radio gaps (`BarkMath`), and the arena
+    pushes them onto `CommsStrip` (`hud.comms()`). Data: `data/combat/barks.tres`. Pirates get callsigns from the same def.
+  - **Tests:** unit `test_{feedback_math,bark_math,encounter_math,feedback_def,bark_def,encounter_def,comms_strip,
+    pirate_ships,wave_menu,feedback_hud,hit_feedback}.gd`; sims `test_encounter_sim`, `test_combat_test_sim`,
+    `test_combat_feedback_sim` (a sim that plays sounds must free its nodes in `after_test` and await a few frames, or
+    the audio streams are reported as leaked), and `sim/long/test_combat_waves_long.gd` (an AI stand-in flies the
+    Kestrel through the waves). Shots: `pirates_shot`, `feedback_shot`, `combat_hud_shot`.
+  - **Balance numbers to compare with the playtest:** the stand-in ("ace" AI, one target at a time, no flares) clears wave 1
+    in ~13 s untouched and wave 2 in ~52 s at 92% hull, and **dies in wave 3** (~33 s). Pirate durability was cut
+    during tuning (fighter 50/40/60, interceptor 40/20/35) and homing missiles were removed from the fighter because the
+    stand-in could not deal with them. If the owner finds 1v3 too hard, soften `combat_test.tres` (profiles, stagger) first.
+  - Not done: radio barks have no voice, wave progress is not saved, the kill "slow-mo tick" is only on the last hostile ship.
 
 - M2-T6 (2026-10-26): destruction, loot and the respawn stub. Things the next session must know:
   - **`DestructionManager`** (`combat/destruction_manager.gd`, one per scene, group `destruction_manager`; the arena has one)

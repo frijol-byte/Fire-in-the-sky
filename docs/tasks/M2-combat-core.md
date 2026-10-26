@@ -131,6 +131,9 @@ great and reads clearly.
   - Jolt prints a harmless "job system exceeded the maximum number of jobs" warning when many
     bodies are created and freed fast in a sim; it does not fail gdUnit.
 
+- **Done (2026-10-26, see `docs/STATUS.md`):** `AIPilot` + `AIProfileDef` (rookie / standard / ace), sims and a dogfight
+  shot sequence. Regroup and Flee are not part of this card (M3). In the arena, F5 calls in a hostile pilot.
+
 ### M2-T6 · Destruction, loot & insurance respawn (stub)
 - **Size:** M · **Depends on:** T1, T5
 - **Do:**

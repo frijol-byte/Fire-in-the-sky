@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AIProfileDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ai_profile_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"standard"
+reaction_time = 0.4
+aim_error_deg = 2.0
+aggression = 0.75
+preferred_range_m = 300.0
+break_off_range_m = 140.0
+fire_cone_deg = 4.0
+secondary_use = 0.5
+evade_cooldown = 3.0
+evade_seconds = 1.5
+break_off_seconds = 1.2
+flip_chance = 0.5
+turn_gain = 5.0

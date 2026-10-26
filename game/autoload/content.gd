@@ -64,6 +64,11 @@ func device(id: StringName) -> DeviceDef:
 	return get_def(&"device", id) as DeviceDef
 
 
+## Returns the AI pilot profile (`&"rookie"`, `&"standard"`, `&"ace"`) with `id`, or `null`.
+func ai_profile(id: StringName) -> AIProfileDef:
+	return get_def(&"ai_profile", id) as AIProfileDef
+
+
 ## Returns the target dummy def with `id`, or `null`.
 func dummy(id: StringName) -> DummyDef:
 	return get_def(&"dummy", id) as DummyDef

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AIProfileDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ai_profile_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"rookie"
+reaction_time = 0.8
+aim_error_deg = 3.0
+aggression = 0.6
+preferred_range_m = 240.0
+break_off_range_m = 160.0
+fire_cone_deg = 6.0
+secondary_use = 0.25
+evade_cooldown = 2.0
+evade_seconds = 2.0
+break_off_seconds = 1.8
+flip_chance = 0.3
+turn_gain = 4.0

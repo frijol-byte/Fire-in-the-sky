@@ -34,6 +34,34 @@ static func spawn_ship(
 	return ship
 
 
+## Adds a ship of `ship_id` flown by an `AIPilot` with the profile `profile_id`, on side `stance`.
+## `seed_value` seeds the pilot's dice; `fight` is who it fights (null: the nearest enemy).
+static func spawn_ai(
+	parent: Node,
+	ship_id: StringName,
+	position: Vector3,
+	look_at: Vector3,
+	stance: Targeting.Stance = Targeting.Stance.HOSTILE,
+	profile_id: StringName = &"standard",
+	seed_value: int = 1,
+	fight: Node3D = null
+) -> Ship:
+	var ship: Ship = spawn_ship(parent, ship_id, position, look_at)
+	ship.stance = stance
+	var pilot: AIPilot = AIPilot.new()
+	pilot.name = "AIPilot"
+	pilot.profile = Content.ai_profile(profile_id)
+	pilot.forced_target = fight
+	ship.add_child(pilot)
+	pilot.seed_rolls(seed_value)
+	return ship
+
+
+## The `AIPilot` child of `ship`.
+static func pilot_of(ship: Ship) -> AIPilot:
+	return ship.get_node("AIPilot") as AIPilot
+
+
 ## Adds a dummy of `def_id` to `parent`, standing at `origin` (sliding along `rail` if not zero).
 static func spawn_dummy(
 	parent: Node, def_id: StringName, origin: Vector3, rail: Vector3 = Vector3.ZERO
@@ -43,6 +71,22 @@ static func spawn_dummy(
 	parent.add_child(dummy)
 	dummy.setup(Content.dummy(def_id), origin, rail)
 	return dummy
+
+
+## Builds the rocks of `arena` (the real field, without the pictures) under `parent` and returns the
+## pool of solid rocks. It follows nothing until `RockColliders.set_target` is called.
+static func spawn_rock_field(parent: Node, arena: ArenaDef) -> RockColliders:
+	var shapes: Array[Shape3D] = []
+	var radii: PackedFloat32Array = []
+	for path: String in AsteroidField.VARIANT_PATHS:
+		var variant: Dictionary = AsteroidField.load_variant(path)
+		shapes.append(variant["shape"] as Shape3D)
+		radii.append(variant["radius"] as float)
+	var field: RockField = RockField.generate(arena, radii)
+	var colliders: RockColliders = RockColliders.new()
+	parent.add_child(colliders)
+	colliders.setup(field, shapes, arena)
+	return colliders
 
 
 ## Adds a static wall (a box, `size` metres) centred at `position` on the world layer.

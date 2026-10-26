@@ -47,9 +47,9 @@ void fragment() {
 	float r = length(p);
 	if (ring) {
 		float edge = progress;
-		float band = exp(-pow((r - edge) * 9.0, 2.0));
+		float band = exp(-pow((r - edge) * 22.0, 2.0));
 		float fade = (1.0 - progress) * (1.0 - progress);
-		ALBEDO = mix(fire_color.rgb, vec3(1.0), 0.5) * band * fade * 0.8;
+		ALBEDO = mix(fire_color.rgb, vec3(1.0), 0.3) * band * fade * 1.6;
 		ALPHA = clamp(band * fade, 0.0, 1.0);
 	} else {
 		float grow = 1.0 - (1.0 - progress) * (1.0 - progress);

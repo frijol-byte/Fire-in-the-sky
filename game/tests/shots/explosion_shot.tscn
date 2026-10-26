@@ -1,0 +1,76 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://tests/shots/explosion_shot_driver.gd" id="1_drv"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="2_def"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="3_dir"]
+
+[sub_resource type="Resource" id="Resource_0"]
+script = ExtResource("2_def")
+label = "1_before"
+frame = 8
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("2_def")
+label = "2_flash"
+frame = 11
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_2"]
+script = ExtResource("2_def")
+label = "3_fireball"
+frame = 13
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("2_def")
+label = "4_peak"
+frame = 16
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("2_def")
+label = "5_ring"
+frame = 20
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("2_def")
+label = "6_cooling"
+frame = 28
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("2_def")
+label = "7_wreck"
+frame = 40
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[sub_resource type="Resource" id="Resource_7"]
+script = ExtResource("2_def")
+label = "8_debris"
+frame = 60
+camera_position = Vector3(-30, 14, 46)
+look_at_point = Vector3(0, 0, -16)
+fov = 60.0
+
+[node name="ExplosionShot" type="Node3D"]
+script = ExtResource("1_drv")
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("3_dir")
+shots = Array[ExtResource("2_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5"), SubResource("Resource_6"), SubResource("Resource_7")])

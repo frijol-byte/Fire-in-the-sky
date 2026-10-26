@@ -26,7 +26,7 @@ const BOOM_PITCH: float = 0.8
 ## Seed of the debris and loot rolls, so sims repeat.
 const ROLL_SEED: int = 4242
 ## The flash and sparks of `CombatFx.explosion` are this fraction of the fireball's radius.
-const FLASH_FACTOR: float = 0.9
+const FLASH_FACTOR: float = 0.4
 
 
 class Blast:

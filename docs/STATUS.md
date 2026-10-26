@@ -81,7 +81,7 @@
 | M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
 | M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
-| M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | (PR pending) |
+| M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | #25 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

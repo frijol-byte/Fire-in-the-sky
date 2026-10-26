@@ -33,6 +33,9 @@ const PIRATE_ASIDE_M: float = 120.0
 ## Until the sky is baked (and always in a headless run) the background is this plain colour.
 const FALLBACK_AMBIENT: Color = Color(0.35, 0.3, 0.28)
 
+## The `ArenaDef` this scene builds. The combat test arena (`CombatTest`) is this scene with another id.
+@export var arena_id: StringName = ARENA_ID
+
 var def: ArenaDef = null
 var ship: Ship = null
 var gates_passed: int = 0
@@ -58,12 +61,14 @@ var _player_ship_id: StringName = &""
 @onready var _hud: FlightHud = $Hud/FlightHud
 @onready var _tools: DevTools = $DevTools
 @onready var _death: DeathScreen = $DeathScreen
+@onready var _feedback: HitFeedback = $HitFeedback
+@onready var _barks: BarkDirector = $BarkDirector
 
 
 func _ready() -> void:
-	def = Content.get_def(&"arena", ARENA_ID) as ArenaDef
+	def = Content.get_def(&"arena", arena_id) as ArenaDef
 	if def == null:
-		Log.error(&"arena", "no ArenaDef '%s'" % ARENA_ID)
+		Log.error(&"arena", "no ArenaDef '%s'" % arena_id)
 		return
 	_configure_light()
 	_environment.environment = make_environment(def, null)
@@ -77,6 +82,7 @@ func _ready() -> void:
 	Events.input_device_changed.connect(_on_input_device_changed)
 	Events.ship_destroyed.connect(_on_ship_destroyed)
 	_death.respawn_requested.connect(respawn_player)
+	_barks.barked.connect(_on_barked)
 	_update_help()
 	Game.set_state(Game.State.SPACE)
 	_bake_sky()
@@ -104,8 +110,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if ship == null:
 		return
-	# Speed, flight assist, boost and energy are on the flight HUD; this is the ship and the course.
-	_readout.text = (
+	_readout.text = readout_text()
+
+
+## The two readout lines. Speed, flight assist, boost and energy are on the flight HUD; this is the
+## ship and the course. `CombatTest` swaps the second line.
+func readout_text() -> String:
+	return (
 		"%s\n%s"
 		% [
 			tr("ARENA_SHIP") % [tr(ship.def.display_name_key), _switch_glyphs()],
@@ -140,7 +151,15 @@ func spawn_player(ship_id: StringName) -> Ship:
 	_field.follow(ship)
 	_hud.bind(ship)
 	_tools.bind(ship, _rig)
+	_feedback.bind(ship, _rig)
+	_on_player_spawned()
 	return ship
+
+
+## Called at the end of `spawn_player`, once everything is bound to the new ship. Arenas that
+## build on this one hook in here.
+func _on_player_spawned() -> void:
+	pass
 
 
 ## Puts a new ship of the player's last class at the start (the "Ship destroyed" screen calls it).
@@ -187,6 +206,10 @@ func call_pirate() -> Ship:
 	pirate.add_child(pilot)
 	pirates.append(pirate)
 	return pirate
+
+
+func _on_barked(_from: Node, speaker: String, line: String) -> void:
+	_hud.comms().push(speaker, line)
 
 
 func _on_ship_destroyed(node: Node, info: DamageInfo) -> void:
@@ -311,6 +334,11 @@ func _switch_glyphs() -> String:
 	return " ".join(glyphs)
 
 
+## Whether the help lists the F5 / F6 pirate keys. The combat test has waves instead.
+func _shows_pirate_help() -> bool:
+	return true
+
+
 func _on_input_device_changed(_device: int) -> void:
 	_update_help()
 
@@ -334,16 +362,17 @@ func _update_help() -> void:
 			% [InputRouter.glyph_for(&"target_nearest"), InputRouter.glyph_for(&"look_at_target")]
 		)
 	)
-	_help.text += (
-		"\n"
-		+ (
-			tr("ARENA_HELP_PIRATE")
-			% [
-				OS.get_keycode_string(CALL_PIRATE_KEY),
-				OS.get_keycode_string(SEND_AWAY_KEY),
-			]
+	if _shows_pirate_help():
+		_help.text += (
+			"\n"
+			+ (
+				tr("ARENA_HELP_PIRATE")
+				% [
+					OS.get_keycode_string(CALL_PIRATE_KEY),
+					OS.get_keycode_string(SEND_AWAY_KEY),
+				]
+			)
 		)
-	)
 	_help.text += (
 		"\n"
 		+ (

@@ -1,0 +1,82 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://ships/ship.tscn" id="1_ship"]
+[ext_resource type="PackedScene" path="res://ships/camera_rig.tscn" id="2_rig"]
+[ext_resource type="Script" path="res://tests/shots/feedback_shot_driver.gd" id="3_drv"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="4_dir"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="5_def"]
+[ext_resource type="PackedScene" path="res://ui/hud/flight_hud.tscn" id="6_hud"]
+[ext_resource type="Resource" path="res://data/ships/pirate_fighter.tres" id="7_fighter"]
+[ext_resource type="Resource" path="res://data/ships/pirate_interceptor.tres" id="8_dagger"]
+
+[sub_resource type="Resource" id="Resource_0"]
+script = ExtResource("5_def")
+label = "1_shield"
+frame = 12
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("5_def")
+label = "2_armor"
+frame = 32
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_2"]
+script = ExtResource("5_def")
+label = "3_hull"
+frame = 52
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("5_def")
+label = "4_kill"
+frame = 72
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("5_def")
+label = "5_indicators"
+frame = 102
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("5_def")
+label = "6_alarm"
+frame = 132
+move_camera = false
+
+[sub_resource type="Environment" id="Environment_space"]
+background_mode = 1
+background_color = Color(0.03, 0.02, 0.07, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.4, 0.7, 1)
+ambient_light_energy = 0.7
+
+[node name="FeedbackShot" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+
+[node name="Ship" parent="." instance=ExtResource("1_ship")]
+
+[node name="Fighter" parent="." instance=ExtResource("1_ship")]
+def = ExtResource("7_fighter")
+
+[node name="Dagger" parent="." instance=ExtResource("1_ship")]
+def = ExtResource("8_dagger")
+
+[node name="CameraRig" parent="." instance=ExtResource("2_rig")]
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="FlightHud" parent="Hud" instance=ExtResource("6_hud")]
+
+[node name="Driver" type="Node" parent="."]
+script = ExtResource("3_drv")
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("4_dir")
+shots = Array[ExtResource("5_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5")])

@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="ShipDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/ship_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"pirate_interceptor"
+display_name_key = "SHIP_PIRATE_INTERCEPTOR_NAME"
+model_path = "res://assets/models/ships/pirate_interceptor.glb"
+mass = 4800.0
+thrust_forward = 330000.0
+thrust_reverse = 200000.0
+thrust_lateral = 520000.0
+thrust_vertical = 520000.0
+max_speed = 200.0
+max_reverse_speed = 90.0
+max_strafe_speed = 95.0
+max_vertical_speed = 75.0
+max_angular_rate_deg = Vector3(105, 105, 170)
+angular_accel_deg = Vector3(520, 520, 680)
+fa_linear_gain = 6.0
+fa_angular_gain = 12.0
+strafe_response_time = 0.9
+energy_capacity = 100.0
+energy_regen = 12.0
+energy_regen_delay = 1.2
+boost_max_speed = 340.0
+boost_thrust_multiplier = 2.0
+boost_energy_per_second = 30.0
+boost_min_energy = 10.0
+fa_excess_bleed_time = 1.0
+shield_capacity = 40.0
+armor_capacity = 20.0
+hull_capacity = 35.0
+shield_regen = 9.0
+shield_regen_delay = 4.0
+chase_offset = Vector3(0, 4, 15)
+chase_look_ahead = 60.0
+chase_position_lag = 0.12
+chase_rotation_lag = 0.18
+chase_speed_pullback = 3.0
+base_fov = 75.0
+boost_fov_kick = 8.0
+canopy_path = "res://assets/models/props/canopy_human_light.glb"
+paint_primary = Color(0.541, 0.231, 0.141, 1)
+paint_secondary = Color(0.102, 0.086, 0.078, 1)
+primary_weapon = &"pulse_laser"
+secondary_weapon = &""
+secondary_launch_offset = Vector3(0, -1.2, -5)
+device_ids = Array[StringName]([&"flares"])
+loot_table_id = &"light"
+primary_slots = 2
+secondary_slots = 1
+device_slots = 1
+engine_color = Color(1, 0.55, 0.2, 1)
+engine_boost_color = Color(1, 0.85, 0.5, 1)

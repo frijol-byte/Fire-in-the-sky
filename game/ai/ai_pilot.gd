@@ -264,6 +264,7 @@ func _choose_behavior(situation: AIUtility.Situation, delta: float) -> void:
 	behavior_time = 0.0
 	_on_enter(chosen, situation)
 	behavior_changed.emit(chosen)
+	Events.ai_behavior_changed.emit(_ship, chosen)
 
 
 func _min_time(of: AIUtility.Behavior) -> float:

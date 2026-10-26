@@ -1,0 +1,77 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="PackedScene" path="res://world/arenas/combat_test.tscn" id="1_arena"]
+[ext_resource type="Script" path="res://tests/shots/combat_hud_shot_driver.gd" id="2_drv"]
+[ext_resource type="Script" path="res://tests/shots/shot_director.gd" id="3_dir"]
+[ext_resource type="Script" path="res://tests/shots/shot_def.gd" id="4_def"]
+
+[sub_resource type="Resource" id="Resource_0"]
+script = ExtResource("4_def")
+label = "1_t240"
+frame = 120
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("4_def")
+label = "2_t340"
+frame = 170
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_2"]
+script = ExtResource("4_def")
+label = "3_t440"
+frame = 220
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("4_def")
+label = "4_t540"
+frame = 270
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("4_def")
+label = "5_t640"
+frame = 320
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("4_def")
+label = "6_t740"
+frame = 370
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_6"]
+script = ExtResource("4_def")
+label = "7_t840"
+frame = 420
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_7"]
+script = ExtResource("4_def")
+label = "8_t940"
+frame = 470
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_8"]
+script = ExtResource("4_def")
+label = "9_t1040"
+frame = 520
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_9"]
+script = ExtResource("4_def")
+label = "10_t1160"
+frame = 580
+move_camera = false
+
+[node name="CombatHudShot" type="Node3D"]
+
+[node name="Arena" parent="." instance=ExtResource("1_arena")]
+
+[node name="Driver" type="Node" parent="."]
+script = ExtResource("2_drv")
+
+[node name="ShotDirector" type="Node" parent="."]
+script = ExtResource("3_dir")
+shots = Array[ExtResource("4_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5"), SubResource("Resource_6"), SubResource("Resource_7"), SubResource("Resource_8"), SubResource("Resource_9")])

@@ -237,6 +237,68 @@ class ShipRosterTests(unittest.TestCase):
         self.assertEqual(lengths, sorted(lengths))
 
 
+# id: (length range in m, primary sockets, secondary, engines). Cinder Clans ships have no tiers.
+PIRATE_SHIPS = {
+    "pirate_fighter": ((14.0, 18.0), 2, 1, 2),
+    "pirate_interceptor": ((9.0, 13.0), 2, 1, 2),
+}
+
+
+class PirateShipTests(unittest.TestCase):
+    """The Cinder Clans' fighter and interceptor (M2-T7): kit-bashed, lopsided, no tiers."""
+
+    def test_names_budget_and_role_materials(self):
+        for ship_id in PIRATE_SHIPS:
+            with self.subTest(ship=ship_id):
+                recipe, data = build_ship(ship_id)
+                common.validate_names(bpy.data.objects)
+                self.assertEqual((recipe.ID, recipe.CATEGORY), (ship_id, "ships"))
+                lo, hi = recipe.TRIANGLE_BUDGET
+                self.assertTrue(lo <= data["triangles"]["total"] <= hi, data["triangles"])
+                for obj in common.mesh_objects():
+                    for slot in obj.material_slots:
+                        self.assertIn(slot.material.name, materials.ROLES)
+
+    def test_size_sockets_and_no_tiers(self):
+        for ship_id, (length, primary, secondary, engine) in PIRATE_SHIPS.items():
+            with self.subTest(ship=ship_id):
+                _recipe, data = build_ship(ship_id)
+                self.assertTrue(length[0] <= data["bounds"]["T0"]["size"][1] <= length[1])
+                counts: dict[str, int] = {}
+                for sock in data["sockets"]:
+                    counts[sock["kind"]] = counts.get(sock["kind"], 0) + 1
+                self.assertEqual(counts["primary"], primary)
+                self.assertEqual(counts.get("secondary", 0), secondary)
+                self.assertEqual(counts["engine"], engine)
+                self.assertEqual(counts["cockpit_cam"], 1)
+                for tier in ("T1", "T2", "T3", "T0ONLY"):
+                    self.assertFalse(data["tier_parts"][tier], tier)
+                self.assertEqual(len(data["collision"]), 1)
+
+    def test_wings_are_not_mirror_images(self):
+        for ship_id in PIRATE_SHIPS:
+            with self.subTest(ship=ship_id):
+                _recipe, data = build_ship(ship_id)
+                right = data["parts"]["wing_R"]["triangles"]
+                self.assertGreater(right, 0)
+                span = {n: max(abs(v.co.x) for v in bpy.data.objects[n].data.vertices) for n in ("wing_R", "wing_L")}
+                self.assertNotAlmostEqual(span["wing_R"], span["wing_L"], places=1)
+
+    def test_build_is_deterministic_and_committed_manifest_matches(self):
+        for ship_id in PIRATE_SHIPS:
+            with self.subTest(ship=ship_id):
+                _recipe, data = build_ship(ship_id)
+                _recipe, again = build_ship(ship_id)
+                self.assertEqual(json.dumps(data, sort_keys=True), json.dumps(again, sort_keys=True))
+                committed = build.MODELS / "ships" / f"{ship_id}.manifest.json"
+                self.assertTrue(committed.exists(), "run tools/blender/build.py --all and commit")
+                self.assertEqual(json.loads(committed.read_text()), json.loads(json.dumps(data)))
+
+    def test_interceptor_is_smaller_than_the_fighter(self):
+        lengths = [build_ship(i)[1]["bounds"]["T0"]["size"][1] for i in ("pirate_interceptor", "pirate_fighter")]
+        self.assertEqual(lengths, sorted(lengths))
+
+
 class PaletteTests(unittest.TestCase):
     def test_tint_changes_only_the_preview_colour_of_a_role(self):
         common.clear_scene()

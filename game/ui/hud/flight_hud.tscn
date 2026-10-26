@@ -1,8 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://ui/hud/flight_hud.gd" id="1_hud"]
 [ext_resource type="Script" path="res://ui/hud/target_hud.gd" id="2_targets"]
 [ext_resource type="Script" path="res://ui/hud/missile_warning.gd" id="3_warning"]
+
+[ext_resource type="Script" path="res://ui/hud/feedback_hud.gd" id="4_feedback"]
+[ext_resource type="Script" path="res://ui/hud/comms_strip.gd" id="5_comms"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_speed"]
 font_size = 44
@@ -43,6 +46,26 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_warning")
+
+[node name="FeedbackHud" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_feedback")
+
+[node name="CommsStrip" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_comms")
 
 [node name="Speed" type="Label" parent="."]
 layout_mode = 1

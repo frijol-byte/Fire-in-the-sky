@@ -204,6 +204,7 @@ func _build_model() -> void:
 	model = packed.instantiate() as ShipModel
 	add_child(model)
 	model.set_paint(def.paint_primary, def.paint_secondary)
+	model.set_engine_color(def.engine_color)
 	_adopt_collision(model)
 
 

@@ -36,8 +36,8 @@ func test_the_lock_envelope_is_a_cone_and_a_range() -> void:
 	)
 
 
-func test_every_ship_starts_with_a_full_magazine_and_its_devices() -> void:
-	for ship_id: StringName in FlightSim.SHIP_IDS:
+func test_every_player_ship_starts_with_a_full_magazine_and_its_devices() -> void:
+	for ship_id: StringName in FlightSim.PLAYER_SHIP_IDS:
 		var ship: Ship = auto_free(FlightSim.spawn(self, ship_id))
 		var secondaries: SecondarySystem = ship.secondaries()
 		assert_object(secondaries.def).is_not_null()

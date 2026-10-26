@@ -1,0 +1,239 @@
+{
+  "axes": "Blender: nose +Y, up +Z, right +X. glTF export is Y-up (nose = Godot -Z).",
+  "bounds": {
+    "T0": {
+      "max": [
+        4.1,
+        5.65,
+        2.3783
+      ],
+      "min": [
+        -2.1443,
+        -5.41,
+        -0.7
+      ],
+      "size": [
+        6.2443,
+        11.06,
+        3.0783
+      ]
+    },
+    "all_tiers": {
+      "max": [
+        4.1,
+        5.65,
+        2.3783
+      ],
+      "min": [
+        -2.1443,
+        -5.41,
+        -0.7
+      ],
+      "size": [
+        6.2443,
+        11.06,
+        3.0783
+      ]
+    }
+  },
+  "category": "ships",
+  "collision": [
+    "hull-colonly"
+  ],
+  "id": "pirate_interceptor",
+  "parts": {
+    "antenna": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 28
+    },
+    "canopy_frame": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 156
+    },
+    "canopy_glass": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "engine": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 464
+    },
+    "engine_glow": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 72
+    },
+    "gun_boom_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 204
+    },
+    "hazard_stripes": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 24
+    },
+    "hull": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 140
+    },
+    "missile_rail": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "nose_gun": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 68
+    },
+    "scrap_plates": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 132
+    },
+    "spikes": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 16
+    },
+    "tail_fin_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "vents": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 232
+    },
+    "wing_L": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    },
+    "wing_R": {
+      "hidden_when_upgraded": false,
+      "min_tier": 0,
+      "triangles": 44
+    }
+  },
+  "sockets": [
+    {
+      "index": 0,
+      "kind": "cockpit_cam",
+      "location": [
+        0.0,
+        0.9,
+        0.7728
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_cockpit_cam_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "engine",
+      "location": [
+        0.0,
+        -5.45,
+        -0.05
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "engine",
+      "location": [
+        3.0,
+        -4.25,
+        -0.2
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_engine_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        3.1416
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "primary",
+      "location": [
+        -2.0,
+        4.3,
+        -0.09
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "kind": "primary",
+      "location": [
+        0.25,
+        5.3,
+        -0.1
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_primary_1",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 0,
+      "kind": "secondary",
+      "location": [
+        0.3,
+        1.6,
+        -0.5
+      ],
+      "min_tier": 0,
+      "name": "SOCKET_secondary_0",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "tier_parts": {
+    "T0ONLY": [],
+    "T1": [],
+    "T2": [],
+    "T3": []
+  },
+  "triangles": {
+    "by_tier": {
+      "T0": 1756,
+      "T1": 1756,
+      "T2": 1756,
+      "T3": 1756
+    },
+    "total": 1756
+  }
+}

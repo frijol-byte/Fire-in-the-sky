@@ -13,3 +13,5 @@ res://ui/dev/tuning_overlay.tscn
 res://ui/pause/pause_menu.tscn
 res://world/props/target_dummy.tscn
 res://ui/death/death_screen.tscn
+res://world/arenas/combat_test.tscn
+res://ui/dev/wave_menu.tscn

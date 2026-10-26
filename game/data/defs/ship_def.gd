@@ -107,6 +107,10 @@ extends ContentDef
 ## (the defaults are the paint shader's own).
 @export var paint_primary: Color = Color(0.30, 0.38, 0.52)
 @export var paint_secondary: Color = Color(0.86, 0.46, 0.12)
+## Engine glow and exhaust trail colour at cruise and while boosting (art bible 2: Concord ships are
+## blue-white, the Cinder Clans' dirty orange).
+@export var engine_color: Color = Color(0.35, 0.65, 1.0)
+@export var engine_boost_color: Color = Color(0.75, 0.95, 1.0)
 
 @export_group("Destruction")
 ## `LootTableDef` id of the containers the ship drops when it is destroyed (not for the player's

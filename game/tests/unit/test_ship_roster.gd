@@ -17,7 +17,10 @@ const LENGTH: Dictionary[StringName, Vector2] = {
 
 
 func ship_params() -> Array[Array]:
-	return FlightSim.ship_params()
+	var result: Array[Array] = []
+	for ship_id: StringName in FlightSim.PLAYER_SHIP_IDS:
+		result.append([ship_id])
+	return result
 
 
 func _manifest(def: ShipDef) -> Dictionary:
@@ -80,7 +83,7 @@ func test_heavier_ships_are_slower_and_turn_slower() -> void:
 
 func test_each_ship_has_its_own_paint() -> void:
 	var seen: Array[Color] = []
-	for ship_id: StringName in FlightSim.SHIP_IDS:
+	for ship_id: StringName in FlightSim.PLAYER_SHIP_IDS:
 		var def: ShipDef = Content.ship(ship_id)
 		assert_array(seen).not_contains([def.paint_primary])
 		seen.append(def.paint_primary)

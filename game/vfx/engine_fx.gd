@@ -31,9 +31,6 @@ const GLOW_SIZE_IDLE: float = 1.1
 const GLOW_SIZE_FULL: float = 3.6
 const GLOW_SIZE_BOOST: float = 2.4
 
-const COLOR_NORMAL: Color = Color(0.35, 0.65, 1.0)
-const COLOR_BOOST: Color = Color(0.75, 0.95, 1.0)
-
 var _ship: Ship = null
 var _sockets: Array[Marker3D] = []
 var _glows: Array[MeshInstance3D] = []
@@ -117,7 +114,7 @@ func update(delta: float) -> void:
 	_boost = lerpf(
 		_boost, 1.0 if _ship.is_boosting() else 0.0, CameraRig.smooth_weight(delta, 0.15)
 	)
-	var color: Color = COLOR_NORMAL.lerp(COLOR_BOOST, _boost)
+	var color: Color = _ship.def.engine_color.lerp(_ship.def.engine_boost_color, _boost)
 	_glow_material.albedo_color = Color(color, glow_alpha(_level))
 	var size: float = glow_size(_level, _boost)
 	for glow: MeshInstance3D in _glows:

@@ -1,0 +1,98 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://world/arenas/combat_test.gd" id="1_arena"]
+[ext_resource type="Script" path="res://world/sky/sky_baker.gd" id="2_baker"]
+[ext_resource type="Script" path="res://world/asteroid_field.gd" id="3_field"]
+[ext_resource type="PackedScene" path="res://ships/camera_rig.tscn" id="4_rig"]
+[ext_resource type="Script" path="res://vfx/speed_fx.gd" id="5_speed"]
+[ext_resource type="Script" path="res://audio/ship_audio.gd" id="6_audio"]
+[ext_resource type="PackedScene" path="res://ui/hud/flight_hud.tscn" id="7_hud"]
+[ext_resource type="PackedScene" path="res://ui/dev/dev_tools.tscn" id="8_tools"]
+[ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="9_pause"]
+[ext_resource type="Script" path="res://combat/projectile_manager.gd" id="10_projectiles"]
+[ext_resource type="Script" path="res://combat/missile_manager.gd" id="11_missiles"]
+[ext_resource type="Script" path="res://combat/destruction_manager.gd" id="12_destruction"]
+[ext_resource type="PackedScene" path="res://ui/death/death_screen.tscn" id="13_death"]
+
+[ext_resource type="Script" path="res://combat/hit_feedback.gd" id="14_feedback"]
+[ext_resource type="Script" path="res://ai/bark_director.gd" id="15_barks"]
+
+[ext_resource type="Script" path="res://combat/encounter_director.gd" id="16_encounter"]
+[ext_resource type="PackedScene" path="res://ui/dev/wave_menu.tscn" id="17_menu"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_text"]
+font_size = 26
+outline_size = 8
+outline_color = Color(0, 0, 0, 0.8)
+
+[node name="CombatTest" type="Node3D"]
+script = ExtResource("1_arena")
+arena_id = &"combat_test"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+
+[node name="Fill" type="DirectionalLight3D" parent="."]
+
+[node name="SkyBaker" type="Node" parent="."]
+script = ExtResource("2_baker")
+
+[node name="AsteroidField" type="Node3D" parent="."]
+script = ExtResource("3_field")
+
+[node name="Gates" type="Node3D" parent="."]
+
+[node name="Dummies" type="Node3D" parent="."]
+
+[node name="ProjectileManager" type="Node3D" parent="."]
+script = ExtResource("10_projectiles")
+
+[node name="MissileManager" type="Node3D" parent="."]
+script = ExtResource("11_missiles")
+
+[node name="DestructionManager" type="Node3D" parent="."]
+script = ExtResource("12_destruction")
+
+[node name="HitFeedback" type="Node" parent="."]
+script = ExtResource("14_feedback")
+
+[node name="BarkDirector" type="Node" parent="."]
+script = ExtResource("15_barks")
+
+[node name="CameraRig" parent="." instance=ExtResource("4_rig")]
+
+[node name="SpeedFx" type="Node3D" parent="."]
+script = ExtResource("5_speed")
+
+[node name="ShipAudio" type="Node" parent="."]
+script = ExtResource("6_audio")
+
+[node name="Readout" type="Label" parent="."]
+offset_left = 48.0
+offset_top = 30.0
+offset_right = 1850.0
+offset_bottom = 100.0
+label_settings = SubResource("LabelSettings_text")
+
+[node name="Help" type="Label" parent="."]
+offset_left = 48.0
+offset_top = 108.0
+offset_right = 1850.0
+offset_bottom = 150.0
+label_settings = SubResource("LabelSettings_text")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="FlightHud" parent="Hud" instance=ExtResource("7_hud")]
+
+[node name="DeathScreen" parent="." instance=ExtResource("13_death")]
+
+[node name="EncounterDirector" type="Node" parent="."]
+script = ExtResource("16_encounter")
+
+[node name="WaveMenu" parent="." instance=ExtResource("17_menu")]
+
+[node name="DevTools" parent="." instance=ExtResource("8_tools")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("9_pause")]

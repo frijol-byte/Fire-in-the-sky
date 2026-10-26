@@ -50,7 +50,9 @@ func test_a_homing_missile_can_be_outrun_by_the_kestrels_boost() -> void:
 func test_every_ship_is_fitted_with_an_existing_secondary_and_devices() -> void:
 	for id: StringName in Content.ids(&"ship"):
 		var ship_def: ShipDef = Content.ship(id)
-		assert_object(Content.secondary(ship_def.secondary_weapon)).is_not_null()
+		# A ship without a secondary (the pirate interceptor) is guns only.
+		if ship_def.secondary_weapon != &"":
+			assert_object(Content.secondary(ship_def.secondary_weapon)).is_not_null()
 		assert_array(ship_def.device_ids).is_not_empty()
 		for device_id: StringName in ship_def.device_ids:
 			assert_object(Content.device(device_id)).is_not_null()

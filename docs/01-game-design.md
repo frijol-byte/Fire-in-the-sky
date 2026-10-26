@@ -267,6 +267,14 @@ Hit markers, a shield-impact ripple on the target, damage-direction indicators, 
 sound for shield/armor/hull hits, a low-shield alarm, and a kill confirmation with a short
 slow-motion tick on the last enemy (optional setting).
 
+*As built (M2-T7; numbers in `data/combat/feedback_default.tres`):* hit markers at the nose ring (shield: thin cyan
+ticks, armor: amber, hull: thick white with a dot, kill: large red burst and a "DESTROYED" line); damage-direction arcs
+on a ring round the screen (cyan / amber / red by the deepest layer hit, pointing at the shooter); the ship's own
+shield / armor / hull bars at the bottom left; a low-shield alarm from 25% (until 40%): flashing screen edge, "LOW
+SHIELD" and a beep every 1.1 s; camera shake on hits (hull hits shake most), on the player's death and on nearby
+explosions; a kill sound; and an optional slow-motion tick (0.3x for 0.45 s) when the last hostile ship dies, off unless
+the `feedback/kill_slowmo` setting (or the F7 menu switch in the combat test) is on.
+
 ## 8. Enemies & AI
 
 ### 8.1 Roles
@@ -290,6 +298,8 @@ slow-motion tick on the last enemy (optional setting).
   reaction time: rookie 0.8 s, standard 0.4 s, ace 0.15 s). It rests its guns when its capacitor is empty,
   like you have to. Rookie, standard and ace differ in reaction time, aim, aggression and range
   (`data/ai/*.tres`).
+- *As built (M2-T7):* AI pilots call out behavior changes as text on a comms strip (five lines per behavior, with a
+  chance per behavior, a gap of 1.6 s on the radio and 5 s per pilot; `data/combat/barks.tres`). No voices yet.
 - Radio barks telegraph intent ("Breaking left!", "He's on me!"), which is also the
   atmosphere pillar.
 

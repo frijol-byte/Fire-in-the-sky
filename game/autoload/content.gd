@@ -99,6 +99,21 @@ func destruction(id: StringName = &"default") -> DestructionDef:
 	return get_def(&"destruction", id) as DestructionDef
 
 
+## Returns the combat feedback numbers with `id` (`&"default"`), or `null`.
+func feedback(id: StringName = &"default") -> FeedbackDef:
+	return get_def(&"feedback", id) as FeedbackDef
+
+
+## Returns the radio bark lines def with `id` (`&"default"`), or `null`.
+func barks(id: StringName = &"default") -> BarkDef:
+	return get_def(&"bark", id) as BarkDef
+
+
+## Returns the encounter (waves of pirates) with `id` (`&"combat_test"`), or `null`.
+func encounter(id: StringName) -> EncounterDef:
+	return get_def(&"encounter", id) as EncounterDef
+
+
 ## Returns the ids of every def of `kind`, sorted.
 func ids(kind: StringName) -> Array[StringName]:
 	var by_id: Dictionary = _defs.get(kind, {})

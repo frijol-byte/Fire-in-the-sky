@@ -18,6 +18,14 @@ const CAMERA_RIG_SCENE: PackedScene = preload("res://ships/camera_rig.tscn")
 const DUMMY_SCENE: PackedScene = preload("res://world/props/target_dummy.tscn")
 ## The keys that pick the arena's selectable ships, in order (slot 1 is the first).
 const SWITCH_KEYS: Array[Key] = [KEY_F2, KEY_F3, KEY_F4]
+## F5 calls in a hostile AI fighter; F6 sends them all away.
+const CALL_PIRATE_KEY: Key = KEY_F5
+const SEND_AWAY_KEY: Key = KEY_F6
+## The AI pilots F5 cycles through, easiest first (`AIProfileDef` ids).
+const PIRATE_PROFILES: Array[StringName] = [&"rookie", &"standard", &"ace"]
+## Where a called-in pirate appears: this far ahead of the player and this far off to the side.
+const PIRATE_AHEAD_M: float = 700.0
+const PIRATE_ASIDE_M: float = 120.0
 
 ## Until the sky is baked (and always in a headless run) the background is this plain colour.
 const FALLBACK_AMBIENT: Color = Color(0.35, 0.3, 0.28)
@@ -25,6 +33,10 @@ const FALLBACK_AMBIENT: Color = Color(0.35, 0.3, 0.28)
 var def: ArenaDef = null
 var ship: Ship = null
 var gates_passed: int = 0
+## The AI fighters called in with F5, oldest first.
+var pirates: Array[Ship] = []
+
+var _pirates_called: int = 0
 
 @onready var _environment: WorldEnvironment = $WorldEnvironment
 @onready var _sun: DirectionalLight3D = $Sun
@@ -70,6 +82,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var key: InputEventKey = event as InputEventKey
 	if key == null or not key.pressed or key.echo:
 		return
+	if key.physical_keycode == CALL_PIRATE_KEY:
+		call_pirate()
+		return
+	if key.physical_keycode == SEND_AWAY_KEY:
+		clear_pirates()
+		return
 	var wanted: StringName = ship_for_slot(def, slot_for_key(key.physical_keycode))
 	if wanted != &"" and ship != null and wanted != ship.def.id:
 		spawn_player(wanted)
@@ -105,6 +123,7 @@ func spawn_player(ship_id: StringName) -> Ship:
 	new_ship.add_child(PlayerPilot.new())
 	InputRouter.recenter_mouse()
 	ship = new_ship
+	_point_pirates_at(ship)
 	_rig.attach(ship)
 	_speed_fx.attach(ship)
 	_audio.attach(ship)
@@ -112,6 +131,50 @@ func spawn_player(ship_id: StringName) -> Ship:
 	_hud.bind(ship)
 	_tools.bind(ship, _rig)
 	return ship
+
+
+## Calls in a hostile AI fighter ahead of the player, one profile further up `PIRATE_PROFILES` each
+## time (rookie, standard, ace, rookie...). Returns it, or null when there is no player ship.
+func call_pirate() -> Ship:
+	if ship == null:
+		return null
+	var profile_id: StringName = PIRATE_PROFILES[_pirates_called % PIRATE_PROFILES.size()]
+	_pirates_called += 1
+	var pirate: Ship = SHIP_SCENE.instantiate() as Ship
+	pirate.def = Content.ship(&"kestrel")
+	pirate.name = "Pirate%d" % _pirates_called
+	pirate.stance = Targeting.Stance.HOSTILE
+	add_child(pirate)
+	var forward: Vector3 = -ship.global_basis.orthonormalized().z
+	var aside: Vector3 = ship.global_basis.orthonormalized().x
+	var start: Vector3 = ship.global_position + forward * PIRATE_AHEAD_M + aside * PIRATE_ASIDE_M
+	pirate.global_transform = Transform3D(
+		Basis.looking_at(ship.global_position - start, Vector3.UP), start
+	)
+	var pilot: AIPilot = AIPilot.new()
+	pilot.name = "AIPilot"
+	pilot.profile = Content.ai_profile(profile_id)
+	# The arena's friendly dummy is on the player's side too: the pirates are here for the player.
+	pilot.forced_target = ship
+	pirate.add_child(pilot)
+	pirates.append(pirate)
+	return pirate
+
+
+## Makes every pirate hunt `new_target` (the player's new ship after a ship switch).
+func _point_pirates_at(new_target: Ship) -> void:
+	for pirate: Ship in pirates:
+		if is_instance_valid(pirate):
+			(pirate.get_node("AIPilot") as AIPilot).forced_target = new_target
+
+
+## Sends every called-in pirate away.
+func clear_pirates() -> void:
+	for pirate: Ship in pirates:
+		if is_instance_valid(pirate):
+			remove_child(pirate)
+			pirate.queue_free()
+	pirates.clear()
 
 
 ## The ship slot (1-3) a key selects, or 0 when it is not one of `SWITCH_KEYS`.
@@ -228,6 +291,16 @@ func _update_help() -> void:
 		+ (
 			tr("ARENA_HELP_TARGET")
 			% [InputRouter.glyph_for(&"target_nearest"), InputRouter.glyph_for(&"look_at_target")]
+		)
+	)
+	_help.text += (
+		"\n"
+		+ (
+			tr("ARENA_HELP_PIRATE")
+			% [
+				OS.get_keycode_string(CALL_PIRATE_KEY),
+				OS.get_keycode_string(SEND_AWAY_KEY),
+			]
 		)
 	)
 	_help.text += (

@@ -8,6 +8,10 @@ extends Node
 
 func _ready() -> void:
 	_set_player_targeting(true)
+	var ship: Ship = get_parent() as Ship
+	if ship != null:
+		# The player's side, so hostile AI ships have somebody to fight.
+		ship.stance = Targeting.Stance.FRIENDLY
 
 
 func _exit_tree() -> void:

@@ -212,6 +212,13 @@ Ship (RigidBody3D, custom_integrator = true)
 ### 5.3 AI
 - `AIPilot` runs a **utility AI** for picking behaviors (Pursue, AttackRun, BreakOff, Evade,
   Regroup, UseDevice, Flee). Each behavior outputs `ShipControls`.
+  *As built (M2-T5):* a child node of the `Ship`, writing `ship.controls` like `PlayerPilot` (no velocities, no
+  aim assist). Pursue, AttackRun, BreakOff, Evade and UseDevice exist; Regroup and Flee come with squads (M3).
+  The scores are the pure functions in `AIUtility`, the steering maths in `AIMath`; both are unit tested. The
+  pilot reads speeds, turn rates and energy from its `ShipDef`, and its personality from an `AIProfileDef`
+  (reaction time, aim error, aggression, ranges, maneuver lengths). Threats (an incoming missile, a missile
+  lock) are noticed only after the profile's reaction time. Sides: `AIPilot.is_enemy` (hostile vs friendly;
+  the player's ship is friendly). Rocks are avoided with rays along the velocity.
 - `Squad` coordinates a wing (roles, formation slots, focus target, tactics).
 - `EncounterDirector` spends a threat budget (danger × difficulty) to compose and spawn
   encounters.

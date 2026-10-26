@@ -352,3 +352,31 @@ func test_the_player_locks_and_launches_a_missile_at_the_dummy_ahead() -> void:
 	await SimHelper.step_physics(get_tree(), 240)
 	assert_float(first.durability().shield).is_less(shield)
 	assert_int(arena.ship.secondaries().ammo).is_equal(arena.ship.secondaries().def.ammo - 1)
+
+
+func test_f5_calls_in_hostile_ai_pirates_that_hunt_the_player_and_f6_sends_them_away() -> void:
+	var arena: FlightTest = ARENA_SCENE.instantiate() as FlightTest
+	_track(arena)
+	add_child(arena)
+	await SimHelper.step_physics(get_tree(), 2)
+	var first: Ship = arena.call_pirate()
+	var second: Ship = arena.call_pirate()
+	var third: Ship = arena.call_pirate()
+	await SimHelper.step_physics(get_tree(), 5)
+	assert_array(arena.pirates).has_size(3)
+	var seen: Array[StringName] = []
+	for pirate: Ship in [first, second, third]:
+		assert_int(pirate.stance).is_equal(Targeting.Stance.HOSTILE)
+		var pilot: AIPilot = pirate.get_node("AIPilot") as AIPilot
+		seen.append(pilot.profile.id)
+		# The player's ship is on the friendly side, so the pirates go for it.
+		assert_object(pilot.target).is_same(arena.ship)
+		# They start ahead of the player, not on top of them.
+		assert_float(pirate.global_position.distance_to(arena.ship.global_position)).is_greater(
+			300.0
+		)
+	assert_array(seen).is_equal([&"rookie", &"standard", &"ace"])
+	arena.clear_pirates()
+	assert_array(arena.pirates).is_empty()
+	await SimHelper.step_physics(get_tree(), 2)
+	assert_bool(is_instance_valid(first) and first.is_inside_tree()).is_false()

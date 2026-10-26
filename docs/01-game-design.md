@@ -284,6 +284,12 @@ slow-motion tick on the last enemy (optional setting).
 - They react to the player: evade (jink, FA-off flip, flares) when locked, retreat to regroup
   when shields are down, call reinforcements when losing.
 - Enemies use the same toolset as the player (drift, boost, devices).
+- *As built (M2-T5):* an AI pilot attacks in runs: it closes on the lead point, fires when the nose lines up,
+  breaks off sideways when a collision is coming, and loops back round. Shot at, it dodges sideways with the
+  guns still on you; locked by a missile, or with one in flight, it jinks, boosts and throws flares (after its
+  reaction time: rookie 0.8 s, standard 0.4 s, ace 0.15 s). It rests its guns when its capacitor is empty,
+  like you have to. Rookie, standard and ace differ in reaction time, aim, aggression and range
+  (`data/ai/*.tres`).
 - Radio barks telegraph intent ("Breaking left!", "He's on me!"), which is also the
   atmosphere pillar.
 

@@ -10,9 +10,11 @@
   now also has **guns** (M2-T2: fire on **A** / **X**, boost on **L3**; shoot the target dummies in
   the arena). **M2-T3** (targeting, lead indicator, aim assist) is merged: target button (**Y**: tap /
   double-tap), brackets, the lead ring and aim assist. **M2-T4** (secondaries: Homing Missile, Rocket Pod,
-  Flares, incoming-missile warning; PR open) adds **X** = secondary (hold on a locked target, release to
+  Flares, incoming-missile warning) is merged: **X** = secondary (hold on a locked target, release to
   launch the missile; press for a rocket salvo) and flares on device slot 1 (key **1** / D-pad up). The
-  arena's ship switcher moved to the **F2 / F3 / F4** keys. **M2-T5** (basic AI pilot) is next.
+  arena's ship switcher moved to the **F2 / F3 / F4** keys. **M2-T5** (basic AI pilot; PR open) adds AI
+  pilots: in the flight arena press **F5** to call in a hostile fighter (rookie, then standard, then ace) and
+  **F6** to send them away. **M2-T6** (destruction, loot & respawn stub) is next.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -74,7 +76,8 @@
 | M2-T1 | Damage model & Durability | M1 | ✅ | #20 |
 | M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
 | M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
-| M2-T4 | Secondaries & countermeasures | T3 | 👀 | #23 |
+| M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
+| M2-T5 | Basic AI pilot | T3 | 👀 | PR_NUMBER |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -523,6 +526,40 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
+
+- M2-T5 (2026-10-26): the basic AI pilot. Things the next session must know:
+  - **`AIPilot`** (`ai/ai_pilot.gd`) is a child node of a `Ship`, like `PlayerPilot`: each physics tick it builds a fresh
+    `ShipControls` and assigns `ship.controls`; it never sets a velocity (a sim pins that). It also calls
+    `ship.targeting().select()` so a missile lock can be built, and nothing else. No aim assist: it aims with
+    `Lead.solve` plus an aim error. Add one with `pilot.profile = Content.ai_profile(&"standard")` (before or after
+    `add_child`) and `pilot.seed_rolls(n)` for a repeatable fight (`CombatSim.spawn_ai(...)` does all of it).
+  - **Sides:** `AIPilot.is_enemy(mine, theirs)`: HOSTILE fights FRIENDLY and the other way round, NEUTRAL fights nobody.
+    `PlayerPilot` now sets the player's ship to **FRIENDLY**, so hostile AI ships hunt the player. An AI picks the
+    nearest enemy node of group `Targeting.GROUP` within `sight_range_m`; `pilot.forced_target` overrides that (sims
+    use it with the dummies, which are HOSTILE by default and so are nobody's enemy).
+  - **Pure rules, unit tested:** `ai/ai_math.gd` (`AIMath`: stick commands with feed-forward, turn radius, fire cone,
+    reaction timing, rock-avoid heading, matched throttle, collision course, fire discipline) and `ai/ai_utility.gd`
+    (`AIUtility`: the behavior scores and the selector). Behaviors: PURSUE, ATTACK_RUN, BREAK_OFF, EVADE, USE_DEVICE
+    (flares). Regroup and Flee from architecture 5.3 are **not built** (M3). Scores and the commit times are the
+    numbers to tune; all pilot tunables are in `AIProfileDef` (`data/ai/{rookie,standard,ace}.tres`, `Content.ai_profile`).
+  - **What the sims taught (tuning notes):** (1) a held trigger on an empty capacitor spends nothing, so the capacitor
+    never regenerates (regen waits 1.2 s after the last spend): the AI rests its guns below 12% energy and resumes at
+    50% (`AIMath.hold_fire`); without that a Kestrel needed 150 s to kill a Drayman. (2) Braking matters: an attack run
+    holds station behind a slow or fleeing target with `AIMath.matched_throttle` instead of overshooting; without it
+    duels were furballs at 4 m. (3) Break-off only on a *collision course* (`AIMath.is_collision_course`) or very
+    close, not whenever a target is within range. (4) The nose tracks the aim point with feed-forward of the aim
+    point's swing, or a jinking target is always 5-8 degrees outside the fire cone. (5) Jinking ships should not boost
+    away from guns (it ends the fight); they boost against missiles.
+  - **Rocks:** five rays along the velocity (centre plus four at the ship's radius), mask `PhysicsLayers.WORLD`. Needs
+    the rock's `StaticBody3D` collider, which the arena only creates around the *player's* ship (`RockColliders.set_target`),
+    so an AI far from the player does not see rocks (and cannot hit them). Sim: <= 3 bumps per minute per ship.
+  - **Sims:** `tests/sim/test_ai_pilot_sim.gd` (dummy kill < 60 s for all three ships, behavior cycle, nearest-enemy rule,
+    controls-only, determinism, rocks, flares timing vs reaction time, lock -> evade) and
+    `tests/sim/long/test_ai_duels_long.gd` (duels with a winner < 180 s; the first long sims). A gdUnit test has a
+    5 minute (game time) timeout, so every duel is its own test. `CombatSim.spawn_ai/pilot_of/spawn_rock_field` are new helpers.
+    **Rookie vs rookie can stall past 180 s** (two cautious pilots; not gated).
+  - **Arena:** F5 `FlightTest.call_pirate()` / F6 `clear_pirates()` (keyboard only, like the ship switcher). Shot scene
+    `ai_dogfight_shot` (the player's ship flown by an AI against a pirate).
 
 - M2-T4 (2026-10-25): homing missile, rocket pod, flares and the incoming-missile warning. Things the next
   session must know:

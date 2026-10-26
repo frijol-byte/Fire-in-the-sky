@@ -208,6 +208,21 @@ Ship (RigidBody3D, custom_integrator = true)
   (by `PlayerPilot`) gets it. Magnetism is the weapon gimbal (`WeaponSystem.set_aim_point` with the
   lead point, `gimbal_scale` = strength); friction is `InputRouter.aim_friction`, which scales the aim
   stick in `look_input()`. The AI never gets either: it writes `ShipControls` like everyone.
+- **Destruction, loot and respawn** (M2-T6). `DestructionManager` (one per scene, group `destruction_manager`)
+  listens for `Events.ship_destroyed` and, for the ship or dummy that blew up: plays the explosion (`CombatFx.explosion`
+  plus a fireball card with `shaders/fireball.gdshader`, a shockwave ring, a pooled `OmniLight3D`), throws `DebrisField`
+  chunks, turns a `Ship` into a wreck (`Ship.begin_wreck`: it coasts and tumbles, loses its collision, leaves the
+  `Targeting.GROUP` group, its engines go dark, its model shrinks away and `wreck_faded` fires; an AI wreck is then
+  removed, the player's stays for the respawn) and drops containers from the ship's `LootTableDef`
+  (`ShipDef.loot_table_id`; the player's own ship drops none). Every number is data: `DestructionDef`
+  (`data/combat/destruction_default.tres`), `LootTableDef` (`data/loot/`), `TractorDef`
+  (`data/combat/tractor_default.tres`); the rules are the pure `DestructionMath` and `LootMath`. `LootManager` (a child of
+  the destruction manager, `economy/`) flies the `LootContainer`s and runs the tractor: the player's ship (the one with
+  `Targeting.is_player`) pulls containers within range and collects those that reach it into the wallet in
+  `GameState` (`credits`, `materials`; `Events.wallet_changed`, `Events.loot_collected`). `DeathScreen`
+  (`ui/death/`) is armed by the flight scene when the player's ship is destroyed and asks for a respawn;
+  `FlightTest.respawn_player()` then calls `spawn_player` again, which re-binds the camera, HUD, speed effects, audio
+  and dev tools. Insurance and the station respawn replace the stub in M4.
 
 ### 5.3 AI
 - `AIPilot` runs a **utility AI** for picking behaviors (Pursue, AttackRun, BreakOff, Evade,

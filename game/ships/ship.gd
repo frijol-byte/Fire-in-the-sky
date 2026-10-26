@@ -4,8 +4,15 @@ extends RigidBody3D
 ## `FlightController`. Whoever pilots it (the player's `PlayerPilot`, an AI, a test) writes
 ## `controls` each physics tick; nothing else steers the ship.
 ##
+## When the ship is destroyed `DestructionManager` calls `begin_wreck`: the ship stops flying, tumbles
+## on, loses its collision and its targetability, and its model shrinks away (`wreck_faded` is
+## emitted when it is gone). The ship node itself stays until whoever owns it removes it.
+##
 ## The body is weightless and undamped: all motion comes from the flight controller. Jolt
 ## still resolves collisions, and flight assist then pulls the velocity back to the command.
+
+## Emitted once, when a wreck's model has shrunk away completely.
+signal wreck_faded
 
 ## Everything about this ship class. Set it before the ship enters the tree.
 @export var def: ShipDef = null
@@ -19,6 +26,11 @@ var model: ShipModel = null
 var stance: Targeting.Stance = Targeting.Stance.HOSTILE
 
 var _target_radius: float = 6.0
+## Seconds since the ship became a wreck, or -1 while it is a ship.
+var _wreck_age: float = -1.0
+var _wreck_fade: float = 1.0
+var _wreck_spin: Vector3 = Vector3.ZERO
+var _wreck_faded: bool = false
 
 @onready var _flight: FlightController = $FlightController
 @onready var _power: PowerSystem = $PowerSystem
@@ -64,10 +76,49 @@ func _ready() -> void:
 	_shield_fx.setup(self, bounds.get_center(), bounds.size * 0.5)
 
 
+func _process(_delta: float) -> void:
+	if _wreck_age >= 0.0 and not _wreck_faded:
+		_fade_wreck()
+
+
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
+	if _wreck_age >= 0.0:
+		# A wreck coasts on with the velocity it had and tumbles; nobody flies it any more.
+		state.angular_velocity = _wreck_spin
+		_wreck_age += state.step
+		return
 	_flight.integrate(state, controls)
 	_power.tick(state.step)
 	_durability.tick(state.step)
+
+
+## `LootTableDef` id of what this ship drops when destroyed (empty for none).
+func loot_table_id() -> StringName:
+	return def.loot_table_id
+
+
+## Turns the destroyed ship into a wreck: it coasts and tumbles at the angular velocity `spin`
+## (radians per second), stops colliding and being targeted, its engines go dark, and its model
+## shrinks away over `look.wreck_fade_seconds`. Call it once, after the hull is gone.
+func begin_wreck(look: DestructionDef, spin: Vector3) -> void:
+	if _wreck_age >= 0.0:
+		return
+	_wreck_age = 0.0
+	_wreck_fade = look.wreck_fade_seconds
+	_wreck_spin = spin
+	_wreck_faded = false
+	collision_layer = 0
+	collision_mask = 0
+	remove_from_group(Targeting.GROUP)
+	_flight.boosting = false
+	_engine_fx.shut_down()
+	_shield_fx.visible = false
+	controls = ShipControls.new()
+
+
+## True once the ship has been destroyed and is only a wreck.
+func is_wrecked() -> bool:
+	return _wreck_age >= 0.0
 
 
 ## The ship's energy capacitor (boost, and later weapons and devices, spend from it).
@@ -133,6 +184,15 @@ func is_boosting() -> bool:
 ## Returns the velocity in the ship's own axes (-Z is forward), handy for HUDs and tests.
 func local_velocity() -> Vector3:
 	return global_basis.orthonormalized().inverse() * linear_velocity
+
+
+func _fade_wreck() -> void:
+	var amount: float = DestructionMath.wreck_scale(_wreck_age, _wreck_fade)
+	model.scale = Vector3.ONE * maxf(amount, 0.001)
+	if amount <= 0.0:
+		_wreck_faded = true
+		model.visible = false
+		wreck_faded.emit()
 
 
 func _on_boost_depleted() -> void:

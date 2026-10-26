@@ -70,6 +70,11 @@ func attach(ship: Ship) -> void:
 ## Advances the sound by `delta` seconds from the ship's state. `_process` calls it every frame;
 ## tests call it directly.
 func update(delta: float) -> void:
+	if _ship.is_wrecked():
+		# The engines died with the ship.
+		_engine.volume_db = SILENT_DB
+		_hiss.volume_db = SILENT_DB
+		return
 	var boosting: bool = _ship.is_boosting()
 	_level = EngineFx.level_step(
 		_level, EngineFx.target_level(_ship.controls.thrust.z, boosting), delta

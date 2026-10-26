@@ -48,6 +48,7 @@ primary_weapon = &"autocannon"
 secondary_weapon = &"homing_missile"
 secondary_launch_offset = Vector3(0, -1.2, -5)
 device_ids = Array[StringName]([&"flares"])
+loot_table_id = &"heavy"
 primary_slots = 2
 secondary_slots = 1
 device_slots = 2

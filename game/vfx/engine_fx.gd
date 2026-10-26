@@ -43,16 +43,17 @@ var _glow_material: StandardMaterial3D = null
 var _trail_material: StandardMaterial3D = null
 var _level: float = 0.0
 var _boost: float = 0.0
+var _off: bool = false
 
 
 func _process(delta: float) -> void:
-	if _ship == null:
+	if _ship == null or _off:
 		return
 	update(delta)
 
 
 func _physics_process(_delta: float) -> void:
-	if _ship == null:
+	if _ship == null or _off:
 		return
 	for index: int in _sockets.size():
 		var points: PackedVector3Array = _trail_points[index]
@@ -92,6 +93,20 @@ func setup(ship: Ship) -> void:
 		_trail_meshes.append(trail)
 		_trail_points.append(PackedVector3Array())
 	update(0.0)
+
+
+## Puts the engines out for good: the glows and trails disappear (a destroyed ship).
+func shut_down() -> void:
+	_off = true
+	for glow: MeshInstance3D in _glows:
+		glow.visible = false
+	for trail: MeshInstance3D in _trail_meshes:
+		trail.visible = false
+
+
+## True once `shut_down` has been called.
+func is_off() -> bool:
+	return _off
 
 
 ## Advances the engine level by `delta` seconds and redraws the glows and trails. `_process`

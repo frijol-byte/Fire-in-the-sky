@@ -16,6 +16,10 @@ extends ContentDef
 @export var shield_regen: float = 10.0
 @export var shield_regen_delay: float = 4.0
 
+@export_group("Destruction")
+## `LootTableDef` id of the containers a destroyed dummy drops, or empty for none.
+@export var loot_table_id: StringName = &""
+
 @export_group("Body")
 ## Radius of the sphere that is both shown and hit, in metres.
 @export var radius: float = 6.0

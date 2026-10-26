@@ -84,6 +84,21 @@ func difficulty(id: StringName) -> DifficultyDef:
 	return get_def(&"difficulty", id) as DifficultyDef
 
 
+## Returns the loot table with `id` (`&"light"`, `&"medium"`, `&"heavy"`, `&"dummy"`), or `null`.
+func loot_table(id: StringName) -> LootTableDef:
+	return get_def(&"loot_table", id) as LootTableDef
+
+
+## Returns the tractor beam def with `id` (`&"default"`), or `null`.
+func tractor(id: StringName = &"default") -> TractorDef:
+	return get_def(&"tractor", id) as TractorDef
+
+
+## Returns the destruction look def with `id` (`&"default"`), or `null`.
+func destruction(id: StringName = &"default") -> DestructionDef:
+	return get_def(&"destruction", id) as DestructionDef
+
+
 ## Returns the ids of every def of `kind`, sorted.
 func ids(kind: StringName) -> Array[StringName]:
 	var by_id: Dictionary = _defs.get(kind, {})

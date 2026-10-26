@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="LootTableDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/loot_table_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"medium"
+containers_min = 2
+containers_max = 4
+credits_min = 30
+credits_max = 90
+material_chance = 0.4
+material_ids = Array[StringName]([&"scrap_metal", &"coolant", &"circuitry"])
+material_amount_min = 2
+material_amount_max = 4
+lifetime_seconds = 60.0
+scatter_speed = 16.0

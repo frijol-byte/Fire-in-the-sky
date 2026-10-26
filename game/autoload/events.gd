@@ -26,3 +26,10 @@ signal ship_damaged(ship: Node, info: DamageInfo, result: DamageResult)
 
 ## Emitted by `Durability` once, when a hit empties a ship's hull. `info` is the killing hit.
 signal ship_destroyed(ship: Node, info: DamageInfo)
+
+## Emitted by `LootManager` when the player's tractor beam collects a container. The wallet has
+## already been paid (`GameState`).
+signal loot_collected(ship: Node, drop: LootDrop)
+
+## Emitted by `GameState` whenever the wallet changes (credits or materials).
+signal wallet_changed

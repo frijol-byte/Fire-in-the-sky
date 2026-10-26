@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://world/arenas/flight_test.gd" id="1_arena"]
 [ext_resource type="Script" path="res://world/sky/sky_baker.gd" id="2_baker"]
@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="9_pause"]
 [ext_resource type="Script" path="res://combat/projectile_manager.gd" id="10_projectiles"]
 [ext_resource type="Script" path="res://combat/missile_manager.gd" id="11_missiles"]
+[ext_resource type="Script" path="res://combat/destruction_manager.gd" id="12_destruction"]
+[ext_resource type="PackedScene" path="res://ui/death/death_screen.tscn" id="13_death"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_text"]
 font_size = 36
@@ -42,6 +44,9 @@ script = ExtResource("10_projectiles")
 [node name="MissileManager" type="Node3D" parent="."]
 script = ExtResource("11_missiles")
 
+[node name="DestructionManager" type="Node3D" parent="."]
+script = ExtResource("12_destruction")
+
 [node name="CameraRig" parent="." instance=ExtResource("4_rig")]
 
 [node name="SpeedFx" type="Node3D" parent="."]
@@ -67,6 +72,8 @@ label_settings = SubResource("LabelSettings_text")
 [node name="Hud" type="CanvasLayer" parent="."]
 
 [node name="FlightHud" parent="Hud" instance=ExtResource("7_hud")]
+
+[node name="DeathScreen" parent="." instance=ExtResource("13_death")]
 
 [node name="DevTools" parent="." instance=ExtResource("8_tools")]
 

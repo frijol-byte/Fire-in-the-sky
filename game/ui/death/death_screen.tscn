@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://ui/death/death_screen.gd" id="1_death"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dim"]
+bg_color = Color(0.09, 0.015, 0.01, 0.62)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 56
+font_color = Color(1, 0.55, 0.3, 1)
+shadow_size = 4
+shadow_color = Color(0, 0, 0, 0.7)
+
+[sub_resource type="LabelSettings" id="LabelSettings_cause"]
+font_size = 26
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.7)
+
+[node name="DeathScreen" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_death")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dim")
+
+[node name="Center" type="CenterContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Column" type="VBoxContainer" parent="Panel/Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Panel/Center/Column"]
+layout_mode = 2
+text = "DEATH_TITLE"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="Cause" type="Label" parent="Panel/Center/Column"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_cause")
+horizontal_alignment = 1
+
+[node name="Respawn" type="Button" parent="Panel/Center/Column"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "DEATH_RESPAWN"

@@ -118,6 +118,11 @@ func target_radius() -> float:
 	return def.radius
 
 
+## `LootTableDef` id of what the dummy drops when destroyed (empty for none).
+func loot_table_id() -> StringName:
+	return def.loot_table_id
+
+
 ## Brings a destroyed dummy back, fully repaired.
 func respawn() -> void:
 	_destroyed = false

@@ -9,11 +9,9 @@ extends Node
 ## tick 2N.
 
 ## The physics tick the victim is destroyed on.
-const KILL_TICK: int = 40
+const KILL_TICK: int = 80
 ## Where the pirate hangs, in the player's ship axes (the camera behind the player sees it).
-const PIRATE_OFFSET: Vector3 = Vector3(14.0, 5.0, -95.0)
-## The player starts flying forward at this tick to scoop up the loot.
-const SCOOP_TICK: int = 150
+const PIRATE_OFFSET: Vector3 = Vector3(7.0, 3.0, -60.0)
 
 @export var player_dies: bool = false
 
@@ -39,23 +37,14 @@ func _physics_process(_delta: float) -> void:
 		victim.durability().apply(
 			DamageInfo.make(100000.0, DamageInfo.Type.EXPLOSIVE, arena.ship, victim.global_position)
 		)
-	if not player_dies and is_instance_valid(arena.ship) and not arena.ship.is_wrecked():
-		arena.ship.controls = scripted_controls(_tick)
-
-
-## The player's scripted controls on physics tick `tick`: hold still, then fly forward to the loot.
-static func scripted_controls(tick: int) -> ShipControls:
-	var controls: ShipControls = ShipControls.new()
-	if tick >= SCOOP_TICK:
-		controls.thrust = Vector3(0.0, 0.0, 0.7)
-	return controls
+	# The player sits still: the tractor brings the loot to the ship.
+	arena.ship.controls = ShipControls.new()
 
 
 func _place() -> void:
 	_placed = true
-	for child: Node in arena.ship.get_children():
-		if child is PlayerPilot:
-			child.queue_free()
+	# The player's pilot stays (it also marks the ship as the player's, which the tractor needs); this
+	# driver runs after it each tick and overwrites the controls it wrote.
 	# The arena's dummies are hostile: keep them out of the way of the picture.
 	for dummy: Node in arena.get_node("Dummies").get_children():
 		(dummy as Node3D).visible = false

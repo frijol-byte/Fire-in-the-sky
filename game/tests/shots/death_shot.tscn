@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="PackedScene" path="res://world/arenas/flight_test.tscn" id="1_arena"]
 [ext_resource type="Script" path="res://tests/shots/destruction_shot_driver.gd" id="2_drv"]
@@ -7,32 +7,38 @@
 
 [sub_resource type="Resource" id="Resource_0"]
 script = ExtResource("4_def")
-label = "1_hit"
-frame = 36
+label = "1_before"
+frame = 38
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_1"]
 script = ExtResource("4_def")
-label = "2_blast"
-frame = 44
+label = "2_flash"
+frame = 41
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("4_def")
-label = "3_wreck"
-frame = 70
+label = "3_blast"
+frame = 46
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_3"]
 script = ExtResource("4_def")
-label = "4_screen"
-frame = 110
+label = "4_wreck"
+frame = 70
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("4_def")
-label = "5_ready"
-frame = 160
+label = "5_screen"
+frame = 105
+move_camera = false
+
+[sub_resource type="Resource" id="Resource_5"]
+script = ExtResource("4_def")
+label = "6_ready"
+frame = 142
 move_camera = false
 
 [node name="DeathShot" type="Node3D"]
@@ -45,4 +51,4 @@ player_dies = true
 
 [node name="ShotDirector" type="Node" parent="."]
 script = ExtResource("3_dir")
-shots = Array[ExtResource("4_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4")])
+shots = Array[ExtResource("4_def")]([SubResource("Resource_0"), SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5")])

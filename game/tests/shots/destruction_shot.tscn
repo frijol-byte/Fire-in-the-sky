@@ -8,7 +8,7 @@
 [sub_resource type="Resource" id="Resource_0"]
 script = ExtResource("4_def")
 label = "1_before"
-frame = 36
+frame = 38
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_1"]
@@ -20,43 +20,43 @@ move_camera = false
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("4_def")
 label = "3_fireball"
-frame = 44
+frame = 43
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_3"]
 script = ExtResource("4_def")
 label = "4_peak"
-frame = 48
+frame = 46
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("4_def")
 label = "5_wreck"
-frame = 56
+frame = 52
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_5"]
 script = ExtResource("4_def")
 label = "6_debris"
-frame = 75
+frame = 64
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_6"]
 script = ExtResource("4_def")
 label = "7_loot"
-frame = 110
+frame = 90
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_7"]
 script = ExtResource("4_def")
 label = "8_tractor"
-frame = 160
+frame = 115
 move_camera = false
 
 [sub_resource type="Resource" id="Resource_8"]
 script = ExtResource("4_def")
 label = "9_collected"
-frame = 200
+frame = 150
 move_camera = false
 
 [node name="DestructionShot" type="Node3D"]

@@ -571,6 +571,9 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
     in ~13 s untouched and wave 2 in ~52 s at 92% hull, and **dies in wave 3** (~33 s). Pirate durability was cut
     during tuning (fighter 50/40/60, interceptor 40/20/35) and homing missiles were removed from the fighter because the
     stand-in could not deal with them. If the owner finds 1v3 too hard, soften `combat_test.tres` (profiles, stagger) first.
+  - **Export gotcha:** a `PackedFloat32Array` export in a def came back empty in the exported build (CI's export step caught it; the
+    editor and every test were fine), so `BarkDef.chances` is an `Array[float]`. Avoid packed arrays in defs. `bash tools/ci/export.sh`
+    reproduces the CI export locally once Godot's export templates are installed.
   - Not done: radio barks have no voice, wave progress is not saved, the kill "slow-mo tick" is only on the last hostile ship.
 
 - M2-T6 (2026-10-26): destruction, loot and the respawn stub. Things the next session must know:

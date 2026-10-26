@@ -8,7 +8,7 @@ extends ContentDef
 ## Which behaviors bark, as `AIUtility.Behavior` names in lower case (`&"break_off"`), and the
 ## chance (0..1) that entering each one makes the pilot speak. Same length.
 @export var behaviors: Array[StringName] = []
-@export var chances: PackedFloat32Array = []
+@export var chances: Array[float] = []
 ## Lines per behavior and the start of their keys.
 @export var line_count: int = 5
 @export var key_prefix: String = "BARK_"

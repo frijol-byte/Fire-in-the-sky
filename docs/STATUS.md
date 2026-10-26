@@ -77,7 +77,7 @@
 | M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
 | M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
-| M2-T5 | Basic AI pilot | T3 | 👀 | PR_NUMBER |
+| M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 

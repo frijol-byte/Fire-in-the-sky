@@ -14,7 +14,10 @@
   launch the missile; press for a rocket salvo) and flares on device slot 1 (key **1** / D-pad up). The
   arena's ship switcher moved to the **F2 / F3 / F4** keys. **M2-T5** (basic AI pilot; PR open) adds AI
   pilots: in the flight arena press **F5** to call in a hostile fighter (rookie, then standard, then ace) and
-  **F6** to send them away. **M2-T6** (destruction, loot & respawn stub) is next.
+  **F6** to send them away. **M2-T6** (destruction, loot & respawn stub; PR open) makes ships blow up: the
+  wreck tumbles and fades, the fighter drops loot containers that your tractor pulls in (credits and scrap show on
+  the arena readout), and when *you* die a "Ship destroyed" screen lets you respawn at the start.
+  **M2-T7** (combat HUD, feedback & encounter test) is next.
 - **Owner actions waiting:**
   0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
      Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
@@ -78,6 +81,7 @@
 | M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
 | M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
+| M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | (PR pending) |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -526,6 +530,40 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
 - Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
   **More info → Run anyway**.
 - Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
+
+- M2-T6 (2026-10-26): destruction, loot and the respawn stub. Things the next session must know:
+  - **`DestructionManager`** (`combat/destruction_manager.gd`, one per scene, group `destruction_manager`; the arena has one)
+    listens for `Events.ship_destroyed` for *any* `Ship` or `TargetDummy` and does the explosion (`CombatFx.explosion` +
+    the fireball/ring cards of `shaders/fireball.gdshader` + a pooled `OmniLight3D` + `DebrisField`), the wreck and the
+    loot. Scenes without one (most sims) simply see no effects. Its pieces: `DebrisField` (96 pooled chunks from three
+    primitive meshes), `LootManager`/`LootContainer`/`LootDrop` (`economy/`), pure rules in `DestructionMath` and `LootMath`.
+    The art bible's "flipbook" is a procedural shader for now; M8 can replace it with painted frames.
+  - **Wreck:** `Ship.begin_wreck(look, spin)` (called by the manager): the ship coasts on its last velocity and tumbles,
+    `collision_layer/mask = 0`, it leaves `Targeting.GROUP`, `EngineFx.shut_down()`, `ShipAudio` goes quiet, and the model
+    shrinks over `DestructionDef.wreck_fade_seconds` (`wreck_faded` signal). `Ship.is_wrecked()` is the check. An AI
+    wreck is removed by the manager when it has faded (`remove_child` + `queue_free`); the **player's wreck stays in the
+    tree** (camera and HUD are bound to it) until `FlightTest.spawn_player` replaces it. Anything that keeps a typed
+    `Array[Ship]` of ships must drop a destroyed one on `ship_destroyed` (the arena does for `pirates`), or the typed
+    loop trips over the freed object.
+  - **Loot:** `ShipDef.loot_table_id` / `DummyDef.loot_table_id` -> `LootTableDef` (`data/loot/`: light, medium, heavy,
+    dummy). Containers hold credits or one of three placeholder materials (`scrap_metal`, `coolant`, `circuitry`;
+    names are `MATERIAL_<ID>` keys). **The player's own ship drops nothing.** The tractor is `TractorDef` (always on, only
+    for the ship with `Targeting.is_player`, which `PlayerPilot` sets): pulled containers ride along with the ship, so
+    even a boosting ship catches them. Pickup pays `GameState.collect` (new `credits`, `materials`, `Events.wallet_changed`,
+    `Events.loot_collected`). The wallet is **not** reset by a death or by entering the arena (insurance is M4); there is
+    no wallet UI beyond the arena readout (`FlightTest.wallet_text()`).
+  - **Respawn:** `DeathScreen` (`ui/death/`) is armed by `FlightTest` on the player's `ship_destroyed`
+    (`death_screen_delay` 2 s, then the button ignores presses for `respawn_input_delay` 1.2 s because A is fire *and*
+    confirm). `FlightTest.respawn_player()` respawns the same ship class at the start (also closes the screen if the
+    ship switcher is used while dead). A death in cockpit view switches the camera to chase.
+  - **Tests:** `tests/unit/test_{loot_table_def,destruction_defs,destruction_math,loot_math,wallet,debris_field,
+    loot_manager,death_screen}.gd`, sims `tests/sim/test_destruction_sim.gd` and `test_respawn_sim.gd` (an arena sim must
+    `await process_frame` in `after_test`, or ships freed with `queue_free` count as orphans). Shots: `destruction_shot`
+    (pirate blown up, loot scooped) and `death_shot` (player dies, respawn screen).
+  - New sound `loot_pickup.wav` (generator + `licenses.csv` row); `strings.csv` gained `DEATH_*`, `MATERIAL_*`, `ARENA_WALLET*`.
+  - For M2-T7: nothing calls `CameraRig.shake` on an explosion yet; the explosion has no screen-space effect. Debris and
+    containers have no collision (decoration/pickups only). Hit-and-run kills by AI on the player show the killer's name
+    on the death screen via `info.source.target_name()`.
 
 - M2-T5 (2026-10-26): the basic AI pilot. Things the next session must know:
   - **`AIPilot`** (`ai/ai_pilot.gd`) is a child node of a `Ship`, like `PlayerPilot`: each physics tick it builds a fresh

@@ -148,6 +148,10 @@ great and reads clearly.
   ship out of the tree at once (`remove_child` then `queue_free`), then re-bind the camera rig,
   HUD, `DevTools`, speed effects and audio to the new ship, and call `InputRouter.recenter_mouse()`.
 
+- **Done (2026-10-26, see `docs/STATUS.md`):** `DestructionManager` (fireball shader + ring + light + debris + wreck),
+  `LootTableDef` / `LootManager` / tractor pickup into a debug wallet in `GameState`, and the `DeathScreen` + arena
+  respawn. The "flipbook" is a procedural fireball shader until the art pass (M8). Insurance rules wait for M4.
+
 ### M2-T7 · Combat HUD, feedback & encounter test
 - **Size:** L · **Depends on:** T2–T6 · **Read:** GDD §7.4, art bible §6–7
 - **Do:**

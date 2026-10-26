@@ -108,6 +108,11 @@ extends ContentDef
 @export var paint_primary: Color = Color(0.30, 0.38, 0.52)
 @export var paint_secondary: Color = Color(0.86, 0.46, 0.12)
 
+@export_group("Destruction")
+## `LootTableDef` id of the containers the ship drops when it is destroyed (not for the player's
+## own ship, which drops nothing), or empty for none.
+@export var loot_table_id: StringName = &""
+
 @export_group("Slots (placeholder)")
 @export var primary_slots: int = 2
 @export var secondary_slots: int = 1

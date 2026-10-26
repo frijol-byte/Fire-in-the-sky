@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generates the placeholder flight and combat sounds as WAV files: engine hum, boost whoosh,
 dust hiss, the two weapons' shots, hit sounds for shield, armor, hull and rock, the overheat vent,
-and the missile sounds (launches, explosion, lock beeps, incoming-missile warning, flare launch).
+the missile sounds (launches, explosion, lock beeps, incoming-missile warning, flare launch) and the
+loot pickup chime.
 
 Everything is synthesised from maths and a seeded random generator, so the files are original
 work released as CC0 and a rebuild is byte-identical. Python standard library only.
@@ -320,6 +321,21 @@ def flare_launch() -> list[float]:
     return _normalise(out, 0.8)
 
 
+def loot_pickup() -> list[float]:
+    """The tractor beam collecting a container: a quick bright two-note chime."""
+    count = int(RATE * 0.3)
+    out = []
+    for i in range(count):
+        t = i / RATE
+        freq = 880.0 if t < 0.08 else 1320.0
+        local = t if t < 0.08 else t - 0.08
+        envelope = min(local / 0.004, 1.0) * math.exp(-local * 14.0)
+        out.append(
+            (math.sin(2.0 * math.pi * freq * t) + 0.3 * math.sin(2.0 * math.pi * freq * 2.0 * t)) * envelope
+        )
+    return _normalise(out, 0.6)
+
+
 FILES = {
     "engine_hum.wav": engine_hum,
     "dust_hiss.wav": dust_hiss,
@@ -338,6 +354,7 @@ FILES = {
     "lock_ready.wav": lock_ready,
     "missile_warning.wav": missile_warning,
     "flare_launch.wav": flare_launch,
+    "loot_pickup.wav": loot_pickup,
 }
 
 

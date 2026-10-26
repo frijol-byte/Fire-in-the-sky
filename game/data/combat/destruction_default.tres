@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="DestructionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/defs/destruction_def.gd" id="1_def"]
+
+[resource]
+script = ExtResource("1_def")
+id = &"default"
+fireball_radius_factor = 3.2
+fireball_min_radius = 9.0
+fireball_seconds = 1.1
+fireball_color = Color(1, 0.62, 0.2, 1)
+light_energy = 6.0
+light_range_factor = 6.0
+light_seconds = 0.9
+shockwave_factor = 1.8
+debris_count = 14
+debris_speed_min = 12.0
+debris_speed_max = 48.0
+debris_size_min = 0.08
+debris_size_max = 0.3
+debris_spin_max_deg = 220.0
+debris_lifetime = 4.5
+debris_cool_seconds = 1.6
+wreck_tumble_deg = 55.0
+wreck_fade_seconds = 2.5
+death_screen_delay = 2.0
+respawn_input_delay = 1.2

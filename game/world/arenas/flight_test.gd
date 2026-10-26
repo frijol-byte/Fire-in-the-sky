@@ -8,7 +8,10 @@ extends Node3D
 ## The ship is spawned by `spawn_player()`. The ship switcher (keyboard keys F2-F4, `SWITCH_KEYS`)
 ## calls it again with the arena's `selectable_ship_ids`. It is a demo-only stand-in; the device
 ## buttons (keys 1-3, the D-pad) belong to the ship's devices, e.g. the flares.
-## It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
+## When the player's ship is destroyed the "Ship destroyed" screen comes up and `respawn_player()`
+## puts a new ship of the same class at the start (M2-T6; insurance rules come with stations in M4).
+## Loot dropped by wrecks is picked up by the player's tractor and lands in the debug wallet on the
+## readout. It also carries the flight HUD, the tuning overlay and bug capture (`DevTools`) and the pause
 ## menu (Esc / Start), like every flight scene (M1-T6).
 
 const ARENA_ID: StringName = &"flight_test"
@@ -37,6 +40,8 @@ var gates_passed: int = 0
 var pirates: Array[Ship] = []
 
 var _pirates_called: int = 0
+## The class of the player's current ship, for the respawn.
+var _player_ship_id: StringName = &""
 
 @onready var _environment: WorldEnvironment = $WorldEnvironment
 @onready var _sun: DirectionalLight3D = $Sun
@@ -52,6 +57,7 @@ var _pirates_called: int = 0
 @onready var _help: Label = $Help
 @onready var _hud: FlightHud = $Hud/FlightHud
 @onready var _tools: DevTools = $DevTools
+@onready var _death: DeathScreen = $DeathScreen
 
 
 func _ready() -> void:
@@ -69,6 +75,8 @@ func _ready() -> void:
 	Settings.set_value(InputRouter.SETTING_FREE_LOOK, true)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	Events.input_device_changed.connect(_on_input_device_changed)
+	Events.ship_destroyed.connect(_on_ship_destroyed)
+	_death.respawn_requested.connect(respawn_player)
 	_update_help()
 	Game.set_state(Game.State.SPACE)
 	_bake_sky()
@@ -101,13 +109,15 @@ func _process(_delta: float) -> void:
 		"%s\n%s"
 		% [
 			tr("ARENA_SHIP") % [tr(ship.def.display_name_key), _switch_glyphs()],
-			tr("ARENA_GATES") % gates_passed,
+			tr("ARENA_GATES") % gates_passed + "    " + wallet_text(),
 		]
 	)
 
 
 ## Puts the player in a new ship of `ship_id` at the start, replacing the old one.
 func spawn_player(ship_id: StringName) -> Ship:
+	_death.close()
+	_player_ship_id = ship_id
 	if ship != null:
 		# Out of the tree at once, so the old body cannot push against the new one.
 		remove_child(ship)
@@ -131,6 +141,24 @@ func spawn_player(ship_id: StringName) -> Ship:
 	_hud.bind(ship)
 	_tools.bind(ship, _rig)
 	return ship
+
+
+## Puts a new ship of the player's last class at the start (the "Ship destroyed" screen calls it).
+func respawn_player() -> Ship:
+	return spawn_player(_player_ship_id if _player_ship_id != &"" else def.spawn_ship_id)
+
+
+## The debug wallet as one line: credits, then each material held.
+func wallet_text() -> String:
+	var held: PackedStringArray = []
+	for id: StringName in GameState.materials:
+		if GameState.materials[id] > 0:
+			var key: String = "MATERIAL_%s" % String(id).to_upper()
+			held.append(tr(key) % GameState.materials[id])
+	return (
+		tr("ARENA_WALLET")
+		% [GameState.credits, "  ".join(held) if not held.is_empty() else tr("ARENA_WALLET_NONE")]
+	)
 
 
 ## Calls in a hostile AI fighter ahead of the player, one profile further up `PIRATE_PROFILES` each
@@ -159,6 +187,19 @@ func call_pirate() -> Ship:
 	pirate.add_child(pilot)
 	pirates.append(pirate)
 	return pirate
+
+
+func _on_ship_destroyed(node: Node, info: DamageInfo) -> void:
+	if node == ship:
+		# The cockpit view would show the inside of a wreck; the chase camera watches it blow up.
+		_rig.set_view(CameraRig.View.CHASE)
+		var look: DestructionDef = Content.destruction()
+		_death.arm(
+			look.death_screen_delay, look.respawn_input_delay, _death.cause_text(info.source)
+		)
+	elif node is Ship:
+		# A dead pirate is no longer in play, whenever its wreck is finally removed.
+		pirates.erase(node as Ship)
 
 
 ## Makes every pirate hunt `new_target` (the player's new ship after a ship switch).

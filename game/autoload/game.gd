@@ -8,6 +8,7 @@ enum State { BOOT, MENU, SPACE, STATION }
 ## Scenes the flow switches between.
 const BOOT_SCENE: String = "res://core/boot/boot.tscn"
 const FLIGHT_TEST_SCENE: String = "res://world/arenas/flight_test.tscn"
+const COMBAT_TEST_SCENE: String = "res://world/arenas/combat_test.tscn"
 
 var state: State = State.BOOT
 
@@ -23,6 +24,11 @@ func set_state(new_state: State) -> void:
 ## Leaves the title screen for the flight test arena.
 func go_to_flight_test() -> void:
 	_change_scene(FLIGHT_TEST_SCENE)
+
+
+## Leaves the title screen for the combat test arena (waves of pirates).
+func go_to_combat_test() -> void:
+	_change_scene(COMBAT_TEST_SCENE)
 
 
 ## Goes back to the title screen.

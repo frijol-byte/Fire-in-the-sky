@@ -67,6 +67,7 @@ ARENA_HELP_DRIFT,    %s drift
 ARENA_HELP_PIRATE,"%s call in a pirate (rookie, standard, ace)    %s send them away"
 ARENA_HELP_SECONDARY,"%s secondary (hold to lock, release to launch)    flares: %s"
 BOOT_FLY_HINT,%s: fly the flight test arena
+BOOT_COMBAT_HINT,%s: fight pirates in the combat test
 HUD_SPEED,%.0f m/s
 HUD_FA_ON,FA ON
 HUD_FA_OFF,FA OFF

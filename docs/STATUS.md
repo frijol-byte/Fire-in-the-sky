@@ -4,31 +4,16 @@
 > session's briefing.
 
 ## Now
-- **Phase:** M1 — Flight: review gate ✅ clean (`docs/reviews/M1.md`); **owner playtest
-  waiting**. The M0 playtest hasn't been reported yet; the M1 build covers it too (below).
-- **What to start next:** M1-F1 (new pad layout, sharper thrusters) is merged; the build to playtest
-  now also has **guns** (M2-T2: fire on **A** / **X**, boost on **L3**; shoot the target dummies in
-  the arena). **M2-T3** (targeting, lead indicator, aim assist) is merged: target button (**Y**: tap /
-  double-tap), brackets, the lead ring and aim assist. **M2-T4** (secondaries: Homing Missile, Rocket Pod,
-  Flares, incoming-missile warning) is merged: **X** = secondary (hold on a locked target, release to
-  launch the missile; press for a rocket salvo) and flares on device slot 1 (key **1** / D-pad up). The
-  arena's ship switcher moved to the **F2 / F3 / F4** keys. **M2-T5** (basic AI pilot; PR open) adds AI
-  pilots: in the flight arena press **F5** to call in a hostile fighter (rookie, then standard, then ace) and
-  **F6** to send them away. **M2-T6** (destruction, loot & respawn stub; PR open) makes ships blow up: the
-  wreck tumbles and fades, the fighter drops loot containers that your tractor pulls in (credits and scrap show on
-  the arena readout), and when *you* die a "Ship destroyed" screen lets you respawn at the start.
-  **M2-T7** (combat HUD, feedback & encounter test; PR open) adds the **combat test arena** (scene
-  `world/arenas/combat_test.tscn`; waves of 1, 2 then 3 Cinder Clans pirates, **F7** wave menu), pirate ships,
-  hit markers, damage indicators, shield/armor/hull bars, a low-shield alarm, kill confirmation, camera shake and
-  radio barks on a comms strip. That completes M2's cards; the **M2 review gate** is next.
+- **Phase:** M2 — Combat core: review gate ✅ clean after one fix (`docs/reviews/M2.md`); **owner playtest
+  waiting**. The M0 and M1 checklists have not been ticked yet either; the M2 build covers all three.
+- **What to start next:** after the M2 playtest report is triaged, **M3** (AI depth & challenge). Its cards
+  carry "Notes from the M2 gate". Fix-up cards from the playtest (`M2-F<k>`) come first if there are any.
 - **Owner actions waiting:**
-  0. Merge the M1 review-gate PR, then **publish the `playtest-M1` release** from GitHub's
-     Releases page (`docs/guides/owner-quickstart.md` §5, "Publish a playtest release
-     yourself"). When the release run is green, download it and play with a gamepad for
-     ~20 minutes using the checklist at the bottom of `docs/tasks/M1-flight.md`. While the
-     game starts, tick the four M0 lines at the bottom of `docs/tasks/M0-foundation.md` too
-     (Windows start, turning ship on the title screen, version, your opinion of the shapes):
-     one session covers both milestones.
+  0. Merge the M2 review-gate PR, then **publish the `playtest-M2` release** from GitHub's Releases page
+     (`docs/guides/owner-quickstart.md` §5). When the release run is green, download it, press **A** on the
+     title screen (the combat test) and play with a gamepad for ~25 minutes using the checklist at the bottom of
+     `docs/tasks/M2-combat-core.md`. Controls are in the release notes below. If you have time, tick the M1
+     (`docs/tasks/M1-flight.md`, press **Y** for the flight arena) and M0 checklists too.
   1. If not done yet: turn on branch protection for `main` requiring the `check-and-build`
      check (clicks are in the M0-T4 PR description, #6).
   2. Read `docs/05-lore-primer.md` and `docs/00-decisions.md` "Defaults" whenever
@@ -40,7 +25,7 @@
 |---|---|---|---|---|
 | M0 | Foundation | 🧪 playtest | ✅ [M0](reviews/M0.md) | `playtest-M0` |
 | M1 | Flight | 🧪 playtest | ✅ [M1](reviews/M1.md) | `playtest-M1` |
-| M2 | Combat core | ⬜ | — | — |
+| M2 | Combat core | 🧪 playtest | ✅ [M2](reviews/M2.md) | `playtest-M2` |
 | M3 | AI depth & challenge | ⬜ | — | — |
 | M4 | World & stations | ⬜ | — | — |
 | M5 | Economy & upgrades | ⬜ | — | — |
@@ -73,7 +58,7 @@
 | M1-T5 | Flight arena & sense of speed | T2, T4 | ✅ | #15 |
 | M1-T6 | Flight HUD v0, tuning overlay & bug capture | T3 | ✅ | #14 |
 | M1-T7 | Three ship profiles + ship switcher | T5 | ✅ | #16 |
-| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | 👀 | #19 |
+| M1-F1 | Gamepad layout: throttle on triggers, thrusters on left stick, sharper thrusters | M1 gate | ✅ | #19 |
 
 ## M2 tasks (Combat core)
 
@@ -83,9 +68,9 @@
 | M2-T2 | Weapons framework + Pulse Laser + Autocannon | T1 | ✅ | #21 |
 | M2-T3 | Targeting, lead indicator & aim assist | T2 | ✅ | #22 |
 | M2-T4 | Secondaries & countermeasures | T3 | ✅ | #23 |
-| M2-T5 | Basic AI pilot | T3 | 👀 | #24 |
-| M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | 👀 | #25 |
-| M2-T7 | Combat HUD, feedback & encounter test | T2–T6 | 👀 | #26 |
+| M2-T5 | Basic AI pilot | T3 | ✅ | #24 |
+| M2-T6 | Destruction, loot & insurance respawn (stub) | T1, T5 | ✅ | #25 |
+| M2-T7 | Combat HUD, feedback & encounter test | T2–T6 | ✅ | #26 |
 
 States: ⬜ not started · 🔨 in progress · 👀 PR open · ✅ merged · ⛔ blocked · 🧪 owner playtest
 
@@ -498,43 +483,6 @@ and keep all notes bullets from both sides.
   - The tuning overlay still has the thrust sliders; if the owner re-tunes thrust, update `strafe_response_time`
     to match or `test_flight_lateral` will tell you.
 
-## Release notes
-_(Filled per milestone; release.yml copies the matching section.)_
-
-### M0 Foundation (playtest-M0)
-The first playable build. There's no gameplay yet: this checks that the whole pipeline
-works, from script-generated ship to a Windows build.
-
-- The boot screen shows the placeholder fighter turning slowly in space. Every 3 seconds it
-  switches upgrade tier (Stock → Armored → Boosted → Elite), and the parts change: armour
-  plates, then extra engine pods, then longer wings.
-- The version number is in the bottom-left corner.
-- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
-  **More info → Run anyway**. Close the window to quit.
-- Playtest checklist: bottom of `docs/tasks/M0-foundation.md`.
-
-### M1 Flight (playtest-M1)
-The first build you can fly. Press **Y** on the gamepad (G on the keyboard) on the title screen to
-enter the flight test arena: an amber nebula, an asteroid belt and a course of ring gates.
-
-- **Fly:** **RT** is throttle, **LT** brakes and reverses, the left stick strafes (left/right) and
-  moves up/down, the right stick turns, bumpers roll. **A** boosts (it drains the energy bar),
-  **R3** switches between the chase and cockpit views. Drift (flight assist off) has no gamepad
-  button for now; hold **Shift** on a keyboard (the green marker shows where you are really going).
-  The side and up/down thrusters respond about three times faster than the first M1 build.
-- **Three ships (demo only; the D-pad belongs to devices from M2):** D-pad up / right / down (keys 1 / 2 / 3) puts you in the Kestrel (light
-  fighter), the Bulwark (heavy fighter) or the Drayman (armed freighter).
-- **Tuning:** Select (F1) opens the tuning overlay and pauses. Move the sliders, fly, and press
-  "Copy values" when something feels right; paste the text into your playtest report.
-- **Bug capture:** Back + Start (F12) saves a screenshot and the game state. The pause menu
-  (Start / Esc) opens the folder.
-- **Free look:** hold Z (or back paddle 3, if your pad has paddles) and look around with the right
-  stick or mouse. Up/down thrust is R / F (left stick up / down on the gamepad).
-- **Mouse and keyboard** work too: the mouse steers (a small dot shows how far), WASD moves.
-- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
-  **More info → Run anyway**.
-- Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
-
 - M2-T7 (2026-10-26): combat HUD, feedback, pirates and the encounter test. Things the next session must know:
   - **Combat test arena:** `CombatTest` (`world/arenas/combat_test.gd`) *extends* `FlightTest` (same ship, camera, HUD, tools,
     respawn); the scene sets `arena_id = &"combat_test"` (`data/arenas/combat_test.tres`: no gates or dummies, a sparse belt).
@@ -778,3 +726,72 @@ enter the flight test arena: an amber nebula, an asteroid belt and a course of r
     can call `durability().restore()` on respawn.
   - `BugReport.ship_state` now has shield/armor/hull, their capacities and `devices_disabled`. The F1 tuning overlay has
     no durability sliders yet.
+
+- M2 gate (2026-10-27): review in `docs/reviews/M2.md`. Things the next session must know:
+  - **Title screen:** **A** (left click) opens the combat test arena (`Game.go_to_combat_test()`), **Y** (G) the flight
+    test arena. Before the gate the combat arena could not be reached in a build at all. `Boot.destination_for(event)`
+    is the pure rule (`test_boot.gd`); the boot scene reads `_input`, because its full-screen root `Control` swallows clicks.
+  - The M3 cards now carry "Notes from the M2 gate" (where AI roles, squads, difficulty and the director plug into
+    what M2 built). Read them before starting M3.
+  - The balance stand-in (an ace AI flying the Kestrel) still **loses wave 3**; the owner's playtest decides whether 1v3
+    needs softening (`data/encounters/combat_test.tres` first).
+
+## Release notes
+_(Filled per milestone; release.yml copies the matching section.)_
+
+### M0 Foundation (playtest-M0)
+The first playable build. There's no gameplay yet: this checks that the whole pipeline
+works, from script-generated ship to a Windows build.
+
+- The boot screen shows the placeholder fighter turning slowly in space. Every 3 seconds it
+  switches upgrade tier (Stock → Armored → Boosted → Elite), and the parts change: armour
+  plates, then extra engine pods, then longer wings.
+- The version number is in the bottom-left corner.
+- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
+  **More info → Run anyway**. Close the window to quit.
+- Playtest checklist: bottom of `docs/tasks/M0-foundation.md`.
+
+### M1 Flight (playtest-M1)
+The first build you can fly. Press **Y** on the gamepad (G on the keyboard) on the title screen to
+enter the flight test arena: an amber nebula, an asteroid belt and a course of ring gates.
+
+- **Fly:** **RT** is throttle, **LT** brakes and reverses, the left stick strafes (left/right) and
+  moves up/down, the right stick turns, bumpers roll. **A** boosts (it drains the energy bar),
+  **R3** switches between the chase and cockpit views. Drift (flight assist off) has no gamepad
+  button for now; hold **Shift** on a keyboard (the green marker shows where you are really going).
+  The side and up/down thrusters respond about three times faster than the first M1 build.
+- **Three ships (demo only; the D-pad belongs to devices from M2):** D-pad up / right / down (keys 1 / 2 / 3) puts you in the Kestrel (light
+  fighter), the Bulwark (heavy fighter) or the Drayman (armed freighter).
+- **Tuning:** Select (F1) opens the tuning overlay and pauses. Move the sliders, fly, and press
+  "Copy values" when something feels right; paste the text into your playtest report.
+- **Bug capture:** Back + Start (F12) saves a screenshot and the game state. The pause menu
+  (Start / Esc) opens the folder.
+- **Free look:** hold Z (or back paddle 3, if your pad has paddles) and look around with the right
+  stick or mouse. Up/down thrust is R / F (left stick up / down on the gamepad).
+- **Mouse and keyboard** work too: the mouse steers (a small dot shows how far), WASD moves.
+- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
+  **More info → Run anyway**.
+- Playtest checklist: bottom of `docs/tasks/M1-flight.md`.
+
+### M2 Combat core (playtest-M2)
+The first build with fighting. On the title screen press **A** for the **combat test** (waves of Cinder Clans
+pirates), or **Y** for the flight test arena from M1 (target dummies to shoot, and F5 calls in a pirate).
+
+- **Combat test:** waves of 1, then 2, then 3 pirates arrive around you a few seconds apart and keep looping.
+  Destroyed pirates drop loot crates that your tractor pulls in (the credits show top left). If you die, the
+  "Ship destroyed" screen comes up: press **A** to respawn, and the wave you died in starts over.
+- **Fight (gamepad):** **A** fires the guns (watch the heat bar), **X** is the secondary: on the Kestrel *hold* X on a
+  locked target until the beeping turns into a steady tone, then let go to launch a homing missile; on the Bulwark,
+  press X for a rocket salvo. **Y** targets the nearest enemy in front of you (tap again to cycle, double-tap for the
+  nearest of anything). **D-pad up** throws flares when "MISSILE" flashes. Boost is now **L3** (left stick click).
+- **Reading the fight:** the ring ahead of a target is where to shoot (lead indicator); hit markers show shield
+  (cyan), armor (amber) or hull (white) hits; red arcs round the centre show where shots come from; your shield,
+  armor and hull bars are bottom centre; pirate radio chatter appears on the comms strip.
+- **Ships:** you start in the Kestrel (pulse laser + homing missiles). To compare guns, press **F3** on a keyboard
+  for the Bulwark (autocannon + rockets) or **F4** for the Drayman (autocannon + missiles); **F2** is the Kestrel.
+- **Keyboard extras:** **F7** opens the wave menu (pick a wave, restart, skip, send them away, slow-motion on the last
+  kill). Select / F1 is still the tuning overlay and Back + Start / F12 the bug capture.
+- **Mouse and keyboard:** left click fires, right click is the secondary, T targets, 1 throws flares.
+- Windows: unzip and run the `.exe`. SmartScreen warns because the game isn't signed: click
+  **More info → Run anyway**.
+- Playtest checklist: bottom of `docs/tasks/M2-combat-core.md`.

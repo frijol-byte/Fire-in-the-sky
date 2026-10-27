@@ -785,8 +785,9 @@ pirates), or **Y** for the flight test arena from M1 (target dummies to shoot, a
   press X for a rocket salvo. **Y** targets the nearest enemy in front of you (tap again to cycle, double-tap for the
   nearest of anything). **D-pad up** throws flares when "MISSILE" flashes. Boost is now **L3** (left stick click).
 - **Reading the fight:** the ring ahead of a target is where to shoot (lead indicator); hit markers show shield
-  (cyan), armor (amber) or hull (white) hits; red arcs round the centre show where shots come from; your shield,
-  armor and hull bars are bottom centre; pirate radio chatter appears on the comms strip.
+  (cyan), armor (amber) or hull (white) hits; arcs round the centre show where shots come from (same colours: which
+  of your layers was hit); your shield, armor and hull bars are bottom left, the target's top right; pirate radio
+  chatter appears on the left.
 - **Ships:** you start in the Kestrel (pulse laser + homing missiles). To compare guns, press **F3** on a keyboard
   for the Bulwark (autocannon + rockets) or **F4** for the Drayman (autocannon + missiles); **F2** is the Kestrel.
 - **Keyboard extras:** **F7** opens the wave menu (pick a wave, restart, skip, send them away, slow-motion on the last

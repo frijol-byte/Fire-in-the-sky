@@ -101,13 +101,14 @@ func test_shots_cost_energy_and_stop_when_it_runs_out() -> void:
 	var weapon: WeaponDef = Content.weapon(ship.def.primary_weapon)
 	var power: PowerSystem = ship.power()
 	power.regen_per_second = 0.0
-	power.energy = weapon.energy_cost * 5.0 + 0.5
+	var left_over: float = weapon.energy_cost * 0.5
+	power.energy = weapon.energy_cost * 5.0 + left_over
 	await CombatSim.settle(get_tree())
 	_hold_fire(ship)
 	await SimHelper.step_physics(get_tree(), 120)
-	# Exactly five shots were paid for; the half left over buys nothing.
+	# Exactly five shots were paid for; the half shot left over buys nothing.
 	assert_int(manager.spawned_total).is_equal(5)
-	assert_float(power.energy).is_equal_approx(0.5, 0.001)
+	assert_float(power.energy).is_equal_approx(left_over, 0.001)
 	assert_bool(ship.weapons().energy_starved).is_true()
 
 
@@ -251,19 +252,21 @@ func test_laser_and_autocannon_hit_a_dummy_with_their_own_damage_math() -> void:
 	var log: CombatSim.HitLog = CombatSim.HitLog.new()
 	log.attach(manager)
 	# One laser shot, then one autocannon shot, straight at the dummy.
-	manager.spawn(Content.weapon(&"pulse_laser"), null, Vector3.ZERO, Vector3(0, 0, -1))
+	var laser: WeaponDef = Content.weapon(&"pulse_laser")
+	var cannon: WeaponDef = Content.weapon(&"autocannon")
+	manager.spawn(laser, null, Vector3.ZERO, Vector3(0, 0, -1))
 	await CombatSim.run_until_hits(get_tree(), log, 1, 100)
 	var table: DamageTable = Content.damage_table()
 	var laser_loss: float = dummy.def.shield_capacity - dummy.durability().shield
 	assert_float(laser_loss).is_equal_approx(
-		8.0 * table.multiplier(DamageInfo.Type.ENERGY, DamageTable.Layer.SHIELD), 0.001
+		laser.damage * table.multiplier(DamageInfo.Type.ENERGY, DamageTable.Layer.SHIELD), 0.001
 	)
 	var shield_before: float = dummy.durability().shield
-	manager.spawn(Content.weapon(&"autocannon"), null, Vector3.ZERO, Vector3(0, 0, -1))
+	manager.spawn(cannon, null, Vector3.ZERO, Vector3(0, 0, -1))
 	await CombatSim.run_until_hits(get_tree(), log, 2, 100)
 	var cannon_loss: float = shield_before - dummy.durability().shield
 	assert_float(cannon_loss).is_equal_approx(
-		4.0 * table.multiplier(DamageInfo.Type.KINETIC, DamageTable.Layer.SHIELD), 0.001
+		cannon.damage * table.multiplier(DamageInfo.Type.KINETIC, DamageTable.Layer.SHIELD), 0.001
 	)
 	# Kinetic does less to a shield than energy does, and the reverse against armor.
 	assert_float(cannon_loss).is_less(laser_loss)

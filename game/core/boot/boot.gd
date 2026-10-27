@@ -1,6 +1,7 @@
 extends Control
 ## Boot scene: the test Kestrel turning slowly against a dark-blue sky, stepping through its
-## upgrade tiers, with the title, the tier name and the version label on top.
+## upgrade tiers, with the title, the tier name and the version label on top. Two buttons leave
+## it: `COMBAT_ACTION` for the combat test arena and `FLY_ACTION` for the flight test arena.
 
 const VERSION_PATH: String = "res://version.txt"
 const DEV_VERSION: String = "dev"
@@ -11,6 +12,8 @@ const TIER_INTERVAL: float = 3.0
 const TURN_SPEED: float = 0.45
 ## The action that leaves the title screen for the flight test arena.
 const FLY_ACTION: StringName = &"interact"
+## The action that leaves the title screen for the combat test arena (A / left click).
+const COMBAT_ACTION: StringName = &"fire_primary"
 const TIER_NAME_KEYS: Array[StringName] = [
 	&"TIER_NAME_0", &"TIER_NAME_1", &"TIER_NAME_2", &"TIER_NAME_3"
 ]
@@ -43,9 +46,24 @@ func _process(delta: float) -> void:
 		_show_tier(next_tier(_tier))
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(FLY_ACTION) and not event.is_echo():
-		Game.go_to_flight_test()
+# `_input`, not `_unhandled_input`: the full-screen root Control would swallow a mouse click.
+func _input(event: InputEvent) -> void:
+	match destination_for(event):
+		Game.COMBAT_TEST_SCENE:
+			Game.go_to_combat_test()
+		Game.FLIGHT_TEST_SCENE:
+			Game.go_to_flight_test()
+
+
+## The scene a title-screen `event` leads to, or "" when it leads nowhere.
+static func destination_for(event: InputEvent) -> String:
+	if event.is_echo():
+		return ""
+	if event.is_action_pressed(COMBAT_ACTION):
+		return Game.COMBAT_TEST_SCENE
+	if event.is_action_pressed(FLY_ACTION):
+		return Game.FLIGHT_TEST_SCENE
+	return ""
 
 
 ## Returns the tier that follows `tier`, wrapping from the highest back to 0.
@@ -73,7 +91,11 @@ func _show_tier(tier: int) -> void:
 
 
 func _update_fly_hint() -> void:
-	_fly_hint.text = tr("BOOT_FLY_HINT") % InputRouter.glyph_for(FLY_ACTION)
+	_fly_hint.text = (
+		tr("BOOT_COMBAT_HINT") % InputRouter.glyph_for(COMBAT_ACTION)
+		+ "\n"
+		+ tr("BOOT_FLY_HINT") % InputRouter.glyph_for(FLY_ACTION)
+	)
 
 
 func _on_input_device_changed(_device: int) -> void:

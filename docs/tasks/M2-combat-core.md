@@ -183,7 +183,8 @@ great and reads clearly.
 ---
 
 ## M2 review gate & playtest checklist
-Play the combat test with a gamepad for ~25 minutes:
+Play the combat test with a gamepad for ~25 minutes (press **A** on the title screen; the controls are in the
+`playtest-M2` release notes). To compare the laser and the autocannon, F3 on a keyboard switches to the Bulwark:
 - [ ] Is shooting satisfying? (sound, hit feedback, explosions)
 - [ ] Can you always tell where enemies are and who is shooting you?
 - [ ] Does the lead indicator help? Is aim assist too strong or too weak?

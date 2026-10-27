@@ -735,6 +735,11 @@ and keep all notes bullets from both sides.
     what M2 built). Read them before starting M3.
   - The balance stand-in (an ace AI flying the Kestrel) still **loses wave 3**; the owner's playtest decides whether 1v3
     needs softening (`data/encounters/combat_test.tres` first).
+- M2 tuning (2026-10-27, owner playtest feedback "guns drain energy way too fast and don't feel impactful"):
+  pulse laser energy per shot 2.0 -> 0.4 (a pair now costs 3.2 / s, ~30 s of firing from a full Kestrel), and damage
+  doubled on both guns (laser 8 -> 16, autocannon 4 -> 8). Pirates use the same `WeaponDef`s, so they hit twice as
+  hard too. Ace stand-in (`test_combat_waves_long`): wave 1 in 9 s (was 13), wave 2 in 29 s (was 52) with more armor
+  lost, wave 3 still lost (31 s). GDD 7.2 table updated. `test_weapon_sim.gd` now reads damage and cost from the defs.
 
 ## Release notes
 _(Filled per milestone; release.yml copies the matching section.)_
